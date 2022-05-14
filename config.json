@@ -1,4 +1,6 @@
 {
     "rpc_endpoint":"https://lisbon.net.solidwallet.io/api/v3",
-    "nid": "0x2"
+    "rpc_debug_endpoint": "https://lisbon.net.solidwallet.io/api/v3d",
+    "nid": "0x2",
+    "ZERO_ADDRESS": "cx0000000000000000000000000000000000000000"
 } 

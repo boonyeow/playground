@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: true,
+    reactStrictMode: false, //was true
     images: {
         formats: ["image/avif", "image/webp"],
     },

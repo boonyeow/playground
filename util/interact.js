@@ -1,4 +1,4 @@
-import IconService from "icon-sdk-js/build/icon-sdk-js.web.min.js";
+import IconService from "icon-sdk-js";
 import cfg from "../config.json";
 
 const {
@@ -44,6 +44,49 @@ class ICONexConnection {
             );
         });
     }
+}
+
+export async function estimateStepsforDeployment(from, content, params) {
+    const timestampInDecimal = Date.now() * 1000;
+    const timestamp = "0x" + timestampInDecimal.toString(16); //to hex string
+    const txObj = {
+        jsonrpc: "2.0",
+        method: "debug_estimateStep",
+        id: 1234,
+        params: {
+            version: "0x3",
+            from,
+            to: cfg.ZERO_ADDRESS, //selectedNetworkData.CONTRACT_DEPLOY_ADDRESS,
+            timestamp,
+            nid: cfg.nid,
+            nonce: "0x1",
+            dataType: "deploy",
+            data: {
+                contentType: "application/java",
+                content, // compressed SCORE data
+                params,
+            },
+        },
+    };
+    try {
+        const responsePromise = await fetch(cfg.rpc_debug_endpoint, {
+            method: "POST",
+            body: JSON.stringify(txObj),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        const responseJSON = await responsePromise.json();
+
+        return responseJSON.result;
+    } catch (err) {
+        console.error("FETCH:", err);
+        throw err;
+    }
+}
+
+export function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export default ICONexConnection;
