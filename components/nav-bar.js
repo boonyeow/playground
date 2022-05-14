@@ -116,7 +116,7 @@ const Navbar = () => {
                 >
                     <HStack>
                         <Heading my="auto" color="#383838" size="xl">
-                            launchpad.
+                            <NextLink href="/">launchpad.</NextLink>
                         </Heading>
                     </HStack>
 

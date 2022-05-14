@@ -1,3 +1,4 @@
 {
-    "rpc_endpoint":"https://ctz.solidwallet.io/api/v3"
+    "rpc_endpoint":"https://lisbon.net.solidwallet.io/api/v3",
+    "nid": "0x2"
 } 

@@ -1,12 +1,21 @@
 import IconService from "icon-sdk-js/build/icon-sdk-js.web.min.js";
 import cfg from "../config.json";
 
-const { IconConverter, IconBuilder, HttpProvider } = IconService;
+const {
+    IconConverter,
+    IconBuilder,
+    HttpProvider,
+    SignedTransaction,
+    IconWallet,
+} = IconService;
 
 class ICONexConnection {
     constructor() {
         this.httpProvider = new HttpProvider(cfg.rpc_endpoint);
-        this.iconService = new IconService(this.provider);
+        this.iconService = new IconService(this.httpProvider);
+        this.wallet = IconService.IconWallet.loadPrivateKey(
+            "4e53d8d26fcb04f1f36b0e0659c19ccf9e2b5c4faea25b29dd084033c7b48dbd"
+        );
     }
 
     getWalletAddress() {
