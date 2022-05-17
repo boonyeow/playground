@@ -1,5 +1,5 @@
 import IconService from "icon-sdk-js";
-import cfg from "../config.json";
+import cfg from "./config";
 
 const {
     IconConverter,
@@ -11,7 +11,7 @@ const {
 
 class ICONexConnection {
     constructor() {
-        this.httpProvider = new HttpProvider(cfg.rpc_endpoint);
+        this.httpProvider = new HttpProvider(cfg.NODE_URL);
         this.iconService = new IconService(this.httpProvider);
         this.wallet = IconService.IconWallet.loadPrivateKey(
             "4e53d8d26fcb04f1f36b0e0659c19ccf9e2b5c4faea25b29dd084033c7b48dbd"
@@ -56,9 +56,9 @@ export async function estimateStepsforDeployment(from, content, params) {
         params: {
             version: "0x3",
             from,
-            to: cfg.ZERO_ADDRESS, //selectedNetworkData.CONTRACT_DEPLOY_ADDRESS,
+            to: cfg.SCORE_INSTALL_ADDRESS, //selectedNetworkData.CONTRACT_DEPLOY_ADDRESS,
             timestamp,
-            nid: cfg.nid,
+            nid: cfg.NID,
             nonce: "0x1",
             dataType: "deploy",
             data: {
@@ -69,7 +69,7 @@ export async function estimateStepsforDeployment(from, content, params) {
         },
     };
     try {
-        const responsePromise = await fetch(cfg.rpc_debug_endpoint, {
+        const responsePromise = await fetch(cfg.DEBUG_URL, {
             method: "POST",
             body: JSON.stringify(txObj),
             headers: {

@@ -6,10 +6,12 @@ import {
     Stack,
     Button,
     Heading,
+    Flex,
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import FeaturedCollection from "../FeaturedCollection";
-import CollectionGrid from "../CollectionGrid";
+import CollectionCarousel from "../CollectionCarousel";
+import NextLink from "next/link";
 
 const HomeContent = () => {
     return (
@@ -79,8 +81,8 @@ const HomeContent = () => {
 
                 <Box
                     w={{
-                        base: "100%",
-                        sm: "100%",
+                        base: "90%",
+                        sm: "90%",
                         md: "90%",
                         lg: "35%",
                         xl: "40%",
@@ -90,10 +92,10 @@ const HomeContent = () => {
                     borderRadius="1rem"
                 >
                     <FeaturedCollection
-                        height={["30rem", "25rem", "30rem"]}
+                        height={["20rem", "25rem", "30rem", "25rem", "30rem"]}
                         src="/../public/7.avif"
                         collectionLabel="Featured"
-                        collectionTitle="Bored Ape Yacht ClubBored Ape Yacht ClubBored Ape Yacht Club"
+                        collectionTitle="Bored Ape Yacht ClubBored Ape Yacht ClubBored Ape Yacht Club  Ape Yacht Club  Ape Yacht Club  Ape Yacht Club  Ape Yacht Club"
                         collectionOwner="@bytan"
                         mintPrice="150"
                     />
@@ -101,31 +103,20 @@ const HomeContent = () => {
             </Stack>
 
             <Box padding="5rem">
-                <Heading textAlign={"center"}>Upcoming Projects</Heading>
-                <HStack pt="1rem">
-                    {/* <Box
-                        w={{
-                            base: "100%",
-                            sm: "100%",
-                            md: "90%",
-                            lg: "35%",
-                            xl: "40%",
-                        }}
-                        h={"80%"}
-                        mb={{ base: 12, md: 0 }}
-                        borderRadius="1rem"
+                <Flex justifyContent={"space-between"} alignItems="center">
+                    <Heading textAlign={"left"}>Upcoming Projects</Heading>
+
+                    <Heading
+                        textAlign={"right"}
+                        fontSize="md"
+                        alignItems={"center"}
+                        fontWeight="500"
+                        color="gray.500"
                     >
-                        <FeaturedCollection
-                            height={["30rem", "25rem", "30rem"]}
-                            src="/../public/7.avif"
-                            collectionLabel="Featured"
-                            collectionTitle="Bored Ape Yacht ClubBored Ape Yacht ClubBored Ape Yacht Club"
-                            collectionOwner="@bytan"
-                            mintPrice="150"
-                        />
-                    </Box> */}
-                    <CollectionGrid />
-                </HStack>
+                        <NextLink href="/collection">View all</NextLink>
+                    </Heading>
+                </Flex>
+                <CollectionCarousel />
             </Box>
         </>
     );

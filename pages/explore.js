@@ -1,5 +1,5 @@
 import { Box, Heading, HStack, VStack } from "@chakra-ui/react";
-import Navbar from "../components/nav-bar";
+import Navbar from "../components/Navbar";
 
 export default function Explore() {
     return (

@@ -1,16 +1,16 @@
 import { Box, Heading, Text, VStack, Button, Flex } from "@chakra-ui/react";
 import NextImage from "next/image";
 
-const FeaturedCollection = (props) => {
+const SingleCollection = (props) => {
     return (
         <>
             <Box
                 height={props.height}
+                width={props.width}
                 margin="1rem"
-                width="auto"
                 rounded="1rem"
                 position="relative"
-                boxShadow={"2xl"}
+                boxShadow={"lg"}
             >
                 <NextImage
                     src={props.src}
@@ -37,10 +37,7 @@ const FeaturedCollection = (props) => {
             </Box>
             <Box p="1rem 2rem">
                 <Flex width="100%">
-                    <VStack
-                        alignItems={"start"}
-                        width={["60%", "80%", "80%", "60%", "60%"]}
-                    >
+                    <VStack alignItems={"start"} width={"100%"}>
                         <Heading
                             fontSize="lg"
                             lineHeight={"1"}
@@ -60,23 +57,10 @@ const FeaturedCollection = (props) => {
                             {props.collectionOwner}
                         </Text>
                     </VStack>
-                    <Box width="100%" textAlign="end">
-                        <Button
-                            variant="homepage-button"
-                            padding="0.5rem 1rem"
-                            fontWeight="bold"
-                            ml="auto"
-                            size={"md"}
-                            rounded="2rem"
-                            marginLeft="auto"
-                        >
-                            {props.mintPrice} ICX
-                        </Button>
-                    </Box>
                 </Flex>
             </Box>
         </>
     );
 };
 
-export default FeaturedCollection;
+export default SingleCollection;

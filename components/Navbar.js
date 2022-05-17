@@ -55,7 +55,7 @@ const Navbar = () => {
             toast({
                 id,
                 title: "Connected to wallet!",
-                position: "top-right",
+                position: "bottom-right",
                 status: "success",
                 duration: 1000,
                 isClosable: true,
@@ -69,7 +69,7 @@ const Navbar = () => {
     };
 
     let loggedOutView = (
-        <Button variant="gs-button" my="auto" ml="auto" onClick={onOpen}>
+        <Button variant="homepage-button" my="auto" ml="auto" onClick={onOpen}>
             Sign In
         </Button>
     );
@@ -122,7 +122,7 @@ const Navbar = () => {
 
                     <HStack my="auto" ml="auto">
                         <HStack spacing={10} mr={10}>
-                            <NextLink href="/explore" passHref>
+                            <NextLink href="/collection" passHref>
                                 <Link fontWeight="500">Explore</Link>
                             </NextLink>
                             <NextLink href="/governance" passHref>
@@ -173,7 +173,7 @@ const Navbar = () => {
                         <Stack w="100%">
                             <Text>Don't have a wallet?</Text>
                             <Button
-                                variant="gs-button"
+                                variant="homepage-button"
                                 onClick={() => {
                                     window.open(
                                         "https://www.icondev.io/getting-started/how-to-create-an-icon-account",

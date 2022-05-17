@@ -1,0 +1,27 @@
+/* .arrow > button:before {
+    color:black;
+    font-size:50px;
+    z-index:1;
+    opacity: 100%;
+}
+
+.arrow button.slick-arrow.slick-next {
+    color:blue !important;
+    background-color: yellow;
+} */
+
+/*  
+.arrow > button{
+    right:0;
+    z-index: 1;
+} */
+
+/* .arrow .slick-arrow.slick-next {
+    display:none;
+    background-color:blue
+}*/
+
+
+.nextArrow{
+    background-color: blue;
+}
