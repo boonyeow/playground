@@ -1,6 +1,6 @@
 import { Box, IconButton } from "@chakra-ui/react";
 import NextLink from "next/link";
-import SingleCollection from "./SingleCollection";
+import { SingleCollection, SingleCollectionv2 } from "./SingleCollection";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -114,7 +114,7 @@ const CollectionCarousel = () => {
                             mb={{ base: 12, md: 0 }}
                             borderRadius="1rem"
                         >
-                            <SingleCollection
+                            <SingleCollectionv2
                                 height={[
                                     "15rem",
                                     "25rem",
@@ -141,6 +141,33 @@ const CollectionCarousel = () => {
                                 }
                                 mintPrice={currentCollection.mintPrice}
                             />
+                            {/* <SingleCollection
+                                height={[
+                                    "15rem",
+                                    "25rem",
+                                    "25rem",
+                                    "15rem",
+                                    "15rem",
+                                ]}
+                                width={[
+                                    "15rem",
+                                    "25rem",
+                                    "25rem",
+                                    "15rem",
+                                    "15rem",
+                                ]}
+                                src={currentCollection.src}
+                                collectionLabel={
+                                    currentCollection.collectionLabel
+                                }
+                                collectionTitle={
+                                    currentCollection.collectionTitle
+                                }
+                                collectionOwner={
+                                    currentCollection.collectionOwner
+                                }
+                                mintPrice={currentCollection.mintPrice}
+                            /> */}
                         </Box>
                     </NextLink>
                 ))}

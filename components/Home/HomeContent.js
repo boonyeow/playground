@@ -12,8 +12,43 @@ import { AddIcon } from "@chakra-ui/icons";
 import FeaturedCollection from "../FeaturedCollection";
 import CollectionCarousel from "../CollectionCarousel";
 import NextLink from "next/link";
+import CollectionGrid from "../CollectionGrid";
 
 const HomeContent = () => {
+    const collectionList = [
+        {
+            contractAddress: "cx23902903999",
+            src: "/../public/4.avif",
+            collectionLabel: "Featured",
+            collectionTitle: "Bored Ape Yacht ClubBored Ape",
+            collectionOwner: "@bytan",
+            mintPrice: "150",
+            shortDesc:
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic",
+        },
+        {
+            contractAddress: "cx23902903998",
+            src: "/../public/5.avif",
+            collectionLabel: "Featured",
+            collectionTitle: "Bored Ape Yacht Club",
+            collectionOwner: "@bytan",
+            mintPrice: "150",
+            shortDesc:
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic",
+        },
+
+        {
+            contractAddress: "cx23902903997",
+            src: "/../public/6.avif",
+            collectionLabel: "Featured",
+            collectionTitle:
+                "Bored Ape Yacht ClubBored Ape Yacht ClubBored Ape Yacht Club",
+            collectionOwner: "@bytan",
+            mintPrice: "150",
+            shortDesc:
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic",
+        },
+    ];
     return (
         <>
             <Stack
@@ -116,7 +151,8 @@ const HomeContent = () => {
                         <NextLink href="/collection">View all</NextLink>
                     </Heading>
                 </Flex>
-                <CollectionCarousel />
+                {/* <CollectionCarousel /> */}
+                <CollectionGrid data={collectionList} />
             </Box>
         </>
     );
