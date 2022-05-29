@@ -1,128 +1,109 @@
-import { Box, Heading, Text, VStack, Button, Flex } from "@chakra-ui/react";
+import { Box, Text, VStack, Flex } from "@chakra-ui/react";
 import NextImage from "next/image";
+import NextLink from "next/link";
 
 const SingleCollection = (props) => {
+    const data = props.data;
     return (
         <>
-            <Box
-                height={props.height}
-                width={props.width}
-                margin="1rem"
-                rounded="1rem"
-                position="relative"
-                boxShadow={"lg"}
+            <NextLink
+                href={{
+                    pathname: `/${props.path}/[cid]`,
+                    query: {
+                        cid: data.contractAddress,
+                    },
+                }}
             >
-                <NextImage
-                    src={props.src}
-                    layout="fill"
-                    objectFit="cover"
-                    style={{
-                        borderRadius: "1rem",
-                    }}
-                />
-                <Box
-                    position="absolute"
-                    zIndex={1}
-                    padding="0.5rem 1rem"
-                    margin="1rem"
-                    bgColor="rgb(0,0,0,0.2)"
-                    backdropFilter="auto"
-                    backdropBlur="sm"
-                    color="white"
-                    rounded="1rem"
-                    fontWeight="semibold"
+                <Flex
+                    w="full"
+                    alignItems="center"
+                    justifyContent="center"
+                    width="100%"
                 >
-                    {props.collectionLabel}
-                </Box>
-            </Box>
-            <Box p="1rem 2rem">
-                <Flex width="100%">
-                    <VStack alignItems={"start"} width={"100%"}>
-                        <Heading
-                            fontSize="lg"
-                            lineHeight={"1"}
-                            isTruncated
-                            fontWeight="bold"
-                            width="100%"
+                    <Box
+                        width={[
+                            96,
+                            96,
+                            96,
+                            "calc(100% - 1rem)",
+                            "calc(100% - 1rem)",
+                        ]}
+                        borderRadius="1rem"
+                        shadow="lg"
+                        transition="transform 0.2s"
+                        _hover={{
+                            cursor: "pointer",
+                            transform: "scale(1.05)",
+                            boxShadow: "var(--chakra-shadows-2xl)",
+                        }}
+                    >
+                        <Box
+                            borderRadius="1rem"
+                            position="relative"
+                            margin="0.5rem"
                         >
-                            {props.collectionTitle}
-                        </Heading>
-                        <Text
-                            lineHeight="1"
-                            mt="0"
-                            color="gray.500"
-                            fontWeight="semibold"
-                            fontSize="md"
-                        >
-                            {props.collectionOwner}
-                        </Text>
-                    </VStack>
+                            <NextImage
+                                layout="responsive"
+                                minWidth={"20rem"}
+                                minHeight="20rem"
+                                width="20rem"
+                                height="20rem"
+                                objectFit="cover"
+                                src={data.src}
+                                style={{ borderRadius: "1rem" }}
+                            ></NextImage>
+                        </Box>
+
+                        <Box px="6" pt="2" pb="4">
+                            <Box maxW={[80, 80, 80, 64, 72]} margin="auto">
+                                <Text variant="card-header" noOfLines={1}>
+                                    {data.collectionTitle}
+                                </Text>
+                            </Box>
+
+                            <Box margin={2}>
+                                <Flex justifyContent={"space-evenly"}>
+                                    <VStack alignItems="center" spacing="-0.5">
+                                        <Text variant="card-item-header">
+                                            Price
+                                        </Text>
+                                        <Text
+                                            variant="card-item-value"
+                                            noOfLines={1}
+                                        >
+                                            {data.mintPrice} {data.currency}
+                                        </Text>
+                                    </VStack>
+                                    <VStack alignItems="center" spacing="-0.5">
+                                        <Text variant="card-item-header">
+                                            Supply
+                                        </Text>
+                                        <Text
+                                            variant="card-item-value"
+                                            noOfLines={1}
+                                        >
+                                            {data.totalSupply}
+                                        </Text>
+                                    </VStack>
+                                    <VStack alignItems="center" spacing="-0.5">
+                                        <Text variant="card-item-header">
+                                            Starts In
+                                        </Text>
+                                        <Text
+                                            variant="card-item-value"
+                                            noOfLines={1}
+                                        >
+                                            1d 5h 38m
+                                        </Text>
+                                    </VStack>
+                                </Flex>
+                            </Box>
+                        </Box>
+                    </Box>
                 </Flex>
-            </Box>
+            </NextLink>
         </>
     );
 };
 
-const SingleCollectionv2 = (props) => {
-    return (
-        <>
-            <Box
-                height={props.height}
-                width={props.width}
-                margin="1rem"
-                rounded="1rem"
-                position="relative"
-                boxShadow={"lg"}
-            >
-                <NextImage
-                    src={props.src}
-                    layout="fill"
-                    objectFit="cover"
-                    style={{
-                        borderRadius: "1rem",
-                    }}
-                />
-                <Box
-                    position="absolute"
-                    zIndex={1}
-                    padding="0.5rem 1rem"
-                    margin="1rem"
-                    bgColor="rgb(0,0,0,0.2)"
-                    backdropFilter="auto"
-                    backdropBlur="sm"
-                    color="white"
-                    rounded="1rem"
-                    fontWeight="semibold"
-                >
-                    {props.collectionLabel}
-                </Box>
-            </Box>
-            <Box p="1rem 2rem">
-                <Flex width="100%">
-                    <VStack alignItems={"start"} width={"100%"}>
-                        <Heading
-                            fontSize="lg"
-                            lineHeight={"1"}
-                            isTruncated
-                            fontWeight="bold"
-                            width="100%"
-                        >
-                            {props.collectionTitle}
-                        </Heading>
-                        <Text
-                            lineHeight="1"
-                            mt="0"
-                            color="gray.500"
-                            fontWeight="semibold"
-                            fontSize="md"
-                        >
-                            {props.collectionOwner}
-                        </Text>
-                    </VStack>
-                </Flex>
-            </Box>
-        </>
-    );
-};
-
-export { SingleCollection, SingleCollectionv2 };
+export default SingleCollection;

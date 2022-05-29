@@ -1,26 +1,3 @@
-
-/* React Slick CSS */
-.slick-arrow.slick-next {
-    color: black;
-    z-index: 1;
-    right:0;
-    opacity:1;
-}
-
-.slick-arrow.slick-prev{
-    color:black;
-    z-index: 1;
-    left:0;
-    opacity:1;
-}
-
-.slick-arrow.slick-prev.slick-disabled,.slick-arrow.slick-next.slick-disabled  {
- display:none !important;
-}
-
-.slick-arrow.slick-next::before,
-.slick-arrow.slick-prev::before{
-    color:black;
-    font-size:xx-large;
-    opacity:1;
+.image-div > span{
+    border-radius: 5rem;
 }

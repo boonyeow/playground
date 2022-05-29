@@ -27,6 +27,7 @@ import {
 import NextLink from "next/link";
 import {
     AiOutlineUser,
+    AiFillDatabase,
     AiOutlineSetting,
     AiOutlineQuestion,
     AiOutlineLogout,
@@ -80,10 +81,19 @@ const Navbar = () => {
                 <Avatar size={"sm"} />
             </MenuButton>
             <MenuList>
-                <MenuItem>
-                    <Icon as={AiOutlineUser} mr="12px" />
-                    Profile
-                </MenuItem>
+                <NextLink href="/profile" passHref>
+                    <MenuItem>
+                        <Icon as={AiOutlineUser} mr="12px" />
+                        Profile
+                    </MenuItem>
+                </NextLink>
+
+                <NextLink href="/manage" passHref>
+                    <MenuItem>
+                        <Icon as={AiFillDatabase} mr="12px" />
+                        Manage Projects
+                    </MenuItem>
+                </NextLink>
                 <MenuItem>
                     <Icon as={AiOutlineSetting} mr="12px" />
                     Settings
@@ -127,9 +137,6 @@ const Navbar = () => {
                             </NextLink>
                             <NextLink href="/governance" passHref>
                                 <Link fontWeight="500">Governance</Link>
-                            </NextLink>
-                            <NextLink href="/create" passHref>
-                                <Link fontWeight="500">Create</Link>
                             </NextLink>
                         </HStack>
                         {walletAddress ? loggedInView : loggedOutView}

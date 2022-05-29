@@ -7,7 +7,7 @@ function padLeadingZeros(num, size) {
     return s;
 }
 
-function fetchContractContent(url) {
+const fetchContractContent = (url) => {
     return new Promise(async (resolve, reject) => {
         try {
             let response = await fetch(url);
@@ -29,6 +29,6 @@ function fetchContractContent(url) {
             reject(err);
         }
     });
-}
+};
 
-export default { fetchContractContent };
+export default fetchContractContent;

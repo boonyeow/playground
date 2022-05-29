@@ -7,22 +7,24 @@ import {
     Button,
     Heading,
     Flex,
+    SimpleGrid,
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
-import FeaturedCollection from "../FeaturedCollection";
-import CollectionCarousel from "../CollectionCarousel";
 import NextLink from "next/link";
-import CollectionGrid from "../CollectionGrid";
+import SingleCollection from "../SingleCollection";
+import FeaturedCollection from "../FeaturedCollection";
 
 const HomeContent = () => {
     const collectionList = [
         {
             contractAddress: "cx23902903999",
-            src: "/../public/4.avif",
+            src: "/../public/unnamed.jpg",
             collectionLabel: "Featured",
-            collectionTitle: "Bored Ape Yacht ClubBored Ape",
+            collectionTitle: "Jan Protocol",
             collectionOwner: "@bytan",
             mintPrice: "150",
+            currency: "ICX",
+            totalSupply: "1000",
             shortDesc:
                 "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic",
         },
@@ -33,6 +35,8 @@ const HomeContent = () => {
             collectionTitle: "Bored Ape Yacht Club",
             collectionOwner: "@bytan",
             mintPrice: "150",
+            currency: "ICX",
+            totalSupply: "1000",
             shortDesc:
                 "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic",
         },
@@ -45,6 +49,8 @@ const HomeContent = () => {
                 "Bored Ape Yacht ClubBored Ape Yacht ClubBored Ape Yacht Club",
             collectionOwner: "@bytan",
             mintPrice: "150",
+            currency: "ICX",
+            totalSupply: "1000",
             shortDesc:
                 "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic",
         },
@@ -123,16 +129,14 @@ const HomeContent = () => {
                         xl: "40%",
                     }}
                     h={"80%"}
+                    maxW={96}
                     mb={{ base: 12, md: 0 }}
                     borderRadius="1rem"
                 >
                     <FeaturedCollection
                         height={["20rem", "25rem", "30rem", "25rem", "30rem"]}
-                        src="/../public/7.avif"
-                        collectionLabel="Featured"
-                        collectionTitle="Bored Ape Yacht ClubBored Ape Yacht ClubBored Ape Yacht Club  Ape Yacht Club  Ape Yacht Club  Ape Yacht Club  Ape Yacht Club"
-                        collectionOwner="@bytan"
-                        mintPrice="150"
+                        src="/../public/unnamed.jpg"
+                        data={collectionList[0]}
                     />
                 </Box>
             </Stack>
@@ -151,8 +155,18 @@ const HomeContent = () => {
                         <NextLink href="/collection">View all</NextLink>
                     </Heading>
                 </Flex>
-                {/* <CollectionCarousel /> */}
-                <CollectionGrid data={collectionList} />
+                <SimpleGrid
+                    columns={[1, 1, 1, 3, 3]}
+                    spacing={[5, 5, 5, 5, 5]}
+                    py="2rem"
+                >
+                    {collectionList.map((currentCollection, index) => (
+                        <SingleCollection
+                            data={currentCollection}
+                            key={index}
+                        />
+                    ))}
+                </SimpleGrid>
             </Box>
         </>
     );
