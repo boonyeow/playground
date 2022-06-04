@@ -114,8 +114,16 @@ const Collection = () => {
                                             (currentCollection, index) => (
                                                 <SingleCollection
                                                     path="collection"
+                                                    asNextLink={true}
                                                     data={currentCollection}
                                                     key={index}
+                                                    _hover={{
+                                                        cursor: "pointer",
+                                                        transform:
+                                                            "scale(1.05)",
+                                                        boxShadow:
+                                                            "var(--chakra-shadows-2xl)",
+                                                    }}
                                                 />
                                             )
                                         )}
@@ -144,8 +152,16 @@ const Collection = () => {
                                             .map((currentCollection, index) => (
                                                 <SingleCollection
                                                     path="collection"
+                                                    asNextLink={true}
                                                     data={currentCollection}
                                                     key={index}
+                                                    _hover={{
+                                                        cursor: "pointer",
+                                                        transform:
+                                                            "scale(1.05)",
+                                                        boxShadow:
+                                                            "var(--chakra-shadows-2xl)",
+                                                    }}
                                                 />
                                             ))}
                                     </SimpleGrid>
@@ -174,8 +190,16 @@ const Collection = () => {
                                             .map((currentCollection, index) => (
                                                 <SingleCollection
                                                     path="collection"
+                                                    asNextLink={true}
                                                     data={currentCollection}
                                                     key={index}
+                                                    _hover={{
+                                                        cursor: "pointer",
+                                                        transform:
+                                                            "scale(1.05)",
+                                                        boxShadow:
+                                                            "var(--chakra-shadows-2xl)",
+                                                    }}
                                                 />
                                             ))}
                                     </SimpleGrid>

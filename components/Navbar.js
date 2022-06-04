@@ -132,6 +132,9 @@ const Navbar = () => {
 
                     <HStack my="auto" ml="auto">
                         <HStack spacing={10} mr={10}>
+                            <NextLink href="/" passHref>
+                                <Link fontWeight="500">Home</Link>
+                            </NextLink>
                             <NextLink href="/collection" passHref>
                                 <Link fontWeight="500">Explore</Link>
                             </NextLink>

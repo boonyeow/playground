@@ -55,7 +55,7 @@ const ManageCollection = () => {
             <Box maxWidth={"8xl"} m="auto">
                 <Box padding="5rem" width="100%" height="100%">
                     <Flex justifyContent={"space-between"} alignItems="center">
-                        <Heading textAlign={"left"}>My Projects</Heading>
+                        <Heading textAlign={"left"}>Manage Projects</Heading>
 
                         <Heading
                             textAlign={"right"}
@@ -64,6 +64,9 @@ const ManageCollection = () => {
                             fontWeight="500"
                             color="gray.500"
                             onClick={onOpen}
+                            _hover={{
+                                cursor: "pointer",
+                            }}
                         >
                             Create project
                         </Heading>
@@ -88,9 +91,16 @@ const ManageCollection = () => {
                                 {collectionList.map(
                                     (currentCollection, index) => (
                                         <SingleCollection
+                                            asNextLink={true}
                                             path="manage"
                                             data={currentCollection}
                                             key={index}
+                                            _hover={{
+                                                cursor: "pointer",
+                                                transform: "scale(1.05)",
+                                                boxShadow:
+                                                    "var(--chakra-shadows-2xl)",
+                                            }}
                                         />
                                     )
                                 )}

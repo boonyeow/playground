@@ -162,11 +162,24 @@ const HomeContent = () => {
                 >
                     {collectionList.map((currentCollection, index) => (
                         <SingleCollection
+                            asNextLink={true}
+                            path="collection"
                             data={currentCollection}
                             key={index}
+                            _hover={{
+                                cursor: "pointer",
+                                transform: "scale(1.05)",
+                                boxShadow: "var(--chakra-shadows-2xl)",
+                            }}
                         />
                     ))}
                 </SimpleGrid>
+            </Box>
+
+            <Box margin="5rem" padding="2rem" height="400px" bgColor="gray.800">
+                <Heading px="3rem" color="white">
+                    How does launchpad. work?
+                </Heading>
             </Box>
         </>
     );

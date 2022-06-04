@@ -9,8 +9,6 @@ export default function Home() {
             <Navbar />
             <Box maxWidth={"8xl"} m="auto">
                 <HomeContent />
-
-                <Heading px="3rem">How does Launchpad work?</Heading>
             </Box>
             <Footer />
         </>
