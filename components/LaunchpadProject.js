@@ -6,7 +6,7 @@ const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
             mt="10px"
             borderRadius="15px"
             p="30px"
-            bg="gray.50"
+            bg="white"
             border="1px solid var(--chakra-colors-blackAlpha-200);"
         >
             <Box color="white">
@@ -29,15 +29,28 @@ const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
                             style={{ borderRadius: "50px" }}
                         />
                     </Box>
-                    <VStack align='left' spacing="5px">
-                        <Text fontWeight="semibold" fontSize="xl" color="black" mt="0" noOfLines={1}>
-                            {title}
-                        </Text>
-                        <Text color="#686868" mt="0" lineHeight="1">
-                            {addr}
-                        </Text>
-                    </VStack>
+                    <Button borderRadius="50px" fontSize="sm" bg="black">
+                        {actionLabel}
+                    </Button>
                 </Flex>
+                <Box alignSelf="center" mt="10px">
+                    <Text
+                        fontWeight="semibold"
+                        fontSize="xl"
+                        color="black"
+                        noOfLines={1}
+                    >
+                        {title}
+                    </Text>
+                    <Text
+                        color="#686868"
+                        mt="0"
+                        lineHeight="1.2"
+                        fontFamily="mono"
+                    >
+                        {addr}
+                    </Text>
+                </Box>
             </Box>
         </Flex>
     );

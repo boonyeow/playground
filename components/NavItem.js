@@ -45,10 +45,6 @@ const NavItem = ({ icon, title, description, active, navSize, href }) => {
                         </MenuButton>
                     </Link>
                 </NextLink>
-
-                <MenuList py={0} border="none" w={200} h={200} ml={5}>
-                    {/* <NavHoverBox title={title} icon={icon} description={description} /> */}
-                </MenuList>
             </Menu>
         </Flex>
     );

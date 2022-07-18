@@ -106,7 +106,7 @@ const PageHeader = ({ title }) => {
                         </MenuItem>
                     </NextLink>
 
-                    <NextLink href="/manage" passHref>
+                    <NextLink href="/launchpad" passHref>
                         <MenuItem>
                             <Icon as={AiFillDatabase} mr="12px" />
                             Manage Projects
