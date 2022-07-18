@@ -1,20 +1,17 @@
 import { SettingsIcon } from "@chakra-ui/icons";
-import { Avatar, Divider, Flex, IconButton, MenuIcon } from "@chakra-ui/react";
+import { Flex, IconButton } from "@chakra-ui/react";
 import { useState } from "react";
 import {
     AiOutlineMenu,
     AiFillHome,
-    AiTwotoneBank,
-    AiOutlineSearch,
     AiFillSetting,
     AiFillCompass,
 } from "react-icons/ai";
 import { MdHowToVote } from "react-icons/md";
 import NavItem from "./NavItem.js";
 
-export default function Sidebar(props) {
+const Sidebar = ({ active }) => {
     const [navSize, setNavSize] = useState("sm");
-
     return (
         <Flex
             pos="fixed"
@@ -51,21 +48,21 @@ export default function Sidebar(props) {
                     icon={AiFillHome}
                     title="Home"
                     href="/"
-                    active={props.active == "Home" ? true : false}
+                    active={active == "Home" ? true : false}
                 ></NavItem>
                 <NavItem
                     navSize={navSize}
                     icon={AiFillCompass}
                     title="Explore"
                     href="/explore"
-                    active={props.active == "Explore" ? true : false}
+                    active={active == "Explore" ? true : false}
                 ></NavItem>
                 <NavItem
                     navSize={navSize}
                     icon={MdHowToVote}
                     title="Governance"
                     href="/governance"
-                    active={props.active == "Governance" ? true : false}
+                    active={active == "Governance" ? true : false}
                 ></NavItem>
             </Flex>
             <Flex
@@ -85,4 +82,6 @@ export default function Sidebar(props) {
             </Flex>
         </Flex>
     );
-}
+};
+
+export default Sidebar;

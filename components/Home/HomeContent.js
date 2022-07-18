@@ -1,33 +1,13 @@
-import {
-    Box,
-    Text,
-    HStack,
-    VStack,
-    Stack,
-    Button,
-    Heading,
-    Flex,
-    SimpleGrid,
-} from "@chakra-ui/react";
-import NextImage from "next/image";
-import { AddIcon } from "@chakra-ui/icons";
-import SingleCollection from "../SingleCollection";
+import { Box, Text, Button, SimpleGrid } from "@chakra-ui/react";
 import FeaturedProject from "../FeaturedProject";
 import Project from "../Project";
+import PageHeader from "../PageHeader";
 
 const HomeContent = () => {
     return (
         <>
             <Box width="100%" height="100%" ml="75px" p="1.5rem 3rem 3rem 3rem">
-                <Flex alignItems="center" justifyContent="space-between">
-                    <Text fontSize="4xl" fontWeight="bold">
-                        Home
-                    </Text>
-                    <Button bg="primary" color="white">
-                        Sign in
-                    </Button>
-                </Flex>
-
+                <PageHeader title="Home" />
                 <Box w="100%" mt="15px">
                     <Text color="gray.600" fontWeight="semibold">
                         Featured

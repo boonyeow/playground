@@ -8,19 +8,13 @@ import {
     Text,
     VStack,
 } from "@chakra-ui/react";
+import PageHeader from "../../components/PageHeader";
 import Project from "../Project";
 const GovernanceContent = () => {
     return (
         <>
             <Box width="100%" height="100%" ml="75px" p="1.5rem 3rem 3rem 3rem">
-                <Flex alignItems="center" justifyContent="space-between">
-                    <Text fontSize="4xl" fontWeight="bold">
-                        Governance
-                    </Text>
-                    <Button bg="primary" color="white">
-                        Sign in
-                    </Button>
-                </Flex>
+                <PageHeader title="Governance" />
                 <Box w="100%" mt="15px">
                     <Text color="gray.600" fontWeight="semibold">
                         Participating DAOs

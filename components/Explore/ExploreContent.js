@@ -13,18 +13,12 @@ import {
 } from "@chakra-ui/react";
 import { AiOutlineSearch } from "react-icons/ai";
 import Project from "../Project";
+import PageHeader from "../PageHeader";
 const ExploreContent = () => {
     return (
         <>
             <Box width="100%" height="100%" ml="75px" p="1.5rem 3rem 3rem 3rem">
-                <Flex alignItems="center" justifyContent="space-between">
-                    <Text fontSize="4xl" fontWeight="bold">
-                        Explore
-                    </Text>
-                    <Button bg="primary" color="white">
-                        Sign in
-                    </Button>
-                </Flex>
+                <PageHeader title="Explore" />
                 <Box w="100%" mt="15px">
                     <Box display="inline-flex">
                         <InputGroup>
@@ -48,19 +42,22 @@ const ExploreContent = () => {
                             title="Project Name"
                             desc="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an"
                             src="/../public/unnamed.jpg"
-                            actionLabel="View Activity"
+                            actionLabel="View Project"
+                            href="/"
                         />
                         <Project
                             title="Project Name"
                             desc="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an"
                             src="/../public/unnamed.jpg"
-                            actionLabel="View Activity"
+                            actionLabel="View Project"
+                            href="/"
                         />
                         <Project
                             title="Project Name"
                             desc="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an"
                             src="/../public/unnamed.jpg"
-                            actionLabel="View Activity"
+                            actionLabel="View Project"
+                            href="/"
                         />
                     </SimpleGrid>
                 </Box>

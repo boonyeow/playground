@@ -6,8 +6,9 @@ const Project = ({ src, title, desc, actionLabel }) => {
             mt="10px"
             borderRadius="15px"
             p="30px"
-            bg="gray.50"
+            bg="white"
             border="1px solid var(--chakra-colors-blackAlpha-200);"
+            shadow="sm"
         >
             <Box color="white">
                 <Flex justifyContent="space-between" alignItems="center">
