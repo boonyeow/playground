@@ -1,16 +1,30 @@
-import { Box, Heading, HStack, VStack } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Flex,
+    Heading,
+    HStack,
+    SimpleGrid,
+    Text,
+    VStack,
+} from "@chakra-ui/react";
 import Navbar from "../components/Navbar";
 import HomeContent from "../components/Home/HomeContent";
 import "../styles/Home.module.css";
 import Footer from "../components/Footer";
+import Sidebar from "../components/Sidebar";
+import NextImage from "next/image";
 export default function Home() {
     return (
         <>
-            <Navbar />
-            <Box maxWidth={"8xl"} m="auto">
+            {/* <Navbar /> */}
+            <Flex></Flex>
+            <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
+                <Sidebar />
+
                 <HomeContent />
             </Box>
-            <Footer />
+            {/* <Footer /> */}
         </>
     );
 }

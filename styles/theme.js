@@ -1,8 +1,16 @@
 import { extendTheme } from "@chakra-ui/react";
 
 export const theme = extendTheme({
+    styles: {
+        global: () => ({
+            body: {
+                bg: "#f9fafc",
+            },
+        }),
+    },
     colors: {
-        primary: "",
+        primary: "black",
+        // primary: "#6f6af8",
     },
     components: {
         Text: {

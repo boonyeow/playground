@@ -56,7 +56,7 @@ const Collection = () => {
     return (
         <>
             <Navbar />
-            <Box maxWidth={"8xl"} m="auto">
+            <Box maxWidth={"8xl"} m="auto" mt="4.5rem">
                 <Box padding="5rem" width="100%" height="100%">
                     <Heading as="h1">Explore Projects</Heading>
                     <Tabs variant="unstyled" pt="1rem">

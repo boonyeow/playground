@@ -24,12 +24,33 @@ class ICONexConnection {
     ICONexRequest(requestType, payload) {
         return new Promise((resolve, reject) => {
             function eventHandler(event) {
-                const { payload } = event.detail;
+                const { type, payload } = event.detail;
                 window.removeEventListener(
                     "ICONEX_RELAY_RESPONSE",
                     eventHandler
                 );
-                resolve(payload);
+
+                switch (type) {
+                    case "RESPONSE_HAS_ACCOUNT":
+                        resolve(payload.hasAccount);
+                        break;
+                    case "RESPONSE_HAS_ADDRESS":
+                        resolve(payload.hasAddress);
+                        break;
+                    case "RESPONSE_ADDRESS":
+                    case "RESPONSE_JSON-RPC":
+                    case "RESPONSE_SIGNING":
+                        resolve(payload);
+                        break;
+                    case "CANCEL_JSON-RPC":
+                        //console.log("error", "user cancelled rpc req");
+                        resolve({ error: "User cancelled JSON-RPC request" });
+                        break;
+                    case "CANCEL_SIGNING":
+                        //console.log("error", "user cancelled signing");
+                        resolve({ error: "User cancelled signing request" });
+                        break;
+                }
             }
             window.addEventListener("ICONEX_RELAY_RESPONSE", eventHandler);
 
@@ -37,7 +58,7 @@ class ICONexConnection {
                 new window.CustomEvent("ICONEX_RELAY_REQUEST", {
                     detail: {
                         type: requestType,
-                        payload,
+                        payload: payload,
                     },
                 })
             );

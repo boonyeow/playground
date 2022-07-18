@@ -3,50 +3,128 @@ import {
     Button,
     CloseButton,
     Flex,
-    Heading,
     HStack,
-    Icon,
     IconButton,
     Link,
     Text,
-    useColorMode,
     useDisclosure,
     VStack,
+    Image,
+    useToast,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalCloseButton,
+    ModalHeader,
+    ModalBody,
+    Stack,
+    Divider,
+    ModalFooter,
 } from "@chakra-ui/react";
-import Navbar from "../components/Navbar";
-import HomeContent from "../components/Home/HomeContent";
-import "../styles/Home.module.css";
-import Footer from "../components/Footer";
-import { useEffect, useRef, useState } from "react";
-import { useViewportScroll } from "framer-motion";
-import { FaHeart } from "react-icons/fa";
-import {
-    AiFillGithub,
-    AiFillHome,
-    AiOutlineInbox,
-    AiOutlineMenu,
-} from "react-icons/ai";
-import { BsFillCameraVideoFill } from "react-icons/bs";
+import { useEffect, useState } from "react";
+import { AiOutlineMenu, AiOutlinePlus, AiOutlineHome } from "react-icons/ai";
+import { MdOutlineExplore } from "react-icons/md";
+import NextLink from "next/link";
+import { useRouter } from "next/router";
+import ICONexConnection from "../util/interact.js";
+import axios from "axios";
+import IconService from "icon-sdk-js";
+
+const {
+    IconConverter,
+    IconBuilder,
+    HttpProvider,
+    SignedTransaction,
+    IconWallet,
+} = IconService;
 
 function Headers() {
+    const connection = new ICONexConnection();
+    const toast = useToast();
+    const router = useRouter();
+
     const mobileNav = useDisclosure();
-    const text = "dark";
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const [walletAddress, setWalletAddress] = useState(0);
 
-    const bg = "white";
-    const ref = useRef();
-    const [y, setY] = useState(0);
-    const { height = 0 } = ref.current
-        ? ref.current.getBoundingClientRect()
-        : {};
-
-    const { scrollY } = useViewportScroll();
     useEffect(() => {
-        return scrollY.onChange(() => setY(scrollY.get()));
-    }, [scrollY]);
+        setWalletAddress(localStorage.getItem("USER_WALLET_ADDRESS"));
+    }, []);
 
-    const MobileNavContent = (
+    const connectWallet = async () => {
+        let userAddress = await connection.ICONexRequest("REQUEST_ADDRESS");
+
+        // Retrieve record with userAddress from DynamoDB
+        let res = await axios.get(
+            `http://localhost:3000/api/users?userAddress=${userAddress}`
+        );
+
+        // Check if user is registered. If not, onboard them
+        if (res.data === "") {
+            res = await axios.post("http://localhost:3000/api/users", {
+                userAddress: userAddress,
+            });
+            console.log("not found hehe", res);
+        }
+
+        // Proceed to build MessageTransaction instance
+        let nonce = res.data.nonce;
+        const txObj = new IconBuilder.MessageTransactionBuilder()
+            .from(userAddress)
+            .to(userAddress)
+            .stepLimit(IconConverter.toBigNumber(100000))
+            .nid(IconConverter.toBigNumber(3))
+            .nonce(IconConverter.toBigNumber(nonce))
+            .version(IconConverter.toBigNumber(3))
+            .build();
+
+        const rawTransaction = IconConverter.toRawTransaction(txObj);
+        const txHash = IconService.IconUtil.serialize(rawTransaction);
+        console.log(txHash);
+        const payload = {
+            id: "1234",
+            jsonrpc: "2.0",
+            method: "icx_sendTransaction",
+            hash: txHash,
+        };
+        let rpcResponse = await connection.ICONexRequest(
+            "REQUEST_SIGNING",
+            payload
+        );
+
+        if (rpcResponse.hasOwnProperty("error")) {
+            alert("user cancelled signing request");
+            return;
+        }
+
+        // Proceed to retrieve signature, txhash, address and send POST to /auth
+        let authRes = await axios.post("http://localhost:3000/api/auth", {
+            userAddress: userAddress,
+            signature: rpcResponse,
+            txHash: txHash,
+        });
+        console.log(authRes);
+        localStorage.setItem("accessToken", authRes.data.token);
+        setWalletAddress(userAddress);
+        isOpen = false;
+        onClose();
+        toast({
+            id: "test-toast",
+            title: "Connected to wallet!",
+            position: "bottom-right",
+            status: "success",
+            duration: 1000,
+            isClosable: true,
+        });
+    };
+
+    const disconnectWallet = () => {
+        setWalletAddress(0);
+        localStorage.removeItem("accessToken");
+    };
+    const mobileView = (
         <VStack
-            pos="absolute"
+            pos="fixed"
             top={0}
             left={0}
             right={0}
@@ -55,40 +133,53 @@ function Headers() {
             p={2}
             pb={4}
             m={2}
-            bg={bg}
+            bg="white"
             spacing={3}
             rounded="sm"
             shadow="sm"
         >
             <CloseButton
                 aria-label="Close menu"
-                justifySelf="self-start"
+                alignSelf={"end"}
                 onClick={mobileNav.onClose}
             />
-            <Button w="full" variant="ghost" leftIcon={<AiFillHome />}>
-                Home
+            <Button
+                w="full"
+                variant="homepage-button"
+                onClick={walletAddress ? disconnectWallet : onOpen}
+            >
+                {walletAddress ? "Disconnect" : "Sign In"}
             </Button>
-            <Button w="full" leftIcon={<AiFillHome />}>
-                Explore
+            <Button w="full" leftIcon={<AiOutlineHome />}>
+                Homepage
             </Button>
-            <Button w="full" leftIcon={<AiFillHome />}>
-                Governance
+            <Button
+                w="full"
+                leftIcon={<MdOutlineExplore style={{ marginTop: "0.1rem" }} />}
+            >
+                Explore projects
+            </Button>
+            <Button w="full" leftIcon={<AiOutlinePlus />}>
+                Start a project
             </Button>
         </VStack>
     );
+
     return (
-        <Box pos="relative">
+        <>
             <Box
+                pos="fixed"
                 as="header"
-                ref={ref}
-                shadow={y > height ? "sm" : undefined}
+                bgColor="rgba(255,255,255,0.9)"
+                backdropFilter={"blur(5px)"}
                 transition="box-shadow 0.2s"
-                bg={bg}
                 w="full"
                 overflowY="hidden"
                 boxShadow="inset 0px -1px 0px #f3f3f4"
+                zIndex="1"
+                top={0}
             >
-                <Box h="4.5rem" mx="auto" maxW="1200px">
+                <Box maxWidth="90rem" h="4.5rem" mx="auto">
                     <Flex
                         w="full"
                         h="full"
@@ -97,9 +188,9 @@ function Headers() {
                         justify="space-between"
                     >
                         <Flex align="center">
-                            <Link href="/">
+                            <Link href="/Toast">
                                 <HStack>
-                                    <Text>launchpad.</Text>
+                                    <Image src="/logo.png" width="150px" />
                                 </HStack>
                             </Link>
                         </Flex>
@@ -107,20 +198,68 @@ function Headers() {
                         <Flex
                             justify="flex-end"
                             w="full"
-                            maxW="824px"
+                            maxW="60rem"
                             align="center"
                             color="gray.400"
                         >
                             <HStack
-                                spacing="5"
+                                spacing="2"
                                 display={{ base: "none", md: "flex" }}
+                                color="gray.600"
                             >
-                                <Text>Home</Text>
-                                <Text>Explore</Text>
-                                <Text>Governance</Text>
+                                <NextLink href="/Toast">
+                                    <Button
+                                        variant="ghost"
+                                        fontWeight={
+                                            router.pathname === "/Toast"
+                                                ? "bold"
+                                                : "unset"
+                                        }
+                                    >
+                                        Home
+                                    </Button>
+                                </NextLink>
+                                <NextLink href="/collection">
+                                    <Button
+                                        variant="ghost"
+                                        fontWeight={
+                                            router.pathname === "/collection"
+                                                ? "bold"
+                                                : "unset"
+                                        }
+                                    >
+                                        Explore
+                                    </Button>
+                                </NextLink>
+                                <NextLink href="/collection">
+                                    <Button
+                                        variant="ghost"
+                                        fontWeight={
+                                            router.pathname === "/collection"
+                                                ? "bold"
+                                                : "unset"
+                                        }
+                                    >
+                                        Start a project
+                                    </Button>
+                                </NextLink>
                             </HStack>
-                            <Button size="sm" ml={5}>
-                                Sign in
+                            <Button
+                                size="md"
+                                ml={10}
+                                onClick={
+                                    walletAddress ? disconnectWallet : onOpen
+                                }
+                                variant="homepage-button"
+                                display={[
+                                    "none",
+                                    "none",
+                                    "flex",
+                                    "flex",
+                                    "flex",
+                                ]}
+                            >
+                                {walletAddress ? "Disconnect" : "Sign In"}
                             </Button>
                             <IconButton
                                 display={{ base: "flex", md: "none" }}
@@ -133,10 +272,68 @@ function Headers() {
                             />
                         </Flex>
                     </Flex>
-                    {MobileNavContent}
                 </Box>
             </Box>
-        </Box>
+            {mobileView}
+            <Modal
+                isCentered
+                onClose={onClose}
+                isOpen={isOpen}
+                motionPreset="slideInBottom"
+                size="sm"
+            >
+                <ModalOverlay />
+                <ModalContent borderRadius={"xl"}>
+                    <ModalCloseButton />
+                    <ModalHeader
+                        textAlign={"center"}
+                        fontWeight="bold"
+                        pb={2}
+                        fontSize={"3xl"}
+                        pt={8}
+                    >
+                        Sign In
+                    </ModalHeader>
+                    <ModalBody px={10} pb={6}>
+                        <Stack spacing={3}>
+                            <Button variant="cw-button" onClick={connectWallet}>
+                                ICONex / Hana
+                            </Button>
+                            <Button variant="cw-button">Bridge</Button>
+                        </Stack>
+                    </ModalBody>
+                    <Divider width="80%" margin="auto" />
+                    <ModalFooter
+                        textAlign={"center"}
+                        fontWeight="500"
+                        px={10}
+                        pb={12}
+                    >
+                        <Stack w="100%">
+                            <Text>Don't have a wallet?</Text>
+                            <Button
+                                variant="homepage-button"
+                                onClick={() => {
+                                    window.open(
+                                        "https://www.icondev.io/getting-started/how-to-create-an-icon-account",
+                                        "_blank"
+                                    );
+                                }}
+                            >
+                                Get started here
+                            </Button>
+                        </Stack>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+
+            <Box
+                as="section"
+                bgColor="gray.50"
+                w="full"
+                minHeight="calc(150vh - 4.5rem)"
+            ></Box>
+        </>
     );
 }
 export default function Toast() {
