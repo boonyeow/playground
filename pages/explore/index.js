@@ -8,10 +8,9 @@ import {
     Text,
     VStack,
 } from "@chakra-ui/react";
-import HomeContent from "../components/Home/HomeContent";
-import "../styles/Home.module.css";
-import Footer from "../components/Footer";
-import Sidebar from "../components/Sidebar";
+import "../../styles/Home.module.css";
+import Sidebar from "../../components/Sidebar";
+import ExploreContent from "../../components/Explore/ExploreContent";
 export default function Home() {
     return (
         <>
@@ -20,7 +19,7 @@ export default function Home() {
             <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
                 <Sidebar />
 
-                <HomeContent />
+                <ExploreContent />
             </Box>
             {/* <Footer /> */}
         </>

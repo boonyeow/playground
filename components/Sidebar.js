@@ -7,7 +7,9 @@ import {
     AiTwotoneBank,
     AiOutlineSearch,
     AiFillSetting,
+    AiFillCompass,
 } from "react-icons/ai";
+import { MdHowToVote } from "react-icons/md";
 import NavItem from "./NavItem.js";
 
 export default function Sidebar() {
@@ -48,16 +50,19 @@ export default function Sidebar() {
                     navSize={navSize}
                     icon={AiFillHome}
                     title="Home"
+                    href="/"
                 ></NavItem>
                 <NavItem
                     navSize={navSize}
-                    icon={AiOutlineSearch}
+                    icon={AiFillCompass}
                     title="Explore"
+                    href="/explore"
                 ></NavItem>
                 <NavItem
                     navSize={navSize}
-                    icon={AiTwotoneBank}
+                    icon={MdHowToVote}
                     title="Governance"
+                    href="/governance"
                 ></NavItem>
             </Flex>
             <Flex
