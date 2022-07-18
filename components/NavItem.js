@@ -21,8 +21,8 @@ const NavItem = ({ icon, title, description, active, navSize, href }) => {
             <Menu placement="right">
                 <NextLink href={href}>
                     <Link
-                        color="white"
-                        backgroundColor={active && "white"}
+                        color={active ? "primary" : "white"}
+                        backgroundColor={active ? "white" : "none"}
                         p="0.75rem 0.75rem 0.5rem 0.75rem"
                         borderRadius={8}
                         _hover={{

@@ -12,7 +12,7 @@ import {
 import { MdHowToVote } from "react-icons/md";
 import NavItem from "./NavItem.js";
 
-export default function Sidebar() {
+export default function Sidebar(props) {
     const [navSize, setNavSize] = useState("sm");
 
     return (
@@ -51,18 +51,21 @@ export default function Sidebar() {
                     icon={AiFillHome}
                     title="Home"
                     href="/"
+                    active={props.active == "Home" ? true : false}
                 ></NavItem>
                 <NavItem
                     navSize={navSize}
                     icon={AiFillCompass}
                     title="Explore"
                     href="/explore"
+                    active={props.active == "Explore" ? true : false}
                 ></NavItem>
                 <NavItem
                     navSize={navSize}
                     icon={MdHowToVote}
                     title="Governance"
                     href="/governance"
+                    active={props.active == "Governance" ? true : false}
                 ></NavItem>
             </Flex>
             <Flex

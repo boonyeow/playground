@@ -9,7 +9,7 @@ export default function Governance() {
             {/* <Navbar /> */}
             <Flex></Flex>
             <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
-                <Sidebar />
+                <Sidebar active="Governance"/>
                 <GovernanceContent />
             </Box>
             {/* <Footer /> */}

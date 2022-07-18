@@ -18,7 +18,7 @@ export default function Home() {
             {/* <Navbar /> */}
             <Flex></Flex>
             <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
-                <Sidebar />
+                <Sidebar active="Home"/>
 
                 <HomeContent />
             </Box>
