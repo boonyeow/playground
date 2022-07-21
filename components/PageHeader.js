@@ -43,15 +43,10 @@ import {
     AiOutlineHome,
 } from "react-icons/ai";
 
-const PageHeader = ({ title }) => {
+const PageHeader = ({ title, walletAddress, setWalletAddress }) => {
     const connection = new ICONexConnection();
     const toast = useToast();
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [walletAddress, setWalletAddress] = useState(0);
-
-    useEffect(() => {
-        setWalletAddress(localStorage.getItem("USER_WALLET_ADDRESS"));
-    }, []);
 
     const connectWallet = async () => {
         let _walletAddress = await connection.getWalletAddress();

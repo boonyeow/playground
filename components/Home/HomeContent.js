@@ -2,12 +2,21 @@ import { Box, Text, Button, SimpleGrid } from "@chakra-ui/react";
 import FeaturedProject from "../FeaturedProject";
 import Project from "../Project";
 import PageHeader from "../PageHeader";
-
+import { useCallback, useEffect, useState } from "react";
 const HomeContent = () => {
+    const [walletAddress, setWalletAddress] = useState(0);
+
+    useEffect(() => {
+        setWalletAddress(localStorage.getItem("USER_WALLET_ADDRESS"));
+    }, []);
     return (
         <>
             <Box width="100%" height="100%" ml="75px" p="1.5rem 3rem 3rem 3rem">
-                <PageHeader title="Home" />
+                <PageHeader
+                    title="Home"
+                    walletAddress={walletAddress}
+                    setWalletAddress={setWalletAddress}
+                />
                 <Box w="100%" mt="15px">
                     <Text color="gray.600" fontWeight="semibold">
                         Featured

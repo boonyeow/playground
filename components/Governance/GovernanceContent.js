@@ -10,11 +10,22 @@ import {
 } from "@chakra-ui/react";
 import PageHeader from "../../components/PageHeader";
 import Project from "../Project";
+import { useCallback, useEffect, useState } from "react";
 const GovernanceContent = () => {
+    const [walletAddress, setWalletAddress] = useState(0);
+
+    useEffect(() => {
+        setWalletAddress(localStorage.getItem("USER_WALLET_ADDRESS"));
+    }, []);
+
     return (
         <>
             <Box width="100%" height="100%" ml="75px" p="1.5rem 3rem 3rem 3rem">
-                <PageHeader title="Governance" />
+                <PageHeader
+                    title="Governance"
+                    walletAddress={walletAddress}
+                    setWalletAddress={setWalletAddress}
+                />
                 <Box w="100%" mt="15px">
                     <Text color="gray.600" fontWeight="semibold">
                         Participating DAOs

@@ -13,6 +13,15 @@ export const theme = extendTheme({
         // primary: "#6f6af8",
     },
     components: {
+        Spinner: {
+            variants: {
+                loading_spinner: {
+                    w: "5rem",
+                    h: "5rem",
+                    borderColor: "#626262",
+                },
+            },
+        },
         Text: {
             variants: {
                 "card-header": {

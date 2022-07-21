@@ -14,11 +14,22 @@ import {
 import { AiOutlineSearch } from "react-icons/ai";
 import Project from "../Project";
 import PageHeader from "../PageHeader";
+import { useCallback, useEffect, useState } from "react";
 const ExploreContent = () => {
+    const [walletAddress, setWalletAddress] = useState(0);
+
+    useEffect(() => {
+        setWalletAddress(localStorage.getItem("USER_WALLET_ADDRESS"));
+    }, []);
+
     return (
         <>
             <Box width="100%" height="100%" ml="75px" p="1.5rem 3rem 3rem 3rem">
-                <PageHeader title="Explore" />
+                <PageHeader
+                    title="Explore"
+                    walletAddress={walletAddress}
+                    setWalletAddress={setWalletAddress}
+                />
                 <Box w="100%" mt="15px">
                     <Box display="inline-flex">
                         <InputGroup>
