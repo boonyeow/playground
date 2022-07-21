@@ -1,6 +1,10 @@
 import { Box, Text, VStack, Button, Flex } from "@chakra-ui/react";
 import NextImage from "next/image";
+import { useState } from "react";
 const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
+    if (src == "") {
+        src = "/../public/4.avif";
+    }
     return (
         <Flex
             mt="10px"

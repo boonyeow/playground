@@ -18,49 +18,55 @@ import LaunchpadProject from "../LaunchpadProject";
 import NextImage from "next/image";
 import CreateProjectModal from "../CreateProjectModal";
 import NewProjectModal from "./NewProjectModal";
+import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-
 const LaunchpadContent = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [walletAddress, setWalletAddress] = useState(0);
+    const [projectList, setProjectList] = useState([]);
 
     useEffect(() => {
-        setWalletAddress(localStorage.getItem("USER_WALLET_ADDRESS"));
+        const temp = localStorage.getItem("USER_WALLET_ADDRESS");
+        setWalletAddress(temp);
+        axios
+            .get(`http://localhost:3000/api/projects?userAddress=${temp}`)
+            .then((res) => setProjectList(res.data));
     }, []);
-    const collectionList = [
-        {
-            contractAddress: "cx23902903999",
-            src: "/../public/4.avif",
-            collectionLabel: "Featured",
-            collectionTitle: "Bored Ape Yacht ClubBored Ape",
-            collectionOwner: "@bytan",
-            mintPrice: "150",
-            shortDesc:
-                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic",
-        },
-        {
-            contractAddress: "cx23902903998",
-            src: "/../public/5.avif",
-            collectionLabel: "Featured",
-            collectionTitle: "Bored Ape Yacht Club",
-            collectionOwner: "@bytan",
-            mintPrice: "150",
-            shortDesc:
-                "inter took a galley of type and scrfive centuries, but also the leap into electronic",
-        },
 
-        {
-            contractAddress: "cx23902903997",
-            src: "/../public/6.avif",
-            collectionLabel: "Featured",
-            collectionTitle:
-                "Bored Ape Yacht ClubBored Ape Yacht ClubBored Ape Yacht Club",
-            collectionOwner: "@bytan",
-            mintPrice: "150",
-            shortDesc:
-                "wn printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic",
-        },
-    ];
+    // const collectionList = [
+    //     {
+    //         contractAddress: "cx23902903999",
+    //         src: "/../public/4.avif",
+    //         collectionLabel: "Featured",
+    //         collectionTitle: "Bored Ape Yacht ClubBored Ape",
+    //         collectionOwner: "@bytan",
+    //         mintPrice: "150",
+    //         shortDesc:
+    //             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic",
+    //     },
+    //     {
+    //         contractAddress: "cx23902903998",
+    //         src: "/../public/5.avif",
+    //         collectionLabel: "Featured",
+    //         collectionTitle: "Bored Ape Yacht Club",
+    //         collectionOwner: "@bytan",
+    //         mintPrice: "150",
+    //         shortDesc:
+    //             "inter took a galley of type and scrfive centuries, but also the leap into electronic",
+    //     },
+
+    //     {
+    //         contractAddress: "cx23902903997",
+    //         src: "/../public/6.avif",
+    //         collectionLabel: "Featured",
+    //         collectionTitle:
+    //             "Bored Ape Yacht ClubBored Ape Yacht ClubBored Ape Yacht Club",
+    //         collectionOwner: "@bytan",
+    //         mintPrice: "150",
+    //         shortDesc:
+    //             "wn printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic",
+    //     },
+    // ];
 
     let loggedOutView = (
         <Text fontWeight="bold" color="red.500">
@@ -90,12 +96,12 @@ const LaunchpadContent = () => {
                     </Flex>
                 </Box>
             </Flex>
-            {collectionList.map((currentCollection, index) => (
+            {projectList.map((currentCollection, index) => (
                 <LaunchpadProject
                     key={index}
-                    title={currentCollection.collectionTitle}
+                    title={currentCollection.name}
                     addr={currentCollection.contractAddress}
-                    src={currentCollection.src}
+                    src={currentCollection.thumbnail}
                     actionLabel="View Project"
                 />
             ))}

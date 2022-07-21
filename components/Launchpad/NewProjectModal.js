@@ -1,12 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import IconService from "icon-sdk-js";
 import {
-    Box,
-    Heading,
     Button,
     CloseButton,
     Text,
-    Divider,
     Modal,
     ModalOverlay,
     ModalContent,
@@ -15,24 +12,10 @@ import {
     ModalBody,
     ModalCloseButton,
     useDisclosure,
-    Stack,
-    HStack,
-    useToast,
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuList,
-    Avatar,
-    Icon,
-    Link,
     Input,
     VStack,
-    Alert,
-    AlertIcon,
-    AlertTitle,
-    AlertDescription,
-    Spinner,
 } from "@chakra-ui/react";
+import axios from "axios";
 import ICONexConnection, { sleep } from "../../util/interact";
 import CustomAlert from "../CustomAlert";
 import cfg from "../../util/config";
@@ -47,7 +30,6 @@ const {
 const connection = new ICONexConnection();
 
 const NewProjectModal = ({ onClose, isOpen }) => {
-    const { statusIsOpen, statusOnOpen, statusOnClose } = useDisclosure();
     const [showStatus, setShowStatus] = useState(false);
     const [statusType, setStatusType] = useState("loading");
     const [statusTitle, setStatusTitle] = useState("deploying contract");
@@ -55,7 +37,8 @@ const NewProjectModal = ({ onClose, isOpen }) => {
 
     const tbProjectName = useRef(null);
     const createProject = async () => {
-        if (tbProjectName.current.value == "") {
+        const projectName = tbProjectName.current.value;
+        if (projectName == "") {
             alert("cannot be empty");
             return;
         }
@@ -73,12 +56,11 @@ const NewProjectModal = ({ onClose, isOpen }) => {
             .contentType("application/java")
             .content(contractContent)
             .params({
-                _name: tbProjectName.current.value,
+                _name: projectName,
                 _signerAddress: signerAddress,
             })
             .nonce(IconConverter.toBigNumber(1))
             .build();
-
         const estimatedSteps = IconConverter.toBigNumber(
             await connection.debugService.estimateStep(txObj).execute()
         );
@@ -99,35 +81,48 @@ const NewProjectModal = ({ onClose, isOpen }) => {
                 "REQUEST_JSON-RPC",
                 payload
             );
-            console.log(rpcResponse);
-            console.log(typeof rpcResponse);
             if (rpcResponse.error) {
                 setStatusType("failure");
                 setStatusTitle("ooops");
                 setStatusDesc("your transaction was not approved");
             } else {
+                console.log(rpcResponse);
                 await sleep(5000);
+
+                //callback to get txResult until response
+                const txResult = await connection.iconService
+                    .getTransactionResult(rpcResponse.result)
+                    .execute();
+                await sleep(5000);
+
+                console.log("txResult", txResult);
+                let response = await axios.post(
+                    "http://localhost:3000/api/projects/add", //change it to {endpoint}/api/projects/add
+                    {
+                        userAddress: localStorage.getItem(
+                            "USER_WALLET_ADDRESS"
+                        ),
+                        contractAddress: txResult.scoreAddress,
+                        name: projectName,
+                        shortDescription: "",
+                        longDescription: "",
+                        thumbnail: "",
+                        fundingGoal: 0,
+                        softCap: 0,
+                    }
+                );
+                console.log("res", response);
+
                 setStatusType("success");
                 setStatusTitle("success");
                 setStatusDesc("your contract has been deployed!");
-
-                //callback to get txObject until response
-                // const txObject = await iconService
-                //     .getTransactionResult(txHash)
-                //     .execute();
             }
-        } catch (err) {}
-
-        // if (rpcResponse === undefined) {
-        //     console.log("dude cancelled transaction");
-        //     alert("user cancelled transaction; failed to create new project");
-        //     return;
-        // }
-
-        // const txHash = rpcResponse.result;
-        // await sleep(5000);
-        // console.log(rpcResponse);
-        return;
+        } catch (err) {
+            console.log(err);
+            setStatusType("failure");
+            setStatusTitle("ooops");
+            setStatusDesc("your transaction has failed, please try again");
+        }
     };
 
     return (

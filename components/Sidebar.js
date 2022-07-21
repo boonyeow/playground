@@ -32,8 +32,8 @@ const Sidebar = ({ active }) => {
                 pos="fixed"
                 h="95vh"
                 boxShadow="0 4px 12px 0 rgba(0, 0, 0, 0.05)"
-                borderRadius={navSize == "sm" ? "15px" : "30px"}
-                w={navSize == "sm" ? "75px" : "200px"}
+                borderRadius={navSize === "sm" ? "15px" : "30px"}
+                w={navSize === "sm" ? "75px" : "200px"}
                 flexDir="column"
                 bg="primary"
                 justifyContent="space-between"
@@ -44,7 +44,7 @@ const Sidebar = ({ active }) => {
                     p="15px"
                     px="5%"
                     flexDir="column"
-                    alignItems={navSize == "sm" ? "center" : "flex-start"}
+                    alignItems={navSize === "sm" ? "center" : "flex-start"}
                     as="nav"
                 >
                     <IconButton
@@ -54,7 +54,7 @@ const Sidebar = ({ active }) => {
                         _hover={{ background: "none" }}
                         icon={<AiOutlineMenu />}
                         onClick={() => {
-                            if (navSize == "sm") setNavSize("lg");
+                            if (navSize === "sm") setNavSize("lg");
                             else setNavSize("sm");
                         }}
                     ></IconButton>
@@ -63,28 +63,28 @@ const Sidebar = ({ active }) => {
                         icon={AiFillHome}
                         title="Home"
                         href="/"
-                        active={active == "Home" ? true : false}
+                        active={active === "Home" ? true : false}
                     ></NavItem>
                     <NavItem
                         navSize={navSize}
                         icon={AiFillCompass}
                         title="Explore"
                         href="/explore"
-                        active={active == "Explore" ? true : false}
+                        active={active === "Explore" ? true : false}
                     ></NavItem>
                     <NavItem
                         navSize={navSize}
                         icon={MdHowToVote}
                         title="Governance"
                         href="/governance"
-                        active={active == "Governance" ? true : false}
+                        active={active === "Governance" ? true : false}
                     ></NavItem>
                     <NavItem
                         navSize={navSize}
                         icon={BiRocket}
                         title="Launchpad"
                         href="/launchpad"
-                        active={active == "Launchpad" ? true : false}
+                        active={active === "Launchpad" ? true : false}
                     ></NavItem>
                 </Flex>
                 <Flex
@@ -103,7 +103,7 @@ const Sidebar = ({ active }) => {
                     ></IconButton>
                 </Flex>
             </Flex>
-            {navSize == "sm" ? "" : overlay}
+            {navSize === "sm" ? "" : overlay}
         </>
     );
 };
