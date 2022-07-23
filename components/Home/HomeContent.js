@@ -4,18 +4,23 @@ import Project from "../Project";
 import PageHeader from "../PageHeader";
 import { useCallback, useEffect, useState } from "react";
 const HomeContent = () => {
-    const [walletAddress, setWalletAddress] = useState(0);
+    const [userInfo, setUserInfo] = useState({
+        userAddress: 0,
+        projectsDeployed: [],
+    });
 
     useEffect(() => {
-        setWalletAddress(localStorage.getItem("USER_WALLET_ADDRESS"));
+        const temp = localStorage.getItem("_persist");
+        temp = temp == null ? userInfo : JSON.parse(temp);
+        setUserInfo(temp);
     }, []);
     return (
         <>
             <Box width="100%" height="100%" ml="75px" p="1.5rem 3rem 3rem 3rem">
                 <PageHeader
                     title="Home"
-                    walletAddress={walletAddress}
-                    setWalletAddress={setWalletAddress}
+                    userInfo={userInfo}
+                    setUserInfo={setUserInfo}
                 />
                 <Box w="100%" mt="15px">
                     <Text color="gray.600" fontWeight="semibold">

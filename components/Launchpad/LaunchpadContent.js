@@ -18,55 +18,19 @@ import LaunchpadProject from "../LaunchpadProject";
 import NextImage from "next/image";
 import CreateProjectModal from "../CreateProjectModal";
 import NewProjectModal from "./NewProjectModal";
-import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 const LaunchpadContent = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [walletAddress, setWalletAddress] = useState(0);
-    const [projectList, setProjectList] = useState([]);
+    const [userInfo, setUserInfo] = useState({
+        userAddress: 0,
+        projectsDeployed: [],
+    });
 
     useEffect(() => {
-        const temp = localStorage.getItem("USER_WALLET_ADDRESS");
-        setWalletAddress(temp);
-        axios
-            .get(`http://localhost:3000/api/projects?userAddress=${temp}`)
-            .then((res) => setProjectList(res.data));
+        const temp = localStorage.getItem("_persist");
+        temp = temp == null ? userInfo : JSON.parse(temp);
+        setUserInfo(temp);
     }, []);
-
-    // const collectionList = [
-    //     {
-    //         contractAddress: "cx23902903999",
-    //         src: "/../public/4.avif",
-    //         collectionLabel: "Featured",
-    //         collectionTitle: "Bored Ape Yacht ClubBored Ape",
-    //         collectionOwner: "@bytan",
-    //         mintPrice: "150",
-    //         shortDesc:
-    //             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic",
-    //     },
-    //     {
-    //         contractAddress: "cx23902903998",
-    //         src: "/../public/5.avif",
-    //         collectionLabel: "Featured",
-    //         collectionTitle: "Bored Ape Yacht Club",
-    //         collectionOwner: "@bytan",
-    //         mintPrice: "150",
-    //         shortDesc:
-    //             "inter took a galley of type and scrfive centuries, but also the leap into electronic",
-    //     },
-
-    //     {
-    //         contractAddress: "cx23902903997",
-    //         src: "/../public/6.avif",
-    //         collectionLabel: "Featured",
-    //         collectionTitle:
-    //             "Bored Ape Yacht ClubBored Ape Yacht ClubBored Ape Yacht Club",
-    //         collectionOwner: "@bytan",
-    //         mintPrice: "150",
-    //         shortDesc:
-    //             "wn printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic",
-    //     },
-    // ];
 
     let loggedOutView = (
         <Text fontWeight="bold" color="red.500">
@@ -96,7 +60,7 @@ const LaunchpadContent = () => {
                     </Flex>
                 </Box>
             </Flex>
-            {projectList.map((currentCollection, index) => (
+            {userInfo.projectsDeployed.map((currentCollection, index) => (
                 <LaunchpadProject
                     key={index}
                     title={currentCollection.name}
@@ -113,14 +77,14 @@ const LaunchpadContent = () => {
         <Box width="100%" height="100%" ml="75px" p="1.5rem 3rem 3rem 3rem">
             <PageHeader
                 title="Launchpad"
-                walletAddress={walletAddress}
-                setWalletAddress={setWalletAddress}
+                userInfo={userInfo}
+                setUserInfo={setUserInfo}
             />
             <Box w="100%" mt="15px">
                 <Text color="gray.600" fontWeight="semibold">
                     My projects
                 </Text>
-                {walletAddress ? loggedInView : loggedOutView}
+                {userInfo.userAddress ? loggedInView : loggedOutView}
             </Box>
         </Box>
     );

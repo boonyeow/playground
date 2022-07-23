@@ -1,6 +1,6 @@
 import { Box, Text, VStack, Button, Flex } from "@chakra-ui/react";
 import NextImage from "next/image";
-import { useState } from "react";
+import NextLink from "next/link";
 const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
     if (src == "") {
         src = "/../public/4.avif";
@@ -13,7 +13,7 @@ const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
             bg="white"
             border="1px solid var(--chakra-colors-blackAlpha-200);"
         >
-            <Box color="white">
+            <Box color="white" width="100%">
                 <Flex justifyContent="space-between" alignItems="center">
                     <Box
                         minWidth="75px"
@@ -21,7 +21,6 @@ const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
                         height="75px"
                         bg="#272727"
                         mr="30px"
-                        // p="2px"
                         borderRadius={"50px"}
                     >
                         <NextImage
@@ -33,9 +32,9 @@ const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
                             style={{ borderRadius: "50px" }}
                         />
                     </Box>
-                    <Button borderRadius="50px" fontSize="sm" bg="black">
-                        {actionLabel}
-                    </Button>
+                    <NextLink href={`/launchpad/${addr}`}>
+                        <Button variant="action-button">{actionLabel}</Button>
+                    </NextLink>
                 </Flex>
                 <Box alignSelf="center" mt="10px">
                     <Text
@@ -51,6 +50,7 @@ const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
                         mt="0"
                         lineHeight="1.2"
                         fontFamily="mono"
+                        noOfLines={1}
                     >
                         {addr}
                     </Text>

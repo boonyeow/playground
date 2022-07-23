@@ -42,8 +42,9 @@ import {
     AiOutlinePlus,
     AiOutlineHome,
 } from "react-icons/ai";
+import axios from "axios";
 
-const PageHeader = ({ title, walletAddress, setWalletAddress }) => {
+const PageHeader = ({ title, userInfo, setUserInfo }) => {
     const connection = new ICONexConnection();
     const toast = useToast();
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -51,8 +52,17 @@ const PageHeader = ({ title, walletAddress, setWalletAddress }) => {
     const connectWallet = async () => {
         let _walletAddress = await connection.getWalletAddress();
         if (_walletAddress) {
-            setWalletAddress(_walletAddress);
-            localStorage.setItem("USER_WALLET_ADDRESS", _walletAddress);
+            let res = await axios.get(
+                `http://localhost:3000/api/projects?userAddress=${_walletAddress}`
+            );
+
+            const temp = {
+                userAddress: _walletAddress,
+                projectsDeployed: res.data,
+            };
+            setUserInfo(temp);
+
+            localStorage.setItem("_persist", JSON.stringify(temp));
             isOpen = false;
             onClose();
             toast({
@@ -67,8 +77,13 @@ const PageHeader = ({ title, walletAddress, setWalletAddress }) => {
     };
 
     const disconnectWallet = () => {
-        setWalletAddress(0);
+        setUserInfo({
+            userAddress: 0,
+            projectsDeployed: [],
+        });
+
         localStorage.removeItem("USER_WALLET_ADDRESS");
+        localStorage.removeItem("_persist");
         toast({
             id: "test-toast",
             title: "Disconnected from wallet!",
@@ -126,7 +141,7 @@ const PageHeader = ({ title, walletAddress, setWalletAddress }) => {
                 <Text fontSize="4xl" fontWeight="bold">
                     {title}
                 </Text>
-                {walletAddress ? loggedInView : loggedOutView}
+                {userInfo.userAddress ? loggedInView : loggedOutView}
             </Flex>
             <Modal
                 isCentered

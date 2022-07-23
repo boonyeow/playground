@@ -56,6 +56,15 @@ export const theme = extendTheme({
                 },
             },
             variants: {
+                "action-button": {
+                    borderRadius: "50px",
+                    fontSize: "sm",
+                    bg: "black",
+                    color: "white",
+                    _hover: {
+                        bg: "#303030",
+                    },
+                },
                 "cw-button": {
                     // Connect Wallet Modal > Connect Wallet Button
                     bgColor: "white",

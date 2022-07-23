@@ -10,7 +10,7 @@ const Project = ({ src, title, desc, actionLabel }) => {
             border="1px solid var(--chakra-colors-blackAlpha-200);"
             shadow="sm"
         >
-            <Box color="white">
+            <Box color="white" width="100%">
                 <Flex justifyContent="space-between" alignItems="center">
                     <Box
                         minWidth="75px"
@@ -30,9 +30,7 @@ const Project = ({ src, title, desc, actionLabel }) => {
                             style={{ borderRadius: "50px" }}
                         />
                     </Box>
-                    <Button borderRadius="50px" fontSize="sm" bg="black">
-                        {actionLabel}
-                    </Button>
+                    <Button variant="action-button">{actionLabel}</Button>
                 </Flex>
                 <Box alignSelf="center" mt="10px">
                     <Text fontWeight="bold" fontSize="2xl" color="black">

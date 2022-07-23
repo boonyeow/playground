@@ -15,14 +15,11 @@ import LaunchpadContent from "../../components/Launchpad/LaunchpadContent";
 export default function Home() {
     return (
         <>
-            {/* <Navbar /> */}
-            <Flex></Flex>
             <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
-                <Sidebar active="Launchpad"/>
+                <Sidebar active="Launchpad" />
 
                 <LaunchpadContent />
             </Box>
-            {/* <Footer /> */}
         </>
     );
 }

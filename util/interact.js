@@ -70,4 +70,13 @@ export function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+export function truncateAddress(addr, displayLength) {
+    const length = addr.length;
+    return (
+        addr.substring(0, displayLength) +
+        "..." +
+        addr.substring(length - displayLength, length)
+    );
+}
+
 export default ICONexConnection;
