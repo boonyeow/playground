@@ -8,13 +8,8 @@ import {
     FormLabel,
     FormHelperText,
     Textarea,
-    Select,
     HStack,
-    Grid,
-    GridItem,
     Button,
-    Stack,
-    VisuallyHidden,
     NumberInput,
     NumberInputField,
     VisuallyHiddenInput,
@@ -23,15 +18,16 @@ import { useEffect, useRef, useState } from "react";
 import PageHeader from "../../components/PageHeader";
 import Sidebar from "../../components/Sidebar";
 import { useRouter } from "next/router";
-import { BsChevronLeft } from "react-icons/bs";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import NextLink from "next/link";
-import UploadFileComponent from "../../components/UploadFileComponent";
 import Project from "../../components/Project";
+import dynamic from "next/dynamic";
 import NextImage from "next/image";
-// import "react-date-range/dist/styles.css"; // main style file
-// import "react-date-range/dist/theme/default.css"; // theme css file
-// import { Calendar } from "react-date-range";
+import NextLink from "next/link";
+import DatePicker from "../../components/DatePicker";
+
+const Editor = dynamic(() => import("../../components/MyEditor"), {
+    ssr: false,
+});
 
 const ProjectDetails = () => {
     const router = useRouter();
@@ -44,21 +40,22 @@ const ProjectDetails = () => {
 
     const [previewInfo, setPreviewInfo] = useState({
         thumbnailSrc: "/../../4.avif",
-        shortDesc:
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries",
+        shortDesc: "",
     });
-    const [thumbnailSrc, setThumbnailSrc] = useState("/../../4.avif");
+
+    // my editor settings
+    const [editorLoaded, setEditorLoaded] = useState(false);
+    const [data, setData] = useState("");
 
     useEffect(() => {
         const temp = localStorage.getItem("_persist");
         temp = temp == null ? userInfo : JSON.parse(temp);
         setUserInfo(temp);
+        setEditorLoaded(true);
         // add check if user is not deployer, not allowed to view
-    }, []);
 
-    const handleSelect = (date) => {
-        console.log(date);
-    };
+        //
+    }, []);
 
     const handleUploadFile = (e) => {
         if (e.target.files.length != 1) {
@@ -75,8 +72,21 @@ const ProjectDetails = () => {
 
         // https://stackoverflow.com/questions/38049966/get-image-preview-before-uploading-in-react
         const objectURL = URL.createObjectURL(uploadedFile);
-        setThumbnailSrc(objectURL);
+        // setThumbnailSrc(objectURL);
+        setPreviewInfo({
+            thumbnailSrc: objectURL,
+            shortDesc: previewInfo.shortDesc,
+        });
+
         return () => URL.revokeObjectURL(objectURL);
+    };
+
+    const handleUpdateDesc = (e) => {
+        console.log(e.target.value);
+        setPreviewInfo({
+            thumbnailSrc: previewInfo.thumbnailSrc,
+            shortDesc: e.target.value,
+        });
     };
 
     return (
@@ -106,10 +116,12 @@ const ProjectDetails = () => {
                         </Flex>
 
                         <Box mt="25px">
-                            <Flex></Flex>
-
-                            <Grid templateColumns="repeat(3,1fr)" gap="25px">
-                                <GridItem colSpan={2}>
+                            <Flex>
+                                <Box
+                                    width="100%"
+                                    maxWidth="calc(100% / 3 * 2 - 12.5px)"
+                                    mr="25px"
+                                >
                                     <FormControl>
                                         <Flex>
                                             <Box
@@ -118,7 +130,6 @@ const ProjectDetails = () => {
                                                 height="75px"
                                                 bg="#272727"
                                                 mr="30px"
-                                                // p="2px"
                                                 borderRadius={"50px"}
                                             >
                                                 <NextImage
@@ -126,7 +137,9 @@ const ProjectDetails = () => {
                                                     objectFit="contain"
                                                     width="100%"
                                                     height="100%"
-                                                    src={thumbnailSrc}
+                                                    src={
+                                                        previewInfo.thumbnailSrc
+                                                    }
                                                     style={{
                                                         borderRadius: "50px",
                                                     }}
@@ -158,7 +171,12 @@ const ProjectDetails = () => {
                                     </FormControl>
                                     <FormControl mt="25px">
                                         <FormLabel>Description</FormLabel>
-                                        <Input type="text" bg="white"></Input>
+                                        <Input
+                                            type="text"
+                                            bg="white"
+                                            onChange={handleUpdateDesc}
+                                            value={previewInfo.shortDesc}
+                                        ></Input>
                                         <FormHelperText>
                                             Tell us about your project in a
                                             sentence.
@@ -179,12 +197,6 @@ const ProjectDetails = () => {
                                         </FormControl>
                                         <FormControl alignSelf="baseline">
                                             <FormLabel>Price per NFT</FormLabel>
-                                            {/* <Input
-                                                type="number"
-                                                defaultValue={100}
-                                                bg="white"
-                                                min={100}
-                                            ></Input> */}
                                             <NumberInput min={100}>
                                                 <NumberInputField bg="white" />
                                             </NumberInput>
@@ -194,31 +206,21 @@ const ProjectDetails = () => {
                                             </FormHelperText>
                                         </FormControl>
                                     </HStack>
-                                    <HStack spacing="25px" mt="25px">
+                                    <Box mt="25px">
                                         <FormControl alignSelf="baseline">
-                                            <FormLabel>Start date</FormLabel>
-                                            <Input
-                                                type="date"
-                                                bg="white"
-                                            ></Input>
+                                            <FormLabel>
+                                                Campaign Duration
+                                            </FormLabel>
+                                            <DatePicker />
                                         </FormControl>
-                                        <FormControl alignSelf="baseline">
-                                            <FormLabel>End date</FormLabel>
-                                            <Input
-                                                type="date"
-                                                bg="white"
-                                            ></Input>
-                                        </FormControl>
-                                    </HStack>
-
+                                    </Box>
                                     <FormControl mt="25px">
-                                        <FormLabel>Long Description</FormLabel>
-                                        <Textarea
-                                            type="text"
-                                            noOfLines={5}
-                                            placeholder="Enter a detailed description of your project"
-                                            bg="white"
-                                        ></Textarea>
+                                        <FormLabel>Project Overview</FormLabel>
+                                        <Editor
+                                            value={"Foo"}
+                                            onChange={(v) => console.log(v)}
+                                        />
+
                                         <FormHelperText>
                                             Tell us about your project, team,
                                             and milestones you intend to achieve
@@ -234,19 +236,22 @@ const ProjectDetails = () => {
                                             Save Changes
                                         </Button>
                                     </Box>
-                                </GridItem>
-                                <GridItem colSpan={1}>
+                                </Box>
+                                <Box
+                                    maxWidth="calc(100% / 3 - 12.5px)"
+                                    width="100%"
+                                >
                                     <FormControl>
                                         <FormLabel>Preview</FormLabel>
                                         <Project
-                                            src={thumbnailSrc}
+                                            src={previewInfo.thumbnailSrc}
                                             title="hello"
-                                            desc="hello world"
+                                            desc={previewInfo.shortDesc}
                                             actionLabel="View Project"
                                         />
                                     </FormControl>
-                                </GridItem>
-                            </Grid>
+                                </Box>
+                            </Flex>
                         </Box>
                     </Box>
                 </Box>

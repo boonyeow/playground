@@ -29,7 +29,7 @@ const {
 
 const connection = new ICONexConnection();
 
-const NewProjectModal = ({ onClose, isOpen }) => {
+const NewProjectModal = ({ onClose, isOpen, userInfo }) => {
     const [showStatus, setShowStatus] = useState(false);
     const [statusType, setStatusType] = useState("loading");
     const [statusTitle, setStatusTitle] = useState("deploying contract");
@@ -49,7 +49,7 @@ const NewProjectModal = ({ onClose, isOpen }) => {
         // deploy contract
         const txObj = new IconBuilder.DeployTransactionBuilder()
             .nid(cfg.NID)
-            .from(localStorage.getItem("USER_WALLET_ADDRESS"))
+            .from(userInfo.userAddress)
             .to(cfg.SCORE_INSTALL_ADDRESS)
             .version(IconConverter.toBigNumber(3))
             .timestamp(Date.now() * 1000)
@@ -95,13 +95,10 @@ const NewProjectModal = ({ onClose, isOpen }) => {
                     .execute();
                 await sleep(5000);
 
-                console.log("txResult", txResult);
                 let response = await axios.post(
                     "http://localhost:3000/api/projects/add", //change it to {endpoint}/api/projects/add
                     {
-                        userAddress: localStorage.getItem(
-                            "USER_WALLET_ADDRESS"
-                        ),
+                        userAddress: userInfo.userAddress,
                         contractAddress: txResult.scoreAddress,
                         name: projectName,
                         shortDescription: "",

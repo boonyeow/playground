@@ -69,7 +69,11 @@ const LaunchpadContent = () => {
                     actionLabel="View Project"
                 />
             ))}
-            <NewProjectModal onClose={onClose} isOpen={isOpen} />
+            <NewProjectModal
+                onClose={onClose}
+                isOpen={isOpen}
+                userInfo={userInfo}
+            />
         </SimpleGrid>
     );
 

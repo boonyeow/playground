@@ -36,7 +36,7 @@ const Project = ({ src, title, desc, actionLabel }) => {
                     <Text fontWeight="bold" fontSize="2xl" color="black">
                         {title}
                     </Text>
-                    <Text color="#686868" mt="10px">
+                    <Text color="#686868" mt="10px" noOfLines={3}>
                         {desc}
                     </Text>
                 </Box>
