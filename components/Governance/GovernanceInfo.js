@@ -7,10 +7,24 @@ import {
     SimpleGrid,
     Text,
     VStack,
+    Table,
+    Thead,
+    Tbody,
+    Tfoot,
+    Tr,
+    Th,
+    Td,
+    TableCaption,
+    TableContainer,
+    Progress,
 } from "@chakra-ui/react";
+import { Greengrass } from "aws-sdk";
 import FeaturedProject from "../FeaturedProject";
 import Project from "../Project";
-const GovernanceInfo = () => {
+import ProposalCollection from "../ProposalCollection";
+const GovernanceInfo = ({ proposalInfo }) => {
+    console.log(proposalInfo);
+
     return (
         <>
             <Box width="100%" height="100%" ml="75px" p="1.5rem 3rem 3rem 3rem">
@@ -48,8 +62,20 @@ const GovernanceInfo = () => {
                         borderRadius="15px"
                         p="30px"
                         border="1px solid #f1f1f1"
+                        bg="white"
                     >
-                        <Text>Most Active Address, Delegate, </Text>
+                        <Text fontSize="20px" fontWeight="bold" paddingBottom="12px">Proposals</Text>
+                        <ProposalCollection proposalInfo={proposalInfo} />
+                    </Box>
+                    <Box
+                        width="100%"
+                        mt="25px"
+                        borderRadius="15px"
+                        p="30px"
+                        border="1px solid #f1f1f1"
+                        bg="white"
+                    >
+                        <Text fontSize="20px" fontWeight="bold" paddingBottom="12px">Voters by Voting Weight</Text>
                     </Box>
                 </Box>
             </Box>
