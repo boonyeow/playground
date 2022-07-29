@@ -12,7 +12,7 @@ import "../../styles/Home.module.css";
 import Sidebar from "../../components/Sidebar";
 import LaunchpadContent from "../../components/Launchpad/LaunchpadContent";
 
-export default function Home() {
+export default function Launchpad() {
     return (
         <>
             <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">

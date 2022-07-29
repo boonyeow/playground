@@ -1,18 +1,26 @@
 import { Box, Text, VStack, Button, Flex } from "@chakra-ui/react";
 import NextImage from "next/image";
+import NextLink from "next/link";
 
 const FeaturedProject = ({
     src,
     title,
     desc,
     price,
-    fundingRequested,
-    launchTimestamp,
+    fundingGoal,
+    startTimestamp,
+    addr,
+    actionLabel,
 }) => {
+    src = src == "" ? "/../../4.avif" : src; // to remove;
     return (
-        <Flex borderRadius="15px" p="30px" shadow="md" bg="#0e0e0e" mt="10px">
-            <Box color="white">
-                <Flex justifyContent="space-between" alignItems="center">
+        <Flex borderRadius="15px" p="30px" shadow="md" bg="#0e0e0e" w="100%">
+            <Box color="white" w="100%">
+                <Flex
+                    justifyContent="space-between"
+                    alignItems="center"
+                    w="100%"
+                >
                     <Box
                         minWidth="75px"
                         width="75px"
@@ -31,9 +39,11 @@ const FeaturedProject = ({
                             style={{ borderRadius: "50px" }}
                         />
                     </Box>
-                    <Button borderRadius="50px" color="black" fontSize="sm">
-                        View Project
-                    </Button>
+                    <NextLink href={`/governance/${addr}`}>
+                        <Button borderRadius="50px" color="black" fontSize="sm">
+                            {actionLabel}
+                        </Button>
+                    </NextLink>
                 </Flex>
                 <Box alignSelf="center" mt="10px">
                     <Text fontWeight="bold" fontSize="2xl">
@@ -74,34 +84,38 @@ const FeaturedProject = ({
                                 alignSelf="self-start"
                                 fontSize="sm"
                             >
-                                Funding requested
+                                Funding goal
                             </Text>
                             <Text
                                 fontSize="lg"
                                 alignSelf="self-start"
                                 color="#8e8e8e"
                             >
-                                {fundingRequested}
+                                {fundingGoal}
                             </Text>
                         </VStack>
-                        <VStack mr="30px" spacing="0">
-                            <Text
-                                color="white"
-                                fontWeight="semibold"
-                                alignSelf="self-start"
-                                fontSize="sm"
-                            >
-                                Starts in
-                            </Text>
-                            <Text
-                                fontSize="lg"
-                                alignSelf="self-start"
-                                color="#8e8e8e"
-                            >
-                                {launchTimestamp}
-                                {/* remember to update for realtime countdown  */}
-                            </Text>
-                        </VStack>
+                        {!startTimestamp ? (
+                            ""
+                        ) : (
+                            <VStack mr="30px" spacing="0">
+                                <Text
+                                    color="white"
+                                    fontWeight="semibold"
+                                    alignSelf="self-start"
+                                    fontSize="sm"
+                                >
+                                    Starts in
+                                </Text>
+                                <Text
+                                    fontSize="lg"
+                                    alignSelf="self-start"
+                                    color="#8e8e8e"
+                                >
+                                    {startTimestamp}
+                                    {/* remember to update for realtime countdown  */}
+                                </Text>
+                            </VStack>
+                        )}
                     </Box>
                 </Box>
             </Box>

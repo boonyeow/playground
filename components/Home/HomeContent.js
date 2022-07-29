@@ -26,19 +26,18 @@ const HomeContent = () => {
                     <Text color="gray.600" fontWeight="semibold">
                         Featured
                     </Text>
-                    <SimpleGrid columns="2" spacingX="25px">
+                    <SimpleGrid columns="2" spacingX="25px" mt="10px">
                         <FeaturedProject
                             src="/../public/unnamed.jpg"
                             title="Project Name"
                             desc="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an"
                             price="100 ICX"
-                            fundingRequested="20,000 ICX"
+                            fundingGoal="20,000 ICX"
                             launchTimestamp="18 July 2022"
                         />
 
                         <Box
                             width="100%"
-                            mt="10px"
                             borderRadius="15px"
                             p="30px"
                             bg="linear-gradient(120deg, #f26688, #ff7878, #ff8f69, #ffa860, #ffc25e)"
@@ -97,6 +96,18 @@ const HomeContent = () => {
                         Recently launched
                     </Text>
                     <SimpleGrid spacingX="25px" spacingY="25px" columns="3">
+                        <Project
+                            title="Project Name"
+                            desc="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an"
+                            src="/../public/unnamed.jpg"
+                            actionLabel="View Project"
+                        />
+                        <Project
+                            title="Project Name"
+                            desc="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an"
+                            src="/../public/unnamed.jpg"
+                            actionLabel="View Project"
+                        />
                         <Project
                             title="Project Name"
                             desc="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an"

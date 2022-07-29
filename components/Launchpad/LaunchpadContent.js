@@ -65,7 +65,7 @@ const LaunchpadContent = () => {
                     key={index}
                     title={currentCollection.name}
                     addr={currentCollection.contractAddress}
-                    src={currentCollection.thumbnail}
+                    src={currentCollection.thumbnailSrc}
                     actionLabel="View Project"
                 />
             ))}
@@ -73,6 +73,7 @@ const LaunchpadContent = () => {
                 onClose={onClose}
                 isOpen={isOpen}
                 userInfo={userInfo}
+                setUserInfo={setUserInfo}
             />
         </SimpleGrid>
     );

@@ -12,7 +12,7 @@ function padLeadingZeros(num, size) {
 const fetchContractContent = async () => {
     try {
         let params = {
-            Bucket: "sauce3",
+            Bucket: "sauce",
             Key: "contracts-0.0.1-optimized.jar",
         };
 

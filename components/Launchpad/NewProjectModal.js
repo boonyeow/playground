@@ -29,7 +29,7 @@ const {
 
 const connection = new ICONexConnection();
 
-const NewProjectModal = ({ onClose, isOpen, userInfo }) => {
+const NewProjectModal = ({ onClose, isOpen, userInfo, setUserInfo }) => {
     const [showStatus, setShowStatus] = useState(false);
     const [statusType, setStatusType] = useState("loading");
     const [statusTitle, setStatusTitle] = useState("deploying contract");
@@ -95,24 +95,43 @@ const NewProjectModal = ({ onClose, isOpen, userInfo }) => {
                     .execute();
                 await sleep(5000);
 
+                let params = {
+                    userAddress: userInfo.userAddress,
+                    contractAddress: txResult.scoreAddress,
+                    name: projectName,
+                    description: "",
+                    details: "",
+                    thumbnailSrc: "",
+                    fundingGoal: "",
+                    pricePerNFT: "",
+                    startTimestamp: "",
+                    endTimestamp: "",
+                };
                 let response = await axios.post(
                     "http://localhost:3000/api/projects/add", //change it to {endpoint}/api/projects/add
-                    {
-                        userAddress: userInfo.userAddress,
-                        contractAddress: txResult.scoreAddress,
-                        name: projectName,
-                        shortDescription: "",
-                        longDescription: "",
-                        thumbnail: "",
-                        fundingGoal: 0,
-                        softCap: 0,
-                    }
+                    params
                 );
                 console.log("res", response);
 
                 setStatusType("success");
                 setStatusTitle("success");
                 setStatusDesc("your contract has been deployed!");
+
+                let projectsDeployed = userInfo.projectsDeployed;
+                projectsDeployed.push(params);
+                localStorage.setItem(
+                    "_persist",
+                    JSON.stringify({
+                        userAddress: userInfo.userAddress,
+                        projectsDeployed: projectsDeployed,
+                    })
+                );
+                // await sleep(2000);
+                // onClose();
+                setUserInfo({
+                    userAddress: userInfo.userAddress,
+                    projectsDeployed: projectsDeployed,
+                });
             }
         } catch (err) {
             console.log(err);

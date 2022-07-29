@@ -1,6 +1,7 @@
 import { Box, Text, VStack, Button, Flex } from "@chakra-ui/react";
 import NextImage from "next/image";
 const Project = ({ src, title, desc, actionLabel }) => {
+    src = src == "" ? "/../../4.avif" : src; // to remove;
     return (
         <Flex
             mt="10px"

@@ -11,13 +11,13 @@ import {
 import "../../styles/Home.module.css";
 import Sidebar from "../../components/Sidebar";
 import ExploreContent from "../../components/Explore/ExploreContent";
-export default function Home() {
+export default function Explore() {
     return (
         <>
             {/* <Navbar /> */}
             <Flex></Flex>
             <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
-                <Sidebar active="Explore"/>
+                <Sidebar active="Explore" />
 
                 <ExploreContent />
             </Box>

@@ -6,11 +6,7 @@ import {
     SelectRangeEventHandler,
 } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-const DatePicker = () => {
-    const [selectedRange, setSelectedRange] = useState({
-        from: "",
-        to: "",
-    });
+const DatePicker = ({ selectedRange, setSelectedRange }) => {
     const [fromValue, setFromValue] = useState("");
     const [toValue, setToValue] = useState("");
 
@@ -35,7 +31,7 @@ const DatePicker = () => {
                 <DayPicker
                     mode="range"
                     selected={selectedRange}
-                    onSelect={handleRangeSelect}
+                    onSelect={setSelectedRange}
                     min={1}
                     max={30}
                     fromDate={new Date()}
