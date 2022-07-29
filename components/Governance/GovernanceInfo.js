@@ -22,20 +22,30 @@ import { Greengrass } from "aws-sdk";
 import FeaturedProject from "../FeaturedProject";
 import Project from "../Project";
 import ProposalCollection from "../ProposalCollection";
-const GovernanceInfo = ({ proposalInfo }) => {
-    console.log(proposalInfo);
+import OwnerList from "../OwnerList";
+import { useEffect, useRef, useState } from "react";
+import PageHeader from "../PageHeader";
 
+
+const GovernanceInfo = ({ proposalInfo, voterInfo, pid }) => {
+    const [userInfo, setUserInfo] = useState({
+        userAddress: 0,
+        projectsDeployed: [],
+    });
+
+    useEffect(() => {
+        const temp = localStorage.getItem("_persist");
+        temp = temp == null ? userInfo : JSON.parse(temp);
+        setUserInfo(temp);
+    }, []);
     return (
         <>
             <Box width="100%" height="100%" ml="75px" p="1.5rem 3rem 3rem 3rem">
-                <Flex alignItems="center" justifyContent="space-between">
-                    <Text fontSize="4xl" fontWeight="bold">
-                        Governance
-                    </Text>
-                    <Button bg="primary" color="white">
-                        Sign in
-                    </Button>
-                </Flex>
+                <PageHeader
+                    title="Governance"
+                    userInfo={userInfo}
+                    setUserInfo={setUserInfo}
+                />
                 <Box w="100%" mt="15px">
                     <SimpleGrid columns="2" spacingX="25px">
                         <FeaturedProject
@@ -66,6 +76,8 @@ const GovernanceInfo = ({ proposalInfo }) => {
                     >
                         <Text fontSize="20px" fontWeight="bold" paddingBottom="12px">Proposals</Text>
                         <ProposalCollection proposalInfo={proposalInfo} />
+                        { }
+
                     </Box>
                     <Box
                         width="100%"
@@ -76,6 +88,7 @@ const GovernanceInfo = ({ proposalInfo }) => {
                         bg="white"
                     >
                         <Text fontSize="20px" fontWeight="bold" paddingBottom="12px">Voters by Voting Weight</Text>
+                        <OwnerList voterInfo={voterInfo} userInfo={userInfo} pid={pid} />
                     </Box>
                 </Box>
             </Box>

@@ -19,10 +19,11 @@ const ProjectGovernance = () => {
     const router = useRouter();
     const { pid } = router.query;
     const connection = new ICONexConnection;
+
     const [proposalInfo, setProposalInfo] = useState({
         proposals: [
             {
-                id: "0",
+                id: "-",
                 startBlockHeight: 0,
                 status: 0,
                 disagreeVotes: 0,
@@ -32,6 +33,7 @@ const ProjectGovernance = () => {
         ]
     });
 
+    const [voterInfo, setVoterInfo] = useState({});
     useEffect(() => {
         if (router.isReady) {
             const txObj = new IconBuilder.CallBuilder()
@@ -44,24 +46,28 @@ const ProjectGovernance = () => {
                 .execute()
                 .then((res) => {
                     var json = JSON.parse(res)
-                    // var idList = []
-                    // var statusList = []
-                    // for (let i = 0; i < json.proposals.length; i++) {
-                    //     idList.push(json.proposals[i].id)
-                    //     statusList.push(json.proposals[i].status)
-                    // }
-                    // setProposalInfo({ id: idList, status: statusList })
                     setProposalInfo(json)
+                });
+
+            txObj = new IconBuilder.CallBuilder()
+                .method('getAllVoters')
+                .to(pid)
+                .build();
+
+            connection.iconService
+                .call(txObj)
+                .execute()
+                .then((res) => {
+                    setVoterInfo(res)
                 });
         }
     }, [router.isReady]);
 
     return (
         <>
-            {console.log(proposalInfo)}
             <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
-                <Sidebar />
-                <GovernanceInfo proposalInfo={proposalInfo} />
+                <Sidebar active="Governance" />
+                <GovernanceInfo proposalInfo={proposalInfo} voterInfo={voterInfo} pid={pid} />
             </Box>
         </>
     );
