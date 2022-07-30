@@ -15,14 +15,15 @@ import {
     Td,
     TableCaption,
     TableContainer,
-    Progress,
+    useToast,
 } from "@chakra-ui/react";
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
 import { useTable, useSortBy } from 'react-table'
 import IconService from "icon-sdk-js";
 import { useRouter } from "next/router";
-import ICONexConnection from "../util/interact";
+import ICONexConnection, { sleep } from "../util/interact";
 import CustomAlert from ".//CustomAlert.js";
+import React, { useEffect, useRef, useState } from "react";
 
 const {
     IconConverter,
@@ -46,6 +47,16 @@ const OwnerList = ({ voterInfo, userInfo, pid }) => {
         return b.value - a.value;
     })
 
+    // custom alert state initialization
+    const [showStatus, setShowStatus] = useState(false);
+    const [statusType, setStatusType] = useState("loading");
+    const [statusTitle, setStatusTitle] = useState("Delegating..");
+    const [statusDesc, setStatusDesc] = useState("Awaiting transaction approval");
+
+    // toast initialization
+    const toast = useToast()
+
+    // delegate function
     const delegateVotes = async (delegateAddress) => {
         const txObj = new IconBuilder.CallTransactionBuilder()
             .from(userInfo.userAddress)
@@ -60,9 +71,29 @@ const OwnerList = ({ voterInfo, userInfo, pid }) => {
             })
             .build();
 
-        const estimatedSteps = IconConverter.toBigNumber(
-            await connection.debugService.estimateStep(txObj).execute()
-        );
+        let estimatedSteps;
+
+        try {
+            estimatedSteps = IconConverter.toBigNumber(
+                await connection.debugService.estimateStep(txObj).execute()
+            );
+        } catch (err) {
+            toast({
+                title: 'Invalid Delegatee',
+                description: "Unable to delegate to this address.",
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+                position: "bottom-right",
+            })
+            return;
+        }
+
+        // in case they close custom alert before cancelling
+        setStatusType("loading");
+        setStatusTitle("Delegating..");
+        setStatusDesc("Awaiting transaction approval")
+        setShowStatus(true);
 
         const margin = IconConverter.toBigNumber(10000);
 
@@ -78,12 +109,39 @@ const OwnerList = ({ voterInfo, userInfo, pid }) => {
             params: IconConverter.toRawTransaction(txObj),
         };
 
-        let rpcResponse = await connection.ICONexRequest(
-            "REQUEST_JSON-RPC",
-            payload
-        );
-        console.log(rpcResponse.error);
+        try {
+            let rpcResponse = await connection.ICONexRequest(
+                "REQUEST_JSON-RPC",
+                payload
+            );
+            if (rpcResponse.error) {
+                setStatusType("failure");
+                setStatusTitle("Cancelled");
+                setStatusDesc("Delegation process has been stopped");
+            } else {
+                console.log(rpcResponse);
+                await sleep(5000);
+                const txResult = await connection.iconService
+                    .getTransactionResult(rpcResponse.result)
+                    .execute();
 
+                // await sleep(5000); // might require it
+                if (txResult.status == 0) {
+                    setStatusType("failure");
+                    setStatusTitle("Delegation failed");
+                    setStatusDesc("Unexpected error has occurred");
+                } else if (txResult.status == 1) {
+                    setStatusType("success");
+                    setStatusTitle("Success!");
+                    setStatusDesc("Votes have been delegated :)");
+                }
+            }
+        } catch (err) {
+            console.log("error in rpcResponse catch block", err);
+            setStatusType("failure");
+            setStatusTitle("oops");
+            setStatusDesc("idk what happen");
+        }
     }
 
     return (
@@ -122,8 +180,18 @@ const OwnerList = ({ voterInfo, userInfo, pid }) => {
                     </Tbody>
                 </Table>
             </TableContainer>
-            {/* <Button onClick={lol}>d</Button> */}
-            <CustomAlert showStatus={false} title="TITLE" desc="DESC" status="status" />
+            <CustomAlert
+                showStatus={showStatus}
+                title={statusTitle}
+                desc={statusDesc}
+                status={statusType}
+                onClose={() => {
+                    setShowStatus(false);
+                    setStatusType("loading");
+                    setStatusTitle("Delegating..");
+                    setStatusDesc("Awaiting transaction approval"); //revert everything to default
+                }}
+            />
 
         </>
     );
