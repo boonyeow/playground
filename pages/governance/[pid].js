@@ -33,6 +33,9 @@ const ProjectGovernance = () => {
         ]
     });
 
+    const [fund, setFund] = useState(0);
+
+
     const [voterInfo, setVoterInfo] = useState({});
     useEffect(() => {
         if (router.isReady) {
@@ -60,6 +63,17 @@ const ProjectGovernance = () => {
                 .then((res) => {
                     setVoterInfo(res)
                 });
+
+            const getContractBalance = async () => {
+                const balance = await connection.iconService
+                    .getBalance(pid)
+                    .execute();
+                setFund(IconConverter.toNumber(balance))
+            };
+
+            getContractBalance();
+
+
         }
     }, [router.isReady]);
 
@@ -67,7 +81,7 @@ const ProjectGovernance = () => {
         <>
             <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
                 <Sidebar active="Governance" />
-                <GovernanceInfo proposalInfo={proposalInfo} voterInfo={voterInfo} pid={pid} />
+                <GovernanceInfo proposalInfo={proposalInfo} voterInfo={voterInfo} pid={pid} totalFund={fund} holders={voterInfo.length} />
             </Box>
         </>
     );
