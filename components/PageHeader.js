@@ -50,14 +50,14 @@ const PageHeader = ({ title, userInfo, setUserInfo }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const connectWallet = async () => {
-        let _walletAddress = await connection.getWalletAddress();
-        if (_walletAddress) {
+        let userAddress = await connection.getWalletAddress();
+        if (userAddress) {
             let res = await axios.get(
-                `http://localhost:3000/api/projects?userAddress=${_walletAddress}`
+                `http://localhost:3000/api/projects?userAddress=${userAddress}`
             );
 
             const temp = {
-                userAddress: _walletAddress,
+                userAddress: userAddress,
                 projectsDeployed: res.data,
             };
             setUserInfo(temp);

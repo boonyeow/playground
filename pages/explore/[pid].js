@@ -4,8 +4,10 @@ import {
     Flex,
     Heading,
     HStack,
+    Input,
     SimpleGrid,
     Text,
+    useNumberInput,
     VStack,
 } from "@chakra-ui/react";
 import "../../styles/Home.module.css";
@@ -16,9 +18,17 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NextLink from "next/link";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import FeaturedProject from "../../components/FeaturedProject";
 import IconService from "icon-sdk-js";
 import ICONexConnection from "../../util/interact";
+import Dispenser from "../../components/Dispenser";
+import dynamic from "next/dynamic";
+
+const FeaturedProject = dynamic(
+    () => import("../../components/FeaturedProject"),
+    {
+        ssr: false,
+    }
+);
 
 const {
     IconConverter,
@@ -42,11 +52,13 @@ const ProjectDetail = () => {
         thumbnailSrc: "",
         description: "",
         details: "",
-        fundingGoal: 0,
-        pricePerNFT: 0,
-        startTimestamp: 0,
-        endTimestamp: 0,
+        fundingGoal: "",
+        pricePerNFT: "",
+        startTimestamp: "",
+        endTimestamp: "",
     });
+
+    const [contractBalance, setContractBalance] = useState(0);
 
     useEffect(() => {
         const fetchProjectInfo = async () => {
@@ -62,17 +74,25 @@ const ProjectDetail = () => {
                 thumbnailSrc: res.thumbnailSrc,
                 description: res.description,
                 details: res.details,
-                fundingGoal: IconConverter.toUtf8(res.fundingGoal),
-                pricePerNFT: IconConverter.toUtf8(res.pricePerNFT),
+                fundingGoal: IconConverter.toNumber(res.fundingGoal),
+                pricePerNFT: IconConverter.toNumber(res.pricePerNFT),
                 startTimestamp: IconConverter.toNumber(res.startTimestamp),
                 endTimestamp: IconConverter.toNumber(res.endTimestamp),
             };
             setProjectInfo(pi);
         };
 
+        const getContractBalance = async () => {
+            const balance = await connection.iconService
+                .getBalance(pid)
+                .execute();
+            setContractBalance(IconConverter.toNumber(balance) / 10 ** 18);
+        };
+
         if (router.isReady) {
             //fetch contract data
             fetchProjectInfo();
+            getContractBalance();
         }
     }, [router.isReady]);
 
@@ -97,25 +117,22 @@ const ProjectDetail = () => {
                             </Text>
                         </Flex>
                         <Flex width="100%" mt="25px">
-                            <Box w="50%" h="100%">
+                            <SimpleGrid
+                                columns="2"
+                                spacingX="25px"
+                                width="100%"
+                            >
                                 <FeaturedProject
-                                    src={projectInfo.thumbnailSrc}
-                                    title={projectInfo.name}
-                                    desc={projectInfo.description}
-                                    price={`${projectInfo.pricePerNFT} ICX`}
-                                    fundingGoal={projectInfo.fundingGoal}
-                                    startTimestamp={projectInfo.startTimestamp}
+                                    projectInfo={projectInfo}
                                     addr={pid}
                                     actionLabel="View Activity"
                                 />
-                            </Box>
-                            <Box w="50%" h="100%" bg="blue">
-                                hello
-                            </Box>
-                        </Flex>
-                        <Flex width="50%" height="100%">
-                            <Box width="100%" height="100%" bg="blue"></Box>
-                            {/* minting dispenser */}
+                                <Dispenser
+                                    projectInfo={projectInfo}
+                                    contractBalance={contractBalance}
+                                    pid={pid}
+                                />
+                            </SimpleGrid>
                         </Flex>
                     </Box>
                 </Box>

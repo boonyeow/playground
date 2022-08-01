@@ -7,80 +7,144 @@ import {
     Text,
     useNumberInput,
     VStack,
+    Flex,
+    NumberInput,
+    NumberInputField,
 } from "@chakra-ui/react";
+import { useEffect, useRef, useState } from "react";
+import IconService from "icon-sdk-js";
+import ICONexConnection, { numberWithCommas, sleep } from "../util/interact";
+import cfg from "../util/config";
 
-const Dispenser = (props) => {
-    const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } =
-        useNumberInput({
-            step: 1,
-            defaultValue: 1,
-            min: 1,
-            max: 5,
-        });
+const {
+    IconConverter,
+    IconBuilder,
+    HttpProvider,
+    SignedTransaction,
+    IconWallet,
+} = IconService;
 
-    const inc = getIncrementButtonProps();
-    const dec = getDecrementButtonProps();
-    const input = getInputProps();
+const Dispenser = ({ projectInfo, contractBalance, pid }) => {
+    const connection = new ICONexConnection();
+    const tbQuantity = useRef(null);
+    let [campaignProgress, setCampaignProgress] = useState(0);
+    let [totalPrice, setTotalPrice] = useState(0);
+
+    const [userInfo, setUserInfo] = useState({
+        userAddress: 0,
+        projectsDeployed: [],
+    });
+
+    useEffect(() => {
+        const temp = localStorage.getItem("_persist");
+        temp = temp == null ? userInfo : JSON.parse(temp);
+        setUserInfo(temp);
+        setCampaignProgress(contractBalance / projectInfo.fundingGoal);
+    }, []);
+
+    const handleUpdatePrice = (e) => {
+        setTotalPrice(projectInfo.pricePerNFT * e.target.value);
+    };
+
+    const handleMint = async () => {
+        const quantity = tbQuantity.current.value;
+        if (quantity == "") {
+            alert("invalid quantity");
+            return;
+        }
+
+        const txObj = new IconBuilder.CallTransactionBuilder()
+            .from(userInfo.userAddress)
+            .to(pid)
+            .nid(cfg.NID)
+            .nonce(IconConverter.toBigNumber(1))
+            .version(IconConverter.toBigNumber(3))
+            .timestamp(new Date().getTime() * 1000)
+            .method("test1")
+            .params({
+                quantity: IconConverter.toHexNumber(quantity),
+            })
+            .value(
+                IconConverter.toHexNumber(
+                    quantity * projectInfo.pricePerNFT * 10 ** 18
+                )
+            )
+            .build();
+
+        const estimatedSteps = IconConverter.toBigNumber(
+            await connection.debugService.estimateStep(txObj).execute()
+        );
+
+        txObj.stepLimit = IconService.IconConverter.toHex(
+            estimatedSteps.plus(IconConverter.toBigNumber(10000)) // prevent out of step
+        );
+
+        const payload = {
+            jsonrpc: "2.0",
+            method: "icx_sendTransaction",
+            id: 6639,
+            params: IconConverter.toRawTransaction(txObj),
+        };
+
+        let rpcResponse = await connection.ICONexRequest(
+            "REQUEST_JSON-RPC",
+            payload
+        );
+    };
 
     return (
         <Box
-            background="radial-gradient(circle, #181818, black)"
-            borderRadius="1rem"
-            padding="1rem"
-            mt={props.mt}
-            color="white"
-            display="inline-block"
-            width={props.width}
+            borderRadius="15px"
+            p="30px"
+            bg="white"
+            border="1px solid var(--chakra-colors-blackAlpha-200);"
         >
-            <Box bgColor="White"></Box>
-            <Heading fontSize="2xl">NFT Dispenser</Heading>
-            <HStack spacing="50" px="1rem" pt="0.5rem">
-                <VStack>
-                    <Text color="#979797">Collection</Text>
-                    <Text>Jan Protocol</Text>
-                </VStack>
-                <VStack>
-                    <Text color="#979797">Quantity</Text>
-                    <HStack maxW="150px">
-                        <Button
-                            {...inc}
-                            padding={"0"}
-                            height="auto"
-                            bgColor="transparent"
-                            _active={{ bgColor: "transparent" }}
-                            _hover={{ bgColor: "transparent" }}
-                        >
-                            +
-                        </Button>
-                        <Input
-                            {...input}
-                            textAlign="center"
-                            border="0"
-                            padding={"0"}
-                            height="auto"
-                            _focus={{ border: "0" }}
-                        />
-                        <Button
-                            {...dec}
-                            padding={"0"}
-                            height="auto"
-                            bgColor="transparent"
-                            _active={{ bgColor: "transparent" }}
-                            _hover={{ bgColor: "transparent" }}
-                        >
-                            -
-                        </Button>
-                    </HStack>
-                </VStack>
-                <VStack>
-                    <Text color="#979797">Total</Text>
-                    <Text>150 ICX</Text>
-                </VStack>
-            </HStack>
-            <Box width="100%" textAlign={"right"} mt="1rem">
-                <Button borderRadius="2rem" color="black">
-                    Mint NFT
-                </Button>
+            <Box>
+                <Text fontWeight="semibold" fontSize="sm">
+                    Total raised
+                </Text>
+                <Text fontWeight="bold" fontSize="4xl" lineHeight={1.2}>
+                    {numberWithCommas(contractBalance)} ICX
+                </Text>
+                <Text color="gray.500" fontSize="sm">
+                    campaign has reached {campaignProgress}% of funding goal
+                </Text>
+
+                <Box mt="15px">
+                    <Text fontWeight="semibold" fontSize="sm">
+                        Participate offering
+                    </Text>
+                    <Flex mt="10px">
+                        <NumberInput w="100%">
+                            <NumberInputField
+                                placeholder="Enter the quantity"
+                                fontSize="sm"
+                                min={1}
+                                onChange={handleUpdatePrice}
+                                ref={tbQuantity}
+                            />
+                        </NumberInput>
+                    </Flex>
+                    <Flex
+                        justifyContent="space-between"
+                        mt="10px"
+                        fontSize="sm"
+                    >
+                        <Text color="gray.500">Total price</Text>
+                        <Text fontWeight="semibold">
+                            {numberWithCommas(totalPrice)} ICX
+                        </Text>
+                    </Flex>
+                    <Button
+                        width="100%"
+                        borderRadius="5px"
+                        mt="15px"
+                        variant="action-button"
+                        onClick={handleMint}
+                    >
+                        Mint Now
+                    </Button>
+                </Box>
             </Box>
         </Box>
     );

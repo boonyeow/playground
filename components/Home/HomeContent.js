@@ -1,8 +1,16 @@
 import { Box, Text, Button, SimpleGrid } from "@chakra-ui/react";
-import FeaturedProject from "../FeaturedProject";
 import Project from "../Project";
 import PageHeader from "../PageHeader";
 import { useCallback, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+
+const FeaturedProject = dynamic(
+    () => import("../../components/FeaturedProject"),
+    {
+        ssr: false,
+    }
+);
+
 const HomeContent = () => {
     const [userInfo, setUserInfo] = useState({
         userAddress: 0,
@@ -14,6 +22,17 @@ const HomeContent = () => {
         temp = temp == null ? userInfo : JSON.parse(temp);
         setUserInfo(temp);
     }, []);
+
+    const projectInfo = {
+        name: "Hello",
+        thumbnailSrc: "/../public/unnamed.jpg",
+        description: "Hello",
+        details: "",
+        fundingGoal: "100",
+        pricePerNFT: "5",
+        startTimestamp: "",
+        endTimestamp: "",
+    };
     return (
         <>
             <Box width="100%" height="100%" ml="75px" p="1.5rem 3rem 3rem 3rem">
@@ -26,14 +45,22 @@ const HomeContent = () => {
                     <Text color="gray.600" fontWeight="semibold">
                         Featured
                     </Text>
-                    <SimpleGrid columns="2" spacingX="25px" mt="10px">
+                    <SimpleGrid
+                        columns="2"
+                        spacingX="25px"
+                        mt="10px"
+                        width="100%"
+                    >
                         <FeaturedProject
-                            src="/../public/unnamed.jpg"
-                            title="Project Name"
-                            desc="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an"
-                            price="100 ICX"
-                            fundingGoal="20,000 ICX"
-                            launchTimestamp="18 July 2022"
+                            projectInfo={projectInfo}
+                            addr="cx67deb13f90599e44068b1478edf9ab824f785e99"
+                            actionLabel="View Details"
+                            // src="/../public/unnamed.jpg"
+                            // title="Project Name"
+                            // desc="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an"
+                            // price="100 ICX"
+                            // fundingGoal="20,000 ICX"
+                            // launchTimestamp="18 July 2022"
                         />
 
                         <Box

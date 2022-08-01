@@ -1,18 +1,126 @@
 import { Box, Text, VStack, Button, Flex } from "@chakra-ui/react";
 import NextImage from "next/image";
 import NextLink from "next/link";
+import { useEffect, useState } from "react";
 
-const FeaturedProject = ({
-    src,
-    title,
-    desc,
-    price,
-    fundingGoal,
-    startTimestamp,
-    addr,
-    actionLabel,
-}) => {
-    src = src == "" ? "/../../4.avif" : src; // to remove;
+const FeaturedProject = ({ projectInfo, addr, actionLabel }) => {
+    const [endDifference, setEndDifference] = useState(
+        projectInfo.endTimestamp - new Date().getTime()
+    );
+    const [startDifference, setStartDifference] = useState(
+        projectInfo.startTimestamp - new Date().getTime()
+    );
+    useEffect(() => {
+        if (projectInfo) {
+            if (
+                currentTimestamp > projectInfo.startTimestamp &&
+                currentTimestamp < projectInfo.endTimestamp
+            ) {
+                const intervalId = setInterval(() => {
+                    updateEndDifference();
+                }, 1000);
+                return () => clearTimeout(intervalId);
+            } else {
+                const intervalId = setInterval(() => {
+                    updateStartDifference();
+                }, 1000);
+                return () => clearTimeout(intervalId);
+            }
+        }
+    }, [projectInfo]);
+
+    const updateEndDifference = () => {
+        setEndDifference(projectInfo.endTimestamp - new Date().getTime());
+    };
+
+    const updateStartDifference = () => {
+        setStartDifference(projectInfo.startTimestamp - new Date().getTime());
+    };
+
+    const formatTimestamp = (difference) => {
+        var daysDifference = Math.floor(difference / 1000 / 60 / 60 / 24); // returns 1
+        difference -= daysDifference * 1000 * 60 * 60 * 24;
+
+        var hoursDifference = Math.floor(difference / 1000 / 60 / 60);
+        difference -= hoursDifference * 1000 * 60 * 60;
+
+        var minutesDifference = Math.floor(difference / 1000 / 60);
+        difference -= minutesDifference * 1000 * 60;
+
+        var secondsDifference = Math.floor(difference / 1000);
+        return `${daysDifference}D ${hoursDifference}H ${minutesDifference}m ${secondsDifference}s`;
+    };
+
+    const src =
+        projectInfo.thumbnailSrc == ""
+            ? "/../../4.avif"
+            : projectInfo.thumbnailSrc; // to remove;
+
+    const currentTimestamp = new Date().getTime();
+    const priceComponent = (
+        <VStack mr="30px" spacing="0">
+            <Text
+                color="white"
+                fontWeight="semibold"
+                alignSelf="self-start"
+                fontSize="sm"
+            >
+                Price per NFT
+            </Text>
+            <Text fontSize="lg" alignSelf="self-start" color="#8e8e8e">
+                {projectInfo.pricePerNFT} ICX
+            </Text>
+        </VStack>
+    );
+
+    const fundingGoalComponent = (
+        <VStack mr="30px" spacing="0">
+            <Text
+                color="white"
+                fontWeight="semibold"
+                alignSelf="self-start"
+                fontSize="sm"
+            >
+                Funding goal
+            </Text>
+            <Text fontSize="lg" alignSelf="self-start" color="#8e8e8e">
+                {projectInfo.fundingGoal} ICX
+            </Text>
+        </VStack>
+    );
+
+    const startsInComponent = (
+        <VStack mr="30px" spacing="0">
+            <Text
+                color="white"
+                fontWeight="semibold"
+                alignSelf="self-start"
+                fontSize="sm"
+            >
+                Starts in
+            </Text>
+            <Text fontSize="lg" alignSelf="self-start" color="#8e8e8e">
+                {formatTimestamp(startDifference)}
+            </Text>
+        </VStack>
+    );
+
+    const endsInComponent = (
+        <VStack mr="30px" spacing="0">
+            <Text
+                color="white"
+                fontWeight="semibold"
+                alignSelf="self-start"
+                fontSize="sm"
+            >
+                Ends in
+            </Text>
+            <Text fontSize="lg" alignSelf="self-start" color="#8e8e8e">
+                {formatTimestamp(endDifference)}
+            </Text>
+        </VStack>
+    );
+
     return (
         <Flex borderRadius="15px" p="30px" shadow="md" bg="#0e0e0e" w="100%">
             <Box color="white" w="100%">
@@ -47,10 +155,10 @@ const FeaturedProject = ({
                 </Flex>
                 <Box alignSelf="center" mt="10px">
                     <Text fontWeight="bold" fontSize="2xl">
-                        {title}
+                        {projectInfo.name}
                     </Text>
                     <Text color="#8e8e8e" mt="10px">
-                        {desc}
+                        {projectInfo.description}
                     </Text>
                 </Box>
                 <Box mt="15px">
@@ -60,62 +168,14 @@ const FeaturedProject = ({
                         p="25px"
                         borderRadius="15px"
                     >
-                        <VStack mr="30px" spacing="0">
-                            <Text
-                                color="white"
-                                fontWeight="semibold"
-                                alignSelf="self-start"
-                                fontSize="sm"
-                            >
-                                Price per NFT
-                            </Text>
-                            <Text
-                                fontSize="lg"
-                                alignSelf="self-start"
-                                color="#8e8e8e"
-                            >
-                                {price}
-                            </Text>
-                        </VStack>
-                        <VStack mr="30px" spacing="0">
-                            <Text
-                                color="white"
-                                fontWeight="semibold"
-                                alignSelf="self-start"
-                                fontSize="sm"
-                            >
-                                Funding goal
-                            </Text>
-                            <Text
-                                fontSize="lg"
-                                alignSelf="self-start"
-                                color="#8e8e8e"
-                            >
-                                {fundingGoal}
-                            </Text>
-                        </VStack>
-                        {!startTimestamp ? (
-                            ""
-                        ) : (
-                            <VStack mr="30px" spacing="0">
-                                <Text
-                                    color="white"
-                                    fontWeight="semibold"
-                                    alignSelf="self-start"
-                                    fontSize="sm"
-                                >
-                                    Starts in
-                                </Text>
-                                <Text
-                                    fontSize="lg"
-                                    alignSelf="self-start"
-                                    color="#8e8e8e"
-                                >
-                                    {startTimestamp}
-                                    {/* remember to update for realtime countdown  */}
-                                </Text>
-                            </VStack>
-                        )}
+                        {priceComponent}
+                        {fundingGoalComponent}
+
+                        {currentTimestamp - projectInfo.startTimestamp <= 0
+                            ? startsInComponent
+                            : projectInfo.endTimestamp - currentTimestamp >= 0
+                            ? endsInComponent
+                            : ""}
                     </Box>
                 </Box>
             </Box>

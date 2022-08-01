@@ -103,8 +103,8 @@ const ProjectDetails = () => {
                 thumbnailSrc: res.thumbnailSrc,
                 description: res.description,
                 details: res.details,
-                fundingGoal: IconConverter.toUtf8(res.fundingGoal),
-                pricePerNFT: IconConverter.toUtf8(res.pricePerNFT),
+                fundingGoal: IconConverter.toNumber(res.fundingGoal),
+                pricePerNFT: IconConverter.toNumber(res.pricePerNFT),
                 startTimestamp: IconConverter.toNumber(res.startTimestamp),
                 endTimestamp: IconConverter.toNumber(res.endTimestamp),
             };
@@ -211,8 +211,8 @@ const ProjectDetails = () => {
             thumbnailSrc: projectInfo.thumbnailSrc,
             description: projectInfo.description,
             details: projectInfo.details,
-            fundingGoal: IconConverter.toHex(fundingGoal),
-            pricePerNFT: IconConverter.toHex(pricePerNFT),
+            fundingGoal: IconConverter.toHexNumber(fundingGoal),
+            pricePerNFT: IconConverter.toHexNumber(pricePerNFT),
             startTimestamp: IconConverter.toHex(
                 new Date(selectedRange.from).getTime()
             ),
