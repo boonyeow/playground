@@ -1,6 +1,7 @@
 import { Box, Text, VStack, Button, Flex } from "@chakra-ui/react";
 import NextImage from "next/image";
-const Project = ({ src, title, desc, actionLabel }) => {
+import NextLink from "next/link";
+const Project = ({ src, title, desc, actionLabel, href }) => {
     src = src == "" ? "/../../4.avif" : src; // to remove;
     return (
         <Flex
@@ -31,7 +32,9 @@ const Project = ({ src, title, desc, actionLabel }) => {
                             style={{ borderRadius: "50px" }}
                         />
                     </Box>
-                    <Button variant="action-button">{actionLabel}</Button>
+                    <NextLink href={href}>
+                        <Button variant="action-button">{actionLabel}</Button>
+                    </NextLink>
                 </Flex>
                 <Box alignSelf="center" mt="10px">
                     <Text fontWeight="bold" fontSize="2xl" color="black">
