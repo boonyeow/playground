@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import IconService from "icon-sdk-js";
 import ICONexConnection, { numberWithCommas, sleep } from "../util/interact";
 import cfg from "../util/config";
+import CustomAlert from "./CustomAlert";
 
 const {
     IconConverter,
@@ -35,6 +36,11 @@ const Dispenser = ({ projectInfo, contractBalance, pid }) => {
         projectsDeployed: [],
     });
 
+    const [showStatus, setShowStatus] = useState(false);
+    const [statusType, setStatusType] = useState("loading");
+    const [statusTitle, setStatusTitle] = useState("minting NFT");
+    const [statusDesc, setStatusDesc] = useState("awaiting tx approval..");
+
     useEffect(() => {
         const temp = localStorage.getItem("_persist");
         temp = temp == null ? userInfo : JSON.parse(temp);
@@ -53,6 +59,7 @@ const Dispenser = ({ projectInfo, contractBalance, pid }) => {
             return;
         }
 
+        setShowStatus(true);
         const txObj = new IconBuilder.CallTransactionBuilder()
             .from(userInfo.userAddress)
             .to(pid)
@@ -86,67 +93,101 @@ const Dispenser = ({ projectInfo, contractBalance, pid }) => {
             params: IconConverter.toRawTransaction(txObj),
         };
 
-        let rpcResponse = await connection.ICONexRequest(
-            "REQUEST_JSON-RPC",
-            payload
-        );
+        try {
+            let rpcResponse = await connection.ICONexRequest(
+                "REQUEST_JSON-RPC",
+                payload
+            );
+            if (rpcResponse.error) {
+                setStatusType("failure");
+                setStatusTitle("ooops");
+                setStatusDesc("your transaction was not approved");
+            } else {
+                console.log(rpcResponse);
+                await sleep(5000);
+                setStatusType("success");
+                setStatusTitle("success");
+                setStatusDesc(
+                    `you have successfully minted ${quantity} NFT(s)`
+                );
+            }
+        } catch (err) {
+            console.log(err);
+            setStatusType("failure");
+            setStatusTitle("ooops");
+            setStatusDesc("your transaction has failed, please try again");
+        }
     };
 
     return (
-        <Box
-            borderRadius="15px"
-            p="30px"
-            bg="white"
-            border="1px solid var(--chakra-colors-blackAlpha-200);"
-        >
-            <Box>
-                <Text fontWeight="semibold" fontSize="sm">
-                    Total raised
-                </Text>
-                <Text fontWeight="bold" fontSize="4xl" lineHeight={1.2}>
-                    {numberWithCommas(contractBalance)} ICX
-                </Text>
-                <Text color="gray.500" fontSize="sm">
-                    campaign has reached {campaignProgress}% of funding goal
-                </Text>
-
-                <Box mt="15px">
+        <>
+            <Box
+                borderRadius="15px"
+                p="30px"
+                bg="white"
+                border="1px solid var(--chakra-colors-blackAlpha-200);"
+            >
+                <Box>
                     <Text fontWeight="semibold" fontSize="sm">
-                        Participate offering
+                        Total raised
                     </Text>
-                    <Flex mt="10px">
-                        <NumberInput w="100%">
-                            <NumberInputField
-                                placeholder="Enter the quantity"
-                                fontSize="sm"
-                                min={1}
-                                onChange={handleUpdatePrice}
-                                ref={tbQuantity}
-                            />
-                        </NumberInput>
-                    </Flex>
-                    <Flex
-                        justifyContent="space-between"
-                        mt="10px"
-                        fontSize="sm"
-                    >
-                        <Text color="gray.500">Total price</Text>
-                        <Text fontWeight="semibold">
-                            {numberWithCommas(totalPrice)} ICX
+                    <Text fontWeight="bold" fontSize="4xl" lineHeight={1.2}>
+                        {numberWithCommas(contractBalance)} ICX
+                    </Text>
+                    <Text color="gray.500" fontSize="sm">
+                        campaign has reached {campaignProgress}% of funding goal
+                    </Text>
+
+                    <Box mt="15px">
+                        <Text fontWeight="semibold" fontSize="sm">
+                            Participate offering
                         </Text>
-                    </Flex>
-                    <Button
-                        width="100%"
-                        borderRadius="5px"
-                        mt="15px"
-                        variant="action-button"
-                        onClick={handleMint}
-                    >
-                        Mint Now
-                    </Button>
+                        <Flex mt="10px">
+                            <NumberInput w="100%">
+                                <NumberInputField
+                                    placeholder="Enter the quantity"
+                                    fontSize="sm"
+                                    min={1}
+                                    onChange={handleUpdatePrice}
+                                    ref={tbQuantity}
+                                />
+                            </NumberInput>
+                        </Flex>
+                        <Flex
+                            justifyContent="space-between"
+                            mt="10px"
+                            fontSize="sm"
+                        >
+                            <Text color="gray.500">Total price</Text>
+                            <Text fontWeight="semibold">
+                                {numberWithCommas(totalPrice)} ICX
+                            </Text>
+                        </Flex>
+                        <Button
+                            width="100%"
+                            borderRadius="5px"
+                            mt="15px"
+                            variant="action-button"
+                            onClick={handleMint}
+                        >
+                            Mint Now
+                        </Button>
+                    </Box>
                 </Box>
-            </Box>
-        </Box>
+            </Box>{" "}
+            <CustomAlert
+                showStatus={showStatus}
+                onClose={() => {
+                    setShowStatus(false);
+                    setStatusType("loading");
+                    setStatusTitle("minting NFTs");
+                    setStatusDesc("awaiting tx approval"); //revert everything to default
+                }}
+                title={statusTitle}
+                desc={statusDesc}
+                status={statusType}
+            />
+        </>
     );
 };
 

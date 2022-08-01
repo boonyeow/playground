@@ -3,7 +3,7 @@ import NextImage from "next/image";
 import NextLink from "next/link";
 import { useEffect, useState } from "react";
 
-const FeaturedProject = ({ projectInfo, addr, actionLabel }) => {
+const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
     const [endDifference, setEndDifference] = useState(
         projectInfo.endTimestamp - new Date().getTime()
     );
@@ -11,7 +11,7 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel }) => {
         projectInfo.startTimestamp - new Date().getTime()
     );
     useEffect(() => {
-        if (projectInfo) {
+        if (projectInfo && !isGovernance) {
             if (
                 currentTimestamp > projectInfo.startTimestamp &&
                 currentTimestamp < projectInfo.endTimestamp
@@ -161,23 +161,28 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel }) => {
                         {projectInfo.description}
                     </Text>
                 </Box>
-                <Box mt="15px">
-                    <Box
-                        bg="#1c1c1c"
-                        display="inline-flex"
-                        p="25px"
-                        borderRadius="15px"
-                    >
-                        {priceComponent}
-                        {fundingGoalComponent}
+                {isGovernance ? (
+                    ""
+                ) : (
+                    <Box mt="15px">
+                        <Box
+                            bg="#1c1c1c"
+                            display="inline-flex"
+                            p="25px"
+                            borderRadius="15px"
+                        >
+                            {priceComponent}
+                            {fundingGoalComponent}
 
-                        {currentTimestamp - projectInfo.startTimestamp <= 0
-                            ? startsInComponent
-                            : projectInfo.endTimestamp - currentTimestamp >= 0
-                            ? endsInComponent
-                            : ""}
+                            {currentTimestamp - projectInfo.startTimestamp <= 0
+                                ? startsInComponent
+                                : projectInfo.endTimestamp - currentTimestamp >=
+                                  0
+                                ? endsInComponent
+                                : ""}
+                        </Box>
                     </Box>
-                </Box>
+                )}
             </Box>
         </Flex>
     );

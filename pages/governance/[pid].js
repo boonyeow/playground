@@ -1,4 +1,4 @@
-import { Box, Flex, SimpleGrid, Text, Button } from "@chakra-ui/react";
+import { Box, Flex, SimpleGrid, Text, Button, HStack } from "@chakra-ui/react";
 import Sidebar from "../../components/Sidebar";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
@@ -170,8 +170,49 @@ const ProjectGovernance = () => {
                                     projectInfo={projectInfo}
                                     addr={pid}
                                     actionLabel="View Activity"
+                                    isGovernance={true}
                                 />
-                                <Box h="10px" bg="blue" w="100%"></Box>
+                                <HStack spacing="25px">
+                                    <Box
+                                        w="100%"
+                                        height="100%"
+                                        bg="black"
+                                        borderRadius="15px"
+                                        p="30px"
+                                    >
+                                        <Text
+                                            color="white"
+                                            fontSize="sm"
+                                            fontWeight="semibold"
+                                        >
+                                            Locked Balance
+                                        </Text>
+                                        <Text
+                                            lineHeight="1.2"
+                                            color="white"
+                                            fontWeight="bold"
+                                            fontSize="4xl"
+                                            noOfLines={1}
+                                        >
+                                            {fund / 10 ** 18} ICX
+                                        </Text>
+
+                                        <Text
+                                            color="white"
+                                            fontSize="sm"
+                                            fontWeight="semibold"
+                                        >
+                                            Holders
+                                        </Text>
+                                    </Box>
+                                    <Box
+                                        w="100%"
+                                        height="100%"
+                                        bg="black"
+                                        borderRadius="15px"
+                                        p="30px"
+                                    ></Box>
+                                </HStack>
                             </SimpleGrid>
                         </Flex>
                         <Box
@@ -224,7 +265,7 @@ const ProjectGovernance = () => {
                                 fontWeight="bold"
                                 paddingBottom="12px"
                             >
-                                Voters by Voting Weight
+                                Voters
                             </Text>
                             <OwnerList
                                 voterInfo={voterInfo}

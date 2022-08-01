@@ -17,8 +17,8 @@ import {
     TableContainer,
     useToast,
 } from "@chakra-ui/react";
-import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
-import { useTable, useSortBy } from 'react-table'
+import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
+import { useTable, useSortBy } from "react-table";
 import IconService from "icon-sdk-js";
 import { useRouter } from "next/router";
 import ICONexConnection, { sleep } from "../util/interact";
@@ -34,27 +34,32 @@ const {
 } = IconService;
 
 const OwnerList = ({ voterInfo, userInfo, pid }) => {
-    const connection = new ICONexConnection;
+    const connection = new ICONexConnection();
 
     // convert javascript object literal to array and tally total votes available
     const voters = [];
     var totalVotes = 0;
     for (var key in voterInfo) {
-        voters.push({ "address": key, "value": IconConverter.toNumber(voterInfo[key]) })
+        voters.push({
+            address: key,
+            value: IconConverter.toNumber(voterInfo[key]),
+        });
         totalVotes += IconConverter.toNumber(voterInfo[key]);
     }
     voters.sort(function (a, b) {
         return b.value - a.value;
-    })
+    });
 
     // custom alert state initialization
     const [showStatus, setShowStatus] = useState(false);
     const [statusType, setStatusType] = useState("loading");
     const [statusTitle, setStatusTitle] = useState("Delegating..");
-    const [statusDesc, setStatusDesc] = useState("Awaiting transaction approval");
+    const [statusDesc, setStatusDesc] = useState(
+        "Awaiting transaction approval"
+    );
 
     // toast initialization
-    const toast = useToast()
+    const toast = useToast();
 
     // delegate function
     const delegateVotes = async (delegateAddress) => {
@@ -67,7 +72,7 @@ const OwnerList = ({ voterInfo, userInfo, pid }) => {
             .timestamp(new Date().getTime() * 1000)
             .method("setDelegation")
             .params({
-                delegate: delegateAddress
+                delegate: delegateAddress,
             })
             .build();
 
@@ -79,20 +84,20 @@ const OwnerList = ({ voterInfo, userInfo, pid }) => {
             );
         } catch (err) {
             toast({
-                title: 'Invalid Delegatee',
+                title: "Invalid Delegatee",
                 description: "Unable to delegate to this address.",
-                status: 'error',
+                status: "error",
                 duration: 3000,
                 isClosable: true,
                 position: "bottom-right",
-            })
+            });
             return;
         }
 
         // in case they close custom alert before cancelling
         setStatusType("loading");
         setStatusTitle("Delegating..");
-        setStatusDesc("Awaiting transaction approval")
+        setStatusDesc("Awaiting transaction approval");
         setShowStatus(true);
 
         const margin = IconConverter.toBigNumber(10000);
@@ -142,12 +147,12 @@ const OwnerList = ({ voterInfo, userInfo, pid }) => {
             setStatusTitle("oops");
             setStatusDesc("idk what happen");
         }
-    }
+    };
 
     return (
         <>
             <TableContainer>
-                <Table variant='simple'>
+                <Table variant="simple">
                     <Thead>
                         <Tr>
                             <Th>Address</Th>
@@ -158,23 +163,43 @@ const OwnerList = ({ voterInfo, userInfo, pid }) => {
                     </Thead>
                     <Tbody>
                         {voters.map((voterContent, index) => {
-                            var voteWeight = voterContent.value / totalVotes * 100;
+                            var voteWeight =
+                                (voterContent.value / totalVotes) * 100;
                             return (
                                 <Tr key={index}>
-                                    <Td>{voterContent.address}</Td>
-                                    <Td textAlign="center">{voterContent.value}</Td>
-                                    <Td textAlign="center">{voteWeight.toFixed(2)}%</Td>
-                                    <Td float="right">
-                                        <Button
-                                            bg="transparent"
-                                            color="#3D5CC3"
-                                            _hover={{ bg: "blue.100", color: "#000000", }}
-                                            onClick={() => { delegateVotes(voterContent.address) }}
-                                        >
-                                            Delegate
-                                        </Button>
+                                    <Td color="#3D5CC3" fontWeight="semibold">
+                                        {voterContent.address}
                                     </Td>
-                                </Tr >
+                                    <Td textAlign="center">
+                                        {voterContent.value}
+                                    </Td>
+                                    <Td textAlign="center">
+                                        {voteWeight.toFixed(2)}%
+                                    </Td>
+                                    <Td>
+                                        {voterContent.address ==
+                                        userInfo.userAddress ? (
+                                            <Button
+                                                variant="outside-button"
+                                                disabled
+                                            >
+                                                Delegate
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                variant="outside-button"
+                                                onClick={() => {
+                                                    delegateVotes(
+                                                        voterContent.address
+                                                    );
+                                                }}
+                                                //disabled //if user is not signed in, disable
+                                            >
+                                                Delegate
+                                            </Button>
+                                        )}
+                                    </Td>
+                                </Tr>
                             );
                         })}
                     </Tbody>
@@ -192,7 +217,6 @@ const OwnerList = ({ voterInfo, userInfo, pid }) => {
                     setStatusDesc("Awaiting transaction approval"); //revert everything to default
                 }}
             />
-
         </>
     );
 };

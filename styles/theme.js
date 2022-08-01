@@ -67,6 +67,14 @@ export const theme = extendTheme(
                             bg: "#303030",
                         },
                     },
+                    "outside-button": {
+                        fontSize: "sm",
+                        bg: "black",
+                        color: "white",
+                        _hover: {
+                            bg: "#303030",
+                        },
+                    },
                     "cw-button": {
                         // Connect Wallet Modal > Connect Wallet Button
                         bgColor: "white",

@@ -93,6 +93,9 @@ const ProjectDetail = () => {
             //fetch contract data
             fetchProjectInfo();
             getContractBalance();
+            const temp = localStorage.getItem("_persist");
+            temp = temp == null ? userInfo : JSON.parse(temp);
+            setUserInfo(temp);
         }
     }, [router.isReady]);
 
@@ -126,6 +129,7 @@ const ProjectDetail = () => {
                                     projectInfo={projectInfo}
                                     addr={pid}
                                     actionLabel="View Activity"
+                                    isGovernance={false}
                                 />
                                 <Dispenser
                                     projectInfo={projectInfo}
