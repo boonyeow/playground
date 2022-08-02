@@ -55,7 +55,7 @@ const ProjectGovernance = () => {
         endTimestamp: "",
     });
 
-    const [fund, setFund] = useState(0);
+    const [contractBalance, setContractBalance] = useState(0);
 
     const [voterInfo, setVoterInfo] = useState({});
     useEffect(() => {
@@ -86,7 +86,7 @@ const ProjectGovernance = () => {
                 const balance = await connection.iconService
                     .getBalance(pid)
                     .execute();
-                setFund(IconConverter.toNumber(balance));
+                setContractBalance(IconConverter.toNumber(balance));
             };
 
             const fetchProjectInfo = async () => {
@@ -179,32 +179,7 @@ const ProjectGovernance = () => {
                                         bg="black"
                                         borderRadius="15px"
                                         p="30px"
-                                    >
-                                        <Text
-                                            color="white"
-                                            fontSize="sm"
-                                            fontWeight="semibold"
-                                        >
-                                            Locked Balance
-                                        </Text>
-                                        <Text
-                                            lineHeight="1.2"
-                                            color="white"
-                                            fontWeight="bold"
-                                            fontSize="4xl"
-                                            noOfLines={1}
-                                        >
-                                            {fund / 10 ** 18} ICX
-                                        </Text>
-
-                                        <Text
-                                            color="white"
-                                            fontSize="sm"
-                                            fontWeight="semibold"
-                                        >
-                                            Holders
-                                        </Text>
-                                    </Box>
+                                    ></Box>
                                     <Box
                                         w="100%"
                                         height="100%"

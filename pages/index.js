@@ -1,13 +1,4 @@
-import {
-    Box,
-    Button,
-    Flex,
-    Heading,
-    HStack,
-    SimpleGrid,
-    Text,
-    VStack,
-} from "@chakra-ui/react";
+import { Box, Button, SimpleGrid, Text } from "@chakra-ui/react";
 import "../styles/Home.module.css";
 import Sidebar from "../components/Sidebar";
 import PageHeader from "../components/PageHeader";
@@ -15,6 +6,7 @@ import Project from "../components/Project";
 import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import axios from "axios";
+import SkeletonProject from "../components/SkeletonProject";
 
 const FeaturedProject = dynamic(() => import("../components/FeaturedProject"), {
     ssr: false,
@@ -25,7 +17,6 @@ const Home = () => {
         projectsDeployed: [],
     });
     const [projectList, setProjectList] = useState([]);
-
     useEffect(() => {
         const fetchProjects = async () => {
             let res = await axios.get(
@@ -34,10 +25,12 @@ const Home = () => {
             setProjectList(res.data);
         };
 
+        console.log(projectList.length);
         const temp = localStorage.getItem("_persist");
         temp = temp == null ? userInfo : JSON.parse(temp);
         setUserInfo(temp);
-        fetchProjects();
+        setTimeout(fetchProjects, 500);
+        //        fetchProjects();
     }, []);
 
     const projectInfo = {
@@ -142,16 +135,23 @@ const Home = () => {
                             Recently launched
                         </Text>
                         <SimpleGrid spacingX="25px" spacingY="25px" columns="3">
-                            {projectList.map((currentProject, index) => (
-                                <Project
-                                    key={index}
-                                    title={currentProject.name}
-                                    desc={currentProject.description}
-                                    src={currentProject.thumbnailSrc}
-                                    actionLabel="View Project"
-                                    href={`explore/${currentProject.contractAddress}`}
-                                />
-                            ))}
+                            {projectList.length > 0 &&
+                                projectList.map((currentProject, index) => (
+                                    <>
+                                        <Project
+                                            key={index}
+                                            title={currentProject.name}
+                                            desc={currentProject.description}
+                                            src={currentProject.thumbnailSrc}
+                                            actionLabel="View Project"
+                                            href={`explore/${currentProject.contractAddress}`}
+                                        />
+                                    </>
+                                ))}
+                            {projectList.length == 0 &&
+                                [0, 1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                                    <SkeletonProject key={n} />
+                                ))}
                         </SimpleGrid>
                     </Box>
                 </Box>

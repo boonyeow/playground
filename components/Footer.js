@@ -11,8 +11,9 @@ const Footer = () => {
             bgColor="#0f1419"
             width={"100%"}
         >
+            <Box></Box>
             <Heading my="auto" color="white" size="xl" textAlign={"center"}>
-                <NextLink href="/">launchpad.</NextLink>
+                <NextLink href="/">crowd9.</NextLink>
             </Heading>
             <Stack spacing={{ base: "4", md: "5" }}>
                 <Stack

@@ -1,4 +1,4 @@
-import { Box, Text, VStack, Button, Flex } from "@chakra-ui/react";
+import { Box, Text, Button, Flex } from "@chakra-ui/react";
 import NextImage from "next/image";
 import NextLink from "next/link";
 const Project = ({ src, title, desc, actionLabel, href }) => {

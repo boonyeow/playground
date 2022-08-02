@@ -1,7 +1,25 @@
-import { Box, Text, VStack, Button, Flex } from "@chakra-ui/react";
+import { Box, Text, VStack, Button, Flex, Skeleton } from "@chakra-ui/react";
 import NextImage from "next/image";
 import NextLink from "next/link";
 import { useEffect, useState } from "react";
+
+const AdditionalInfo = ({ title, value }) => {
+    return (
+        <VStack mr="30px" spacing="0">
+            <Text
+                color="white"
+                fontWeight="semibold"
+                alignSelf="self-start"
+                fontSize="sm"
+            >
+                {title}
+            </Text>
+            <Text fontSize="lg" alignSelf="self-start" color="#8e8e8e">
+                {value}
+            </Text>
+        </VStack>
+    );
+};
 
 const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
     const [endDifference, setEndDifference] = useState(
@@ -57,69 +75,6 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
             : projectInfo.thumbnailSrc; // to remove;
 
     const currentTimestamp = new Date().getTime();
-    const priceComponent = (
-        <VStack mr="30px" spacing="0">
-            <Text
-                color="white"
-                fontWeight="semibold"
-                alignSelf="self-start"
-                fontSize="sm"
-            >
-                Price per NFT
-            </Text>
-            <Text fontSize="lg" alignSelf="self-start" color="#8e8e8e">
-                {projectInfo.pricePerNFT} ICX
-            </Text>
-        </VStack>
-    );
-
-    const fundingGoalComponent = (
-        <VStack mr="30px" spacing="0">
-            <Text
-                color="white"
-                fontWeight="semibold"
-                alignSelf="self-start"
-                fontSize="sm"
-            >
-                Funding goal
-            </Text>
-            <Text fontSize="lg" alignSelf="self-start" color="#8e8e8e">
-                {projectInfo.fundingGoal} ICX
-            </Text>
-        </VStack>
-    );
-
-    const startsInComponent = (
-        <VStack mr="30px" spacing="0">
-            <Text
-                color="white"
-                fontWeight="semibold"
-                alignSelf="self-start"
-                fontSize="sm"
-            >
-                Starts in
-            </Text>
-            <Text fontSize="lg" alignSelf="self-start" color="#8e8e8e">
-                {formatTimestamp(startDifference)}
-            </Text>
-        </VStack>
-    );
-
-    const endsInComponent = (
-        <VStack mr="30px" spacing="0">
-            <Text
-                color="white"
-                fontWeight="semibold"
-                alignSelf="self-start"
-                fontSize="sm"
-            >
-                Ends in
-            </Text>
-            <Text fontSize="lg" alignSelf="self-start" color="#8e8e8e">
-                {formatTimestamp(endDifference)}
-            </Text>
-        </VStack>
-    );
 
     return (
         <Flex borderRadius="15px" p="30px" shadow="md" bg="#0e0e0e" w="100%">
@@ -161,28 +116,56 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
                         {projectInfo.description}
                     </Text>
                 </Box>
-                {isGovernance ? (
-                    ""
-                ) : (
-                    <Box mt="15px">
-                        <Box
-                            bg="#1c1c1c"
-                            display="inline-flex"
-                            p="25px"
-                            borderRadius="15px"
-                        >
-                            {priceComponent}
-                            {fundingGoalComponent}
 
-                            {currentTimestamp - projectInfo.startTimestamp <= 0
-                                ? startsInComponent
-                                : projectInfo.endTimestamp - currentTimestamp >=
-                                  0
-                                ? endsInComponent
-                                : ""}
-                        </Box>
+                <Box mt="15px">
+                    <Box
+                        bg="#1c1c1c"
+                        display="inline-flex"
+                        p="25px"
+                        borderRadius="15px"
+                    >
+                        {isGovernance ? (
+                            <>
+                                <AdditionalInfo
+                                    title="Locked Balance"
+                                    value={`100 ICX`}
+                                />
+                                <AdditionalInfo
+                                    title="Withdrawal Rate"
+                                    value={`100 ICX`}
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <AdditionalInfo
+                                    title="Price per NFT"
+                                    value={`${projectInfo.pricePerNFT} ICX`}
+                                />
+                                <AdditionalInfo
+                                    title="Funding Goal"
+                                    value={`${projectInfo.fundingGoal} ICX`}
+                                />
+                                {currentTimestamp -
+                                    projectInfo.startTimestamp <=
+                                0 ? (
+                                    <AdditionalInfo
+                                        title="Starts In"
+                                        value={formatTimestamp(startDifference)}
+                                    />
+                                ) : projectInfo.endTimestamp -
+                                      currentTimestamp >=
+                                  0 ? (
+                                    <AdditionalInfo
+                                        title="Ends In"
+                                        value={formatTimestamp(endDifference)}
+                                    />
+                                ) : (
+                                    ""
+                                )}
+                            </>
+                        )}
                     </Box>
-                )}
+                </Box>
             </Box>
         </Flex>
     );

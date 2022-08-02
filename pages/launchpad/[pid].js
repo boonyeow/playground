@@ -85,10 +85,13 @@ const ProjectDetails = () => {
     });
 
     const [showStatus, setShowStatus] = useState(false);
-    const [statusType, setStatusType] = useState("loading");
-    const [statusTitle, setStatusTitle] = useState("updating contract");
-    const [statusDesc, setStatusDesc] = useState("awaiting tx approval..");
+    const [statusInfo, setStatusInfo] = useState({
+        type: "loading",
+        title: "updating contract",
+        desc: "awaiting tx approval...",
+    });
 
+    const [showClose, setShowClose] = useState(true);
     useEffect(() => {
         const fetchProjectInfo = async () => {
             const call = new IconBuilder.CallBuilder()
@@ -156,50 +159,25 @@ const ProjectDetails = () => {
     };
 
     const handleUpdateDesc = (e) => {
-        console.log(e.target.value);
-        setProjectInfo({
-            name: projectInfo.name,
-            thumbnailSrc: projectInfo.thumbnailSrc,
-            description: e.target.value,
-            details: projectInfo.details,
-            fundingGoal: projectInfo.fundingGoal,
-            pricePerNFT: projectInfo.pricePerNFT,
-            startTimestamp: projectInfo.startTimestamp,
-            endTimestamp: projectInfo.endTimestamp,
-        });
+        const temp = { ...projectInfo };
+        temp.description = e.target.value;
+        setProjectInfo(temp);
     };
 
     const handleUpdateGoal = (e) => {
-        setProjectInfo({
-            name: projectInfo.name,
-            thumbnailSrc: projectInfo.thumbnailSrc,
-            description: projectInfo.description,
-            details: projectInfo.details,
-            fundingGoal: e.target.value,
-            pricePerNFT: projectInfo.pricePerNFT,
-            startTimestamp: projectInfo.startTimestamp,
-            endTimestamp: projectInfo.endTimestamp,
-        });
+        const temp = { ...projectInfo };
+        temp.fundingGoal = Number(e.target.value);
+        setProjectInfo(temp);
     };
 
     const handleUpdatePrice = (e) => {
-        setProjectInfo({
-            name: projectInfo.name,
-            thumbnailSrc: projectInfo.thumbnailSrc,
-            description: projectInfo.description,
-            details: projectInfo.details,
-            fundingGoal: projectInfo.fundingGoal,
-            pricePerNFT: e.target.value,
-            startTimestamp: projectInfo.startTimestamp,
-            endTimestamp: projectInfo.endTimestamp,
-        });
+        const temp = { ...projectInfo };
+        temp.pricePerNFT = Number(e.target.value);
+        setProjectInfo(temp);
     };
 
     const handleSave = async () => {
-        const fundingGoal = tbFundingGoal.current.value;
-        const pricePerNFT = tbPricePerNFT.current.value;
-
-        if (fundingGoal.length == 0 || pricePerNFT.length == 0) {
+        if (projectInfo.fundingGoal == 0 || projectInfo.pricePerNFT == 0) {
             alert("not allowed");
             return;
         }
@@ -211,8 +189,8 @@ const ProjectDetails = () => {
             thumbnailSrc: projectInfo.thumbnailSrc,
             description: projectInfo.description,
             details: projectInfo.details,
-            fundingGoal: IconConverter.toHexNumber(fundingGoal),
-            pricePerNFT: IconConverter.toHexNumber(pricePerNFT),
+            fundingGoal: IconConverter.toHexNumber(projectInfo.fundingGoal),
+            pricePerNFT: IconConverter.toHexNumber(projectInfo.pricePerNFT),
             startTimestamp: IconConverter.toHex(
                 new Date(selectedRange.from).getTime()
             ),
@@ -248,69 +226,94 @@ const ProjectDetails = () => {
             params: IconConverter.toRawTransaction(txObj),
         };
 
-        try {
-            let rpcResponse = await connection.ICONexRequest(
-                "REQUEST_JSON-RPC",
-                payload
-            );
-            if (rpcResponse.error) {
-                setStatusType("failure");
-                setStatusTitle("ooops");
-                setStatusDesc("your transaction was not approved");
-            } else {
-                // success
-                console.log(rpcResponse);
-                await sleep(5000);
+        let rpcResponse = await connection.ICONexRequest(
+            "REQUEST_JSON-RPC",
+            payload
+        );
 
-                //callback to get txResult until response
+        getTransactionResult(rpcResponse, 5);
+    };
+
+    const getTransactionResult = async (rpcResponse, maxRetry) => {
+        console.log("trying...", maxRetry);
+        if (rpcResponse.error) {
+            setShowClose(true);
+            setStatusInfo({
+                type: "failure",
+                title: "ooops",
+                desc: "your transaction was not approved",
+            });
+        } else {
+            try {
                 const txResult = await connection.iconService
                     .getTransactionResult(rpcResponse.result)
                     .execute();
-                await sleep(5000);
-
-                let params = {
-                    userAddress: userInfo.userAddress,
-                    contractAddress: pid,
-                    name: projectInfo.name,
-                    description: projectInfo.description,
-                    details: projectInfo.details,
-                    thumbnailSrc: projectInfo.thumbnailSrc,
-                    fundingGoal: fundingGoal,
-                    pricePerNFT: pricePerNFT,
-                    startTimestamp: new Date(selectedRange.from).getTime(),
-                    endTimestamp: new Date(selectedRange.to).getTime(),
-                };
-                let response = await axios.post(
-                    "http://localhost:3000/api/projects/add", //change it to {endpoint}/api/projects/add
-                    params
-                );
-
-                setStatusType("success");
-                setStatusTitle("success");
-                setStatusDesc("your contract has been updated!");
-
-                let projectsDeployed = userInfo.projectsDeployed;
-                let contractIndex;
-                for (let i = 0; i < projectsDeployed.length; i++) {
-                    if (projectsDeployed[i].contractAddress == pid) {
-                        contractIndex = i;
-                        break;
-                    }
-                }
-                projectsDeployed[contractIndex] = params;
-                localStorage.setItem(
-                    "_persist",
-                    JSON.stringify({
+                if (txResult.status === 1) {
+                    let params = {
                         userAddress: userInfo.userAddress,
-                        projectsDeployed: projectsDeployed,
-                    })
-                );
+                        contractAddress: pid,
+                        name: projectInfo.name,
+                        description: projectInfo.description,
+                        details: projectInfo.details,
+                        thumbnailSrc: projectInfo.thumbnailSrc,
+                        fundingGoal: projectInfo.fundingGoal,
+                        pricePerNFT: projectInfo.pricePerNFT,
+                        startTimestamp: new Date(selectedRange.from).getTime(),
+                        endTimestamp: new Date(selectedRange.to).getTime(),
+                    };
+                    let response = await axios.post(
+                        "http://localhost:3000/api/projects/add", //change it to {endpoint}/api/projects/add
+                        params
+                    );
+
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "success",
+                        title: "success",
+                        desc: "your contract has been updated!",
+                    });
+
+                    let projectsDeployed = userInfo.projectsDeployed;
+                    let contractIndex;
+                    for (let i = 0; i < projectsDeployed.length; i++) {
+                        if (projectsDeployed[i].contractAddress == pid) {
+                            contractIndex = i;
+                            break;
+                        }
+                    }
+                    projectsDeployed[contractIndex] = params;
+                    localStorage.setItem(
+                        "_persist",
+                        JSON.stringify({
+                            userAddress: userInfo.userAddress,
+                            projectsDeployed: projectsDeployed,
+                        })
+                    );
+                } else {
+                    console.log("FAILED BOI", txResult);
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "failure",
+                        title: "ooops",
+                        desc: "your transaction has failed, please try again",
+                    });
+                }
+            } catch (err) {
+                if (maxRetry > 0) {
+                    setTimeout(
+                        () => getTransactionResult(rpcResponse, maxRetry - 1),
+                        2200
+                    );
+                } else {
+                    console.log(err);
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "failure",
+                        title: "ooops",
+                        desc: "your transaction has failed, please try again",
+                    });
+                }
             }
-        } catch (err) {
-            console.log(err);
-            setStatusType("failure");
-            setStatusTitle("ooops");
-            setStatusDesc("your transaction has failed, please try again");
         }
     };
 
@@ -491,6 +494,7 @@ const ProjectDetails = () => {
                                             title={projectInfo.name}
                                             desc={projectInfo.description}
                                             actionLabel="View Project"
+                                            href={""}
                                         />
                                     </FormControl>
                                 </Box>
@@ -503,13 +507,16 @@ const ProjectDetails = () => {
                 showStatus={showStatus}
                 onClose={() => {
                     setShowStatus(false);
-                    setStatusType("loading");
-                    setStatusTitle("updating contract");
-                    setStatusDesc("awaiting tx approval"); //revert everything to default
+                    setStatusInfo({
+                        type: "loading",
+                        title: "updating contract",
+                        desc: "awaiting tx approval",
+                    }); //revert everything to default
                 }}
-                title={statusTitle}
-                desc={statusDesc}
-                status={statusType}
+                title={statusInfo.title}
+                desc={statusInfo.desc}
+                status={statusInfo.type}
+                showClose={showClose}
             />
         </>
     );

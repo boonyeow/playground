@@ -12,7 +12,6 @@ import {
 } from "@chakra-ui/react";
 import "../../styles/Home.module.css";
 import Sidebar from "../../components/Sidebar";
-import ExploreContent from "../../components/Explore/ExploreContent";
 import PageHeader from "../../components/PageHeader";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";

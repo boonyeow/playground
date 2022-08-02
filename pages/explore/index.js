@@ -15,10 +15,10 @@ import { AiOutlineSearch } from "react-icons/ai";
 import "../../styles/Home.module.css";
 import Project from "../../components/Project";
 import Sidebar from "../../components/Sidebar";
-import ExploreContent from "../../components/Explore/ExploreContent";
 import PageHeader from "../../components/PageHeader";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import SkeletonProject from "../../components/SkeletonProject";
 
 const Explore = () => {
     const [userInfo, setUserInfo] = useState({
@@ -44,8 +44,6 @@ const Explore = () => {
 
     return (
         <>
-            {/* <Navbar /> */}
-            <Flex></Flex>
             <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
                 <Sidebar active="Explore" />
                 <Box
@@ -80,20 +78,24 @@ const Explore = () => {
                             columns="3"
                             mt="5px"
                         >
-                            {projectList.map((currentProject, index) => (
-                                <Project
-                                    key={index}
-                                    title={currentProject.name}
-                                    desc={currentProject.description}
-                                    src={currentProject.thumbnailSrc}
-                                    actionLabel="View Project"
-                                    href={`explore/${currentProject.contractAddress}`}
-                                />
-                            ))}
+                            {projectList.length > 0 &&
+                                projectList.map((currentProject, index) => (
+                                    <Project
+                                        key={index}
+                                        title={currentProject.name}
+                                        desc={currentProject.description}
+                                        src={currentProject.thumbnailSrc}
+                                        actionLabel="View Project"
+                                        href={`explore/${currentProject.contractAddress}`}
+                                    />
+                                ))}
+                            {projectList.length == 0 &&
+                                [0, 1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                                    <SkeletonProject key={n} />
+                                ))}
                         </SimpleGrid>
                     </Box>
                 </Box>
-                {/* <ExploreContent /> */}
             </Box>
             {/* <Footer /> */}
         </>

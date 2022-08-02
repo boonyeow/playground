@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import IconService from "icon-sdk-js";
 import {
     Button,
-    CloseButton,
     Text,
     Modal,
     ModalOverlay,
@@ -11,14 +10,13 @@ import {
     ModalFooter,
     ModalBody,
     ModalCloseButton,
-    useDisclosure,
     Input,
     VStack,
 } from "@chakra-ui/react";
 import axios from "axios";
-import ICONexConnection, { sleep } from "../../util/interact";
-import CustomAlert from "../CustomAlert";
-import cfg from "../../util/config";
+import ICONexConnection from "../util/interact";
+import CustomAlert from "./CustomAlert";
+import cfg from "../util/config";
 const {
     IconConverter,
     IconBuilder,
@@ -31,19 +29,22 @@ const connection = new ICONexConnection();
 
 const NewProjectModal = ({ onClose, isOpen, userInfo, setUserInfo }) => {
     const [showStatus, setShowStatus] = useState(false);
-    const [statusType, setStatusType] = useState("loading");
-    const [statusTitle, setStatusTitle] = useState("deploying contract");
-    const [statusDesc, setStatusDesc] = useState("awaiting tx approval..");
+    const [statusInfo, setStatusInfo] = useState({
+        type: "loading",
+        title: "deploying contract",
+        desc: "awaiting tx approval...",
+    });
+    const [showClose, setShowClose] = useState(true);
+    const [projectName, setProjectName] = useState("");
 
-    const tbProjectName = useRef(null);
     const createProject = async () => {
-        const projectName = tbProjectName.current.value;
         if (projectName == "") {
             alert("cannot be empty");
             return;
         }
         onClose();
         setShowStatus(true);
+        setShowClose(false);
         let contractContent = cfg.CONTRACT_CONTENT;
         let signerAddress = "hx1f199d7b495ebb2ce3cf704a5dc3c2ac584b6cd3"; // note: to hardcode in contract
         // deploy contract
@@ -76,68 +77,92 @@ const NewProjectModal = ({ onClose, isOpen, userInfo, setUserInfo }) => {
             params: IconConverter.toRawTransaction(txObj),
         };
 
-        try {
-            let rpcResponse = await connection.ICONexRequest(
-                "REQUEST_JSON-RPC",
-                payload
-            );
-            if (rpcResponse.error) {
-                setStatusType("failure");
-                setStatusTitle("ooops");
-                setStatusDesc("your transaction was not approved");
-            } else {
-                console.log(rpcResponse);
-                await sleep(5000);
+        let rpcResponse = await connection.ICONexRequest(
+            "REQUEST_JSON-RPC",
+            payload
+        );
 
-                //callback to get txResult until response
+        getTransactionResult(rpcResponse, 5);
+    };
+
+    const getTransactionResult = async (rpcResponse, maxRetry) => {
+        console.log("trying...", maxRetry);
+        if (rpcResponse.error) {
+            setShowClose(true);
+            setStatusInfo({
+                type: "failure",
+                title: "ooops",
+                desc: "your transaction was not approved",
+            });
+        } else {
+            try {
                 const txResult = await connection.iconService
                     .getTransactionResult(rpcResponse.result)
                     .execute();
-                await sleep(5000);
+                if (txResult.status === 1) {
+                    let params = {
+                        userAddress: userInfo.userAddress,
+                        contractAddress: txResult.scoreAddress,
+                        name: projectName,
+                        description: "",
+                        details: "",
+                        thumbnailSrc: "",
+                        fundingGoal: "",
+                        pricePerNFT: "",
+                        startTimestamp: "",
+                        endTimestamp: "",
+                    };
+                    let response = await axios.post(
+                        "http://localhost:3000/api/projects/add", //change it to {endpoint}/api/projects/add
+                        params
+                    );
+                    console.log("res", response);
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "success",
+                        title: "success",
+                        desc: "your contract has been deployed!",
+                    });
 
-                let params = {
-                    userAddress: userInfo.userAddress,
-                    contractAddress: txResult.scoreAddress,
-                    name: projectName,
-                    description: "",
-                    details: "",
-                    thumbnailSrc: "",
-                    fundingGoal: "",
-                    pricePerNFT: "",
-                    startTimestamp: "",
-                    endTimestamp: "",
-                };
-                let response = await axios.post(
-                    "http://localhost:3000/api/projects/add", //change it to {endpoint}/api/projects/add
-                    params
-                );
-                console.log("res", response);
+                    let projectsDeployed = userInfo.projectsDeployed;
+                    projectsDeployed.push(params);
+                    localStorage.setItem(
+                        "_persist",
+                        JSON.stringify({
+                            userAddress: userInfo.userAddress,
+                            projectsDeployed: projectsDeployed,
+                        })
+                    );
 
-                setStatusType("success");
-                setStatusTitle("success");
-                setStatusDesc("your contract has been deployed!");
-
-                let projectsDeployed = userInfo.projectsDeployed;
-                projectsDeployed.push(params);
-                localStorage.setItem(
-                    "_persist",
-                    JSON.stringify({
+                    setUserInfo({
                         userAddress: userInfo.userAddress,
                         projectsDeployed: projectsDeployed,
-                    })
-                );
-                // await sleep(2000);
-                // onClose();
-                setUserInfo({
-                    userAddress: userInfo.userAddress,
-                    projectsDeployed: projectsDeployed,
-                });
+                    });
+                } else {
+                    console.log("FAILED BOI", txResult);
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "failure",
+                        title: "ooops",
+                        desc: "your transaction has failed, please try again",
+                    });
+                }
+            } catch (err) {
+                if (maxRetry > 0) {
+                    setTimeout(
+                        () => getTransactionResult(rpcResponse, maxRetry - 1),
+                        2200
+                    );
+                } else {
+                    console.log(err);
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "failure",
+                        title: "ooops",
+                        desc: "your transaction has failed, please try again",
+                    });
+                }
             }
-        } catch (err) {
-            console.log(err);
-            setStatusType("failure");
-            setStatusTitle("ooops");
-            setStatusDesc("your transaction has failed, please try again");
         }
     };
 
@@ -168,8 +193,10 @@ const NewProjectModal = ({ onClose, isOpen, userInfo, setUserInfo }) => {
                         <VStack>
                             <Text alignSelf="baseline">Project Name</Text>
                             <Input
-                                ref={tbProjectName}
                                 placeholder="Enter your project name"
+                                onChange={(e) => {
+                                    setProjectName(e.target.value);
+                                }}
                             ></Input>
                         </VStack>
                     </ModalBody>
@@ -193,13 +220,16 @@ const NewProjectModal = ({ onClose, isOpen, userInfo, setUserInfo }) => {
                 showStatus={showStatus}
                 onClose={() => {
                     setShowStatus(false);
-                    setStatusType("loading");
-                    setStatusTitle("deploying contract");
-                    setStatusDesc("awaiting tx approval"); //revert everything to default
+                    setStatusInfo({
+                        type: "loading",
+                        title: "deploying contract",
+                        desc: "awaiting tx approval",
+                    }); //revert everything to default
                 }}
-                title={statusTitle}
-                desc={statusDesc}
-                status={statusType}
+                title={statusInfo.title}
+                desc={statusInfo.desc}
+                status={statusInfo.type}
+                showClose={showClose}
             />
         </>
     );

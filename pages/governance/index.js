@@ -1,11 +1,12 @@
 import { Box, Flex, Text, SimpleGrid } from "@chakra-ui/react";
 import "../../styles/Home.module.css";
-import HomeContent from "../../components/Home/HomeContent";
 import Sidebar from "../../components/Sidebar";
 import Project from "../../components/Project";
 import PageHeader from "../../components/PageHeader";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import SkeletonProject from "../../components/SkeletonProject";
+import Footer from "../../components/Footer";
 const Governance = () => {
     const [userInfo, setUserInfo] = useState({
         userAddress: 0,
@@ -28,7 +29,13 @@ const Governance = () => {
 
     return (
         <>
-            <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
+            <Box
+                maxWidth={"6xl"}
+                width="100%"
+                m="auto"
+                minHeight="100vh"
+                py="2.5vh"
+            >
                 <Sidebar active="Governance" />
                 <Box
                     width="100%"
@@ -60,21 +67,26 @@ const Governance = () => {
                             Explore DAOs
                         </Text>
                         <SimpleGrid spacingX="25px" spacingY="25px" columns="3">
-                            {projectList.map((currentProject, index) => (
-                                <Project
-                                    key={index}
-                                    title={currentProject.name}
-                                    desc={currentProject.description}
-                                    src={currentProject.thumbnailSrc}
-                                    actionLabel="View Project"
-                                    href={`explore/${currentProject.contractAddress}`}
-                                />
-                            ))}
+                            {projectList.length > 0 &&
+                                projectList.map((currentProject, index) => (
+                                    <Project
+                                        key={index}
+                                        title={currentProject.name}
+                                        desc={currentProject.description}
+                                        src={currentProject.thumbnailSrc}
+                                        actionLabel="View Activity"
+                                        href={`governance/${currentProject.contractAddress}`}
+                                    />
+                                ))}
+                            {projectList.length === 0 &&
+                                [0, 1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                                    <SkeletonProject key={n} />
+                                ))}
                         </SimpleGrid>
                     </Box>
                 </Box>
             </Box>
-            {/* <Footer /> */}
+            <Footer />
         </>
     );
 };

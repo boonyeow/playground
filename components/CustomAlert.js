@@ -13,7 +13,14 @@ import {
     Button,
 } from "@chakra-ui/react";
 
-const CustomAlert = ({ showStatus, title, desc, status, onClose }) => {
+const CustomAlert = ({
+    showStatus,
+    title,
+    desc,
+    status,
+    onClose,
+    showClose,
+}) => {
     const successColor = "#5cb85c";
     const failureColor = "#f44336";
 
@@ -124,7 +131,7 @@ const CustomAlert = ({ showStatus, title, desc, status, onClose }) => {
         >
             <ModalOverlay />
             <ModalContent borderRadius={"xl"}>
-                <ModalCloseButton />
+                {showClose ? <ModalCloseButton /> : ""}
                 <ModalBody px={10} pb={8} textAlign="center">
                     {status === "loading"
                         ? loading

@@ -37,9 +37,13 @@ const Dispenser = ({ projectInfo, contractBalance, pid }) => {
     });
 
     const [showStatus, setShowStatus] = useState(false);
-    const [statusType, setStatusType] = useState("loading");
-    const [statusTitle, setStatusTitle] = useState("minting NFT");
-    const [statusDesc, setStatusDesc] = useState("awaiting tx approval..");
+    const [statusInfo, setStatusInfo] = useState({
+        type: "loading",
+        title: "minting NFT(s)",
+        desc: "awaiting tx approval...",
+    });
+
+    const [showClose, setShowClose] = useState(true);
 
     useEffect(() => {
         const temp = localStorage.getItem("_persist");
@@ -93,29 +97,59 @@ const Dispenser = ({ projectInfo, contractBalance, pid }) => {
             params: IconConverter.toRawTransaction(txObj),
         };
 
-        try {
-            let rpcResponse = await connection.ICONexRequest(
-                "REQUEST_JSON-RPC",
-                payload
-            );
-            if (rpcResponse.error) {
-                setStatusType("failure");
-                setStatusTitle("ooops");
-                setStatusDesc("your transaction was not approved");
-            } else {
-                console.log(rpcResponse);
-                await sleep(5000);
-                setStatusType("success");
-                setStatusTitle("success");
-                setStatusDesc(
-                    `you have successfully minted ${quantity} NFT(s)`
-                );
+        let rpcResponse = await connection.ICONexRequest(
+            "REQUEST_JSON-RPC",
+            payload
+        );
+        getTransactionResult(rpcResponse, 5);
+    };
+
+    const getTransactionResult = async (rpcResponse, maxRetry) => {
+        console.log("trying...", maxRetry);
+        if (rpcResponse.error) {
+            setShowClose(true);
+            setStatusInfo({
+                type: "failure",
+                title: "ooops",
+                desc: "your transaction was not approved",
+            });
+        } else {
+            try {
+                const txResult = await connection.iconService
+                    .getTransactionResult(rpcResponse.result)
+                    .execute();
+                if (txResult.status === 1) {
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "success",
+                        title: "success",
+                        desc: "you have successfully minted the NFT(s)!",
+                    });
+                } else {
+                    console.log("FAILED BOI", txResult);
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "failure",
+                        title: "ooops",
+                        desc: "your transaction has failed, please try again",
+                    });
+                }
+            } catch (err) {
+                if (maxRetry > 0) {
+                    setTimeout(
+                        () => getTransactionResult(rpcResponse, maxRetry - 1),
+                        2200
+                    );
+                } else {
+                    console.log(err);
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "failure",
+                        title: "ooops",
+                        desc: "your transaction has failed, please try again",
+                    });
+                }
             }
-        } catch (err) {
-            console.log(err);
-            setStatusType("failure");
-            setStatusTitle("ooops");
-            setStatusDesc("your transaction has failed, please try again");
         }
     };
 
@@ -179,13 +213,16 @@ const Dispenser = ({ projectInfo, contractBalance, pid }) => {
                 showStatus={showStatus}
                 onClose={() => {
                     setShowStatus(false);
-                    setStatusType("loading");
-                    setStatusTitle("minting NFTs");
-                    setStatusDesc("awaiting tx approval"); //revert everything to default
+                    setStatusInfo({
+                        type: "loading",
+                        title: "minting NFT(s)",
+                        desc: "awaiting tx approval",
+                    }); //revert everything to default
                 }}
-                title={statusTitle}
-                desc={statusDesc}
-                status={statusType}
+                title={statusInfo.title}
+                desc={statusInfo.desc}
+                status={statusInfo.type}
+                showClose={showClose}
             />
         </>
     );
