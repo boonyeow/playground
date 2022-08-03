@@ -1,16 +1,16 @@
 import { Box, Flex, SimpleGrid, Text, Button, HStack } from "@chakra-ui/react";
-import Sidebar from "../../components/Sidebar";
+import Sidebar from "../../../components/Sidebar";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
 import IconService from "icon-sdk-js";
-import ICONexConnection from "../../util/interact";
+import ICONexConnection from "../../../util/interact";
 import { useEffect, useState } from "react";
-import PageHeader from "../../components/PageHeader";
+import PageHeader from "../../../components/PageHeader";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import FeaturedProject from "../../components/FeaturedProject";
+import FeaturedProject from "../../../components/FeaturedProject";
 import axios from "axios";
-import ProposalCollection from "../../components/ProposalCollection";
-import OwnerList from "../../components/OwnerList";
+import ProposalCollection from "../../../components/ProposalCollection";
+import OwnerList from "../../../components/OwnerList";
 
 const {
     IconConverter,
@@ -68,7 +68,7 @@ const ProjectGovernance = () => {
                 const proposals = await connection.iconService
                     .call(txObj)
                     .execute();
-                setProposalInfo(proposals);
+                setProposalInfo(JSON.parse(proposals));
             };
 
             const getAllVoters = async () => {
@@ -79,6 +79,7 @@ const ProjectGovernance = () => {
                 const voters = await connection.iconService
                     .call(txObj)
                     .execute();
+                console.log(voters)
                 setVoterInfo(voters);
             };
 
@@ -130,10 +131,11 @@ const ProjectGovernance = () => {
             const temp = localStorage.getItem("_persist");
             temp = temp == null ? userInfo : JSON.parse(temp);
             setUserInfo(temp);
+            console.log("test", projectInfo);
         }
     }, [router.isReady]);
 
-    const delegateVotes = () => {};
+    const delegateVotes = () => { };
 
     return (
         <>
@@ -210,19 +212,22 @@ const ProjectGovernance = () => {
                                     Proposals
                                 </Text>
                                 {isOwner === true && (
-                                    <Button
-                                        bg="transparent"
-                                        color="#3D5CC3"
-                                        _hover={{
-                                            bg: "blue.100",
-                                            color: "#000000",
-                                        }}
-                                        onClick={() => {
-                                            console.log("hello");
-                                        }}
-                                    >
-                                        Create Proposal
-                                    </Button>
+                                    <NextLink href={`${pid}/proposal`}>
+
+                                        <Button
+                                            bg="transparent"
+                                            color="#3D5CC3"
+                                            _hover={{
+                                                bg: "blue.100",
+                                                color: "#000000",
+                                            }}
+                                            onClick={() => {
+                                                localStorage.setItem("lastEvent", pid);
+                                            }}
+                                        >
+                                            Create Proposal
+                                        </Button>
+                                    </NextLink>
                                 )}
                             </Flex>
                             <ProposalCollection proposalInfo={proposalInfo} />

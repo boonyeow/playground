@@ -40,8 +40,8 @@ const Test = () => {
         const txObj = new IconService.IconBuilder.DeployTransactionBuilder()
             .nid(cfg.NID)
             .from(wallet.address)
-            .to("cx489abf1ffc9d80e6fcc45e600d49255d3195dd41") //use the same address to update contract else, use cfg.SCORE_INSTALL_ADDRESS
-            //.to(cfg.SCORE_INSTALL_ADDRESS)
+            // .to("cx489abf1ffc9d80e6fcc45e600d49255d3195dd41") //use the same address to update contract else, use cfg.SCORE_INSTALL_ADDRESS
+            .to(cfg.SCORE_INSTALL_ADDRESS)
             .version(IconConverter.toBigNumber(3))
             .timestamp(Date.now() * 1000)
             .contentType("application/java")
