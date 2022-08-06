@@ -56,7 +56,11 @@ const RefundProposal = () => {
     };
     return (
         <div>
-            <Formik>
+            <Formik
+                onSubmit={(values, actions) => {
+                    handleSave();
+                }}
+            >
                 <Form>
                     <Box mt="25px">
                         <FormControl alignSelf="baseline" isRequired>

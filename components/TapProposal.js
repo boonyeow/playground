@@ -54,7 +54,11 @@ const TapProposal = () => {
 
     return (
         <div>
-            <Formik>
+            <Formik
+                onSubmit={(values, actions) => {
+                    handleSave();
+                }}
+            >
                 <Form>
                     <Box mt="25px">
                         <FormControl alignSelf="baseline" isRequired>
@@ -101,7 +105,7 @@ const TapProposal = () => {
                     </HStack>
                     <Box mt="25px" width="100%" textAlign="right">
                         <Button type="submit" variant="action-button"
-                            onClick={handleSave}
+                        // onClick={handleSave}
                         >Submit</Button>
                     </Box>
 
