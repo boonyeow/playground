@@ -26,22 +26,37 @@ import {
     Select,
 } from "@chakra-ui/react";
 import { Form, Formik } from 'formik';
+import CustomAlert from "./CustomAlert";
+import { useEffect, useRef, useState } from "react";
+
+
 
 const RefundProposal = () => {
     // const handleSubmit = (e) => {
     //     e.preventDefault();
     //     alert(`Email: ${Title} & Password: ${Description}`);
     // };
+    const [showStatus, setShowStatus] = useState(false);
+    const [statusInfo, setStatusInfo] = useState({
+        type: "loading",
+        title: "updating contract",
+        desc: "awaiting tx approval...",
+    });
+    const [showClose, setShowClose] = useState(true);
+
+
+    const handleSave = async () => {
+        setShowStatus(true);
+        setShowClose(true);
+        setStatusInfo({
+            type: "success",
+            title: "success",
+            desc: "your contract has been updated!",
+        });
+    };
     return (
-        <>
-            <Formik
-                initialValues={{ name: 'jared' }}
-                onSubmit={(values, actions) => {
-                    setTimeout(() => {
-                        alert(JSON.stringify(values, null, 2));
-                        actions.setSubmitting(false);
-                    }, 1000);
-                }}>
+        <div>
+            <Formik>
                 <Form>
                     <Box mt="25px">
                         <FormControl alignSelf="baseline" isRequired>
@@ -64,12 +79,34 @@ const RefundProposal = () => {
                             </FormHelperText>
                         </FormControl>
                     </Box>
+
                     <Box mt="25px" width="100%" textAlign="right">
-                        <Button type="submit">Submit</Button>
+                        <Button type="submit" variant="action-button"
+                            onClick={handleSave}
+                        >Submit</Button>
                     </Box>
+
                 </Form>
             </Formik>
-        </>
+            <CustomAlert
+                showStatus={showStatus}
+                onClose={() => {
+                    setShowStatus(false);
+                    setStatusInfo({
+                        type: "loading",
+                        title: "updating contract",
+                        desc: "awaiting tx approval",
+                    }); //revert everything to default
+                }}
+                title={statusInfo.title}
+                desc={statusInfo.desc}
+                status={statusInfo.type}
+                showClose={showClose}
+            />
+
+
+        </div >
+
     );
 };
 
