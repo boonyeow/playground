@@ -79,7 +79,7 @@ const ProjectGovernance = () => {
                 const voters = await connection.iconService
                     .call(txObj)
                     .execute();
-                console.log(voters)
+
                 setVoterInfo(voters);
             };
 
@@ -211,24 +211,24 @@ const ProjectGovernance = () => {
                                 >
                                     Proposals
                                 </Text>
-                                {isOwner === true && (
-                                    <NextLink href={`${pid}/proposal`}>
+                                {/* {isOwner === false && ( // need edit */}
+                                <NextLink href={`${pid}/proposal`}>
 
-                                        <Button
-                                            bg="transparent"
-                                            color="#3D5CC3"
-                                            _hover={{
-                                                bg: "blue.100",
-                                                color: "#000000",
-                                            }}
-                                            onClick={() => {
-                                                localStorage.setItem("lastEvent", pid);
-                                            }}
-                                        >
-                                            Create Proposal
-                                        </Button>
-                                    </NextLink>
-                                )}
+                                    <Button
+                                        bg="transparent"
+                                        color="#3D5CC3"
+                                        _hover={{
+                                            bg: "blue.100",
+                                            color: "#000000",
+                                        }}
+                                        onClick={() => {
+                                            localStorage.setItem("lastEvent", pid);
+                                        }}
+                                    >
+                                        Create Proposal
+                                    </Button>
+                                </NextLink>
+                                {/* )} */}
                             </Flex>
                             <ProposalCollection proposalInfo={proposalInfo} />
                         </Box>

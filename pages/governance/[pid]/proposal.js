@@ -127,39 +127,6 @@ const createProposal = () => {
                                 </FormControl>
                                 {tapVisible && <TapProposal />}
                                 {refundVisible && <RefundProposal />}
-                                {/* <HStack spacing="25px" mt="25px">
-                                    <FormControl alignSelf="baseline">
-                                        <FormLabel>Funding goal</FormLabel>
-                                        <Input></Input>
-                                        <FormHelperText>
-                                            Upon reaching funding goal, subsequent mints are priced at
-                                            a 50% premium.
-                                        </FormHelperText>
-                                    </FormControl>
-                                    <FormControl alignSelf="baseline">
-                                        <FormLabel>Price per NFT</FormLabel>
-                                        <Input></Input>
-                                        <FormHelperText>
-                                            Minimum price per NFT fixed at 100 ICX.
-                                        </FormHelperText>
-                                    </FormControl>
-                                </HStack>
-                                <Box mt="25px">
-                                    <FormControl alignSelf="baseline">
-                                        <FormLabel>Campaign Duration</FormLabel>
-                                        <DatePicker />
-                                    </FormControl>
-                                </Box>
-                                <FormControl mt="25px">
-                                    <FormLabel>Project Overview</FormLabel>
-                                    <FormHelperText>
-                                        Tell us about your project, team, and milestones you intend
-                                        to achieve with the funding.
-                                    </FormHelperText>
-                                </FormControl> */}
-                                <Box mt="25px" width="100%" textAlign="right">
-                                    <Button>Create</Button>
-                                </Box>
                             </Box>
                         </Flex>
                     </Box>
