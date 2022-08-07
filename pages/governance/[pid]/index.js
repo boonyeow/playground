@@ -1,4 +1,13 @@
-import { Box, Flex, SimpleGrid, Text, Button, HStack } from "@chakra-ui/react";
+import {
+    Box,
+    Flex,
+    SimpleGrid,
+    Text,
+    Button,
+    HStack,
+    Skeleton,
+    SkeletonText,
+} from "@chakra-ui/react";
 import Sidebar from "../../../components/Sidebar";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
@@ -10,7 +19,8 @@ import { ChevronRightIcon } from "@chakra-ui/icons";
 import FeaturedProject from "../../../components/FeaturedProject";
 import axios from "axios";
 import ProposalCollection from "../../../components/ProposalCollection";
-import OwnerList from "../../../components/OwnerList";
+import cfg from "../../../util/config";
+import HolderList from "../../../components/HolderList";
 
 const {
     IconConverter,
@@ -31,18 +41,7 @@ const ProjectGovernance = () => {
         projectsDeployed: [],
     });
 
-    const [proposalInfo, setProposalInfo] = useState({
-        proposals: [
-            {
-                id: "-",
-                startBlockHeight: 0,
-                status: 0,
-                disagreeVotes: 0,
-                agreeVotes: 0,
-                noVotes: 0,
-            },
-        ],
-    });
+    const [proposalInfo, setProposalInfo] = useState({});
 
     const [projectInfo, setProjectInfo] = useState({
         name: "",
@@ -56,38 +55,36 @@ const ProjectGovernance = () => {
     });
 
     const [contractBalance, setContractBalance] = useState(0);
+    const [delegate, setDelegate] = useState(null);
+    const [totalSupply, setTotalSupply] = useState(0);
 
     const [voterInfo, setVoterInfo] = useState({});
+
     useEffect(() => {
         if (router.isReady) {
+            const temp = localStorage.getItem("_persist");
+            temp = temp == null ? userInfo : JSON.parse(temp);
+            setUserInfo(temp);
+            console.log("React 18 Application Re-Rendering");
             const getProposals = async () => {
-                const txObj = new IconBuilder.CallBuilder()
-                    .method("getProposals")
+                const call = new IconBuilder.CallBuilder()
+                    .method("getAllProposals")
                     .to(pid)
                     .build();
-                const proposals = await connection.iconService
-                    .call(txObj)
-                    .execute();
-                setProposalInfo(JSON.parse(proposals));
+                let res = await connection.iconService.call(call).execute();
+                setProposalInfo(res);
             };
 
             const getAllVoters = async () => {
-                const txObj = new IconBuilder.CallBuilder()
+                const call = new IconBuilder.CallBuilder()
                     .method("getAllVoters")
                     .to(pid)
                     .build();
-                const voters = await connection.iconService
-                    .call(txObj)
-                    .execute();
-
-                setVoterInfo(voters);
+                return await connection.iconService.call(call).execute();
             };
 
             const getContractBalance = async () => {
-                const balance = await connection.iconService
-                    .getBalance(pid)
-                    .execute();
-                setContractBalance(IconConverter.toNumber(balance));
+                return await connection.iconService.getBalance(pid).execute();
             };
 
             const fetchProjectInfo = async () => {
@@ -96,19 +93,25 @@ const ProjectGovernance = () => {
                     .to(pid)
                     .method("getProjectInfo")
                     .build();
+                return await connection.iconService.call(call).execute();
+            };
+
+            const getDelegate = async () => {
+                const call = new IconBuilder.CallBuilder()
+                    .method("getDelegate")
+                    .to(pid)
+                    .params({ user: temp.userAddress })
+                    .build();
+                return await connection.iconService.call(call).execute();
+            };
+
+            const getTotalSupply = async () => {
+                const call = new IconBuilder.CallBuilder()
+                    .method("totalSupply")
+                    .to(pid)
+                    .build();
                 let res = await connection.iconService.call(call).execute();
-                console.log("res", res);
-                let pi = {
-                    name: res.name,
-                    thumbnailSrc: res.thumbnailSrc,
-                    description: res.description,
-                    details: res.details,
-                    fundingGoal: IconConverter.toNumber(res.fundingGoal),
-                    pricePerNFT: IconConverter.toNumber(res.pricePerNFT),
-                    startTimestamp: IconConverter.toNumber(res.startTimestamp),
-                    endTimestamp: IconConverter.toNumber(res.endTimestamp),
-                };
-                setProjectInfo(pi);
+                setTotalSupply(res);
             };
 
             const checkOwner = async () => {
@@ -123,19 +126,74 @@ const ProjectGovernance = () => {
                 }
             };
 
+            Promise.all([
+                getAllVoters(),
+                getContractBalance(),
+                fetchProjectInfo(),
+                getDelegate(),
+            ]).then((res) => {
+                // setProposalInfo(res[0]);
+                setVoterInfo(res[0]);
+                setContractBalance(IconConverter.toNumber(res[1]));
+
+                let pi = {
+                    name: res[2].name,
+                    thumbnailSrc: res[2].thumbnailSrc,
+                    description: res[2].description,
+                    details: res[2].details,
+                    fundingGoal: IconConverter.toNumber(res[2].fundingGoal),
+                    pricePerNFT: IconConverter.toNumber(res[2].pricePerNFT),
+                    startTimestamp: IconConverter.toNumber(
+                        res[2].startTimestamp
+                    ),
+                    endTimestamp: IconConverter.toNumber(res[2].endTimestamp),
+                };
+                setProjectInfo(pi);
+                setDelegate(res[3]);
+            });
+
             getProposals();
-            getAllVoters();
-            getContractBalance();
-            fetchProjectInfo();
             checkOwner();
-            const temp = localStorage.getItem("_persist");
-            temp = temp == null ? userInfo : JSON.parse(temp);
-            setUserInfo(temp);
-            console.log("test", projectInfo);
+            getDelegate();
+            getTotalSupply();
         }
     }, [router.isReady]);
 
-    const delegateVotes = () => { };
+    const test = async () => {
+        const txObj = new IconBuilder.CallTransactionBuilder()
+            .from(userInfo.userAddress)
+            .to(pid)
+            .nid(cfg.NID)
+            .nonce(IconConverter.toBigNumber(1))
+            .version(IconConverter.toBigNumber(3))
+            .timestamp(new Date().getTime() * 1000)
+            .method("createProposal")
+            .params({
+                startBlockHeight: IconConverter.toHexNumber(1000),
+            })
+            .build();
+        const estimatedSteps = IconConverter.toBigNumber(
+            await connection.debugService.estimateStep(txObj).execute()
+        );
+        console.log("estimatedSteps", estimatedSteps);
+
+        txObj.stepLimit = IconService.IconConverter.toHex(
+            estimatedSteps.plus(IconConverter.toBigNumber(10000)) // prevent out of step
+        );
+
+        const payload = {
+            jsonrpc: "2.0",
+            method: "icx_sendTransaction",
+            id: 6639,
+            params: IconConverter.toRawTransaction(txObj),
+        };
+
+        let rpcResponse = await connection.ICONexRequest(
+            "REQUEST_JSON-RPC",
+            payload
+        );
+        console.log(rpcResponse);
+    };
 
     return (
         <>
@@ -181,14 +239,9 @@ const ProjectGovernance = () => {
                                         bg="black"
                                         borderRadius="15px"
                                         p="30px"
-                                    ></Box>
-                                    <Box
-                                        w="100%"
-                                        height="100%"
-                                        bg="black"
-                                        borderRadius="15px"
-                                        p="30px"
-                                    ></Box>
+                                    >
+                                        {contractBalance}
+                                    </Box>
                                 </HStack>
                             </SimpleGrid>
                         </Flex>
@@ -213,7 +266,6 @@ const ProjectGovernance = () => {
                                 </Text>
                                 {/* {isOwner === false && ( // need edit */}
                                 <NextLink href={`${pid}/proposal`}>
-
                                     <Button
                                         bg="transparent"
                                         color="#3D5CC3"
@@ -222,13 +274,36 @@ const ProjectGovernance = () => {
                                             color: "#000000",
                                         }}
                                         onClick={() => {
-                                            localStorage.setItem("lastEvent", pid);
+                                            localStorage.setItem(
+                                                "lastEvent",
+                                                pid
+                                            );
                                         }}
                                     >
                                         Create Proposal
                                     </Button>
                                 </NextLink>
-                                {/* )} */}
+                                <Button onClick={test}> createetest</Button>
+                                {isOwner === true && (
+                                    <NextLink href={`${pid}/proposal`}>
+                                        <Button
+                                            bg="transparent"
+                                            color="#3D5CC3"
+                                            _hover={{
+                                                bg: "blue.100",
+                                                color: "#000000",
+                                            }}
+                                            onClick={() => {
+                                                localStorage.setItem(
+                                                    "lastEvent",
+                                                    pid
+                                                );
+                                            }}
+                                        >
+                                            Create Proposal
+                                        </Button>
+                                    </NextLink>
+                                )}
                             </Flex>
                             <ProposalCollection proposalInfo={proposalInfo} />
                         </Box>
@@ -245,12 +320,14 @@ const ProjectGovernance = () => {
                                 fontWeight="bold"
                                 paddingBottom="12px"
                             >
-                                Voters
+                                Holders
                             </Text>
-                            <OwnerList
+                            <HolderList
                                 voterInfo={voterInfo}
                                 userInfo={userInfo}
                                 pid={pid}
+                                delegate={delegate}
+                                totalSupply={totalSupply}
                             />
                         </Box>
                     </Box>

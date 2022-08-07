@@ -29,6 +29,7 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
         projectInfo.startTimestamp - new Date().getTime()
     );
     useEffect(() => {
+        console.log("rendering");
         if (projectInfo && !isGovernance) {
             if (
                 currentTimestamp > projectInfo.startTimestamp &&
@@ -45,7 +46,7 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
                 return () => clearTimeout(intervalId);
             }
         }
-    }, [projectInfo]);
+    }, []);
 
     const updateEndDifference = () => {
         setEndDifference(projectInfo.endTimestamp - new Date().getTime());
@@ -69,12 +70,11 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
         return `${daysDifference}D ${hoursDifference}H ${minutesDifference}m ${secondsDifference}s`;
     };
 
+    const currentTimestamp = new Date().getTime();
     const src =
         projectInfo.thumbnailSrc == ""
             ? "/../../4.avif"
             : projectInfo.thumbnailSrc; // to remove;
-
-    const currentTimestamp = new Date().getTime();
 
     return (
         <Flex borderRadius="15px" p="30px" shadow="md" bg="#0e0e0e" w="100%">

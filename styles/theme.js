@@ -73,6 +73,9 @@ export const theme = extendTheme(
                         color: "white",
                         _hover: {
                             bg: "#303030",
+                            _disabled: {
+                                bg: "#303030",
+                            },
                         },
                     },
                     "cw-button": {

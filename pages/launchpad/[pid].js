@@ -48,7 +48,6 @@ const ProjectDetails = () => {
     const hiddenUploadFile = useRef(null);
     const tbDescription = useRef(null);
     const tbFundingGoal = useRef(null);
-    const tbPricePerNFT = useRef(null);
 
     const router = useRouter();
     const { pid } = router.query;
@@ -82,6 +81,7 @@ const ProjectDetails = () => {
         pricePerNFT: "",
         startTimestamp: "",
         endTimestamp: "",
+        withdrawalRate: "",
     });
 
     const [showStatus, setShowStatus] = useState(false);
@@ -110,8 +110,9 @@ const ProjectDetails = () => {
                 pricePerNFT: IconConverter.toNumber(res.pricePerNFT),
                 startTimestamp: IconConverter.toNumber(res.startTimestamp),
                 endTimestamp: IconConverter.toNumber(res.endTimestamp),
+                withdrawalRate: IconConverter.toNumber(res.withdrawalRate),
             };
-            console.log("pi", pi);
+
             setProjectInfo(pi);
 
             let range = {};
@@ -176,6 +177,12 @@ const ProjectDetails = () => {
         setProjectInfo(temp);
     };
 
+    const handleUpdateWithdrawal = (e) => {
+        const temp = { ...projectInfo };
+        temp.withdrawalRate = Number(e.target.value);
+        setProjectInfo(temp);
+    };
+
     const handleSave = async () => {
         if (projectInfo.fundingGoal == 0 || projectInfo.pricePerNFT == 0) {
             alert("not allowed");
@@ -196,6 +203,9 @@ const ProjectDetails = () => {
             ),
             endTimestamp: IconConverter.toHex(
                 new Date(selectedRange.to).getTime()
+            ),
+            withdrawalRate: IconConverter.toHexNumber(
+                projectInfo.withdrawalRate
             ),
         };
 
@@ -260,6 +270,7 @@ const ProjectDetails = () => {
                         pricePerNFT: projectInfo.pricePerNFT,
                         startTimestamp: new Date(selectedRange.from).getTime(),
                         endTimestamp: new Date(selectedRange.to).getTime(),
+                        withdrawalRate: projectInfo.withdrawalRate,
                     };
                     let response = await axios.post(
                         "http://localhost:3000/api/projects/add", //change it to {endpoint}/api/projects/add
@@ -430,7 +441,6 @@ const ProjectDetails = () => {
                                         <FormControl alignSelf="baseline">
                                             <FormLabel>Price per NFT</FormLabel>
                                             <Input
-                                                ref={tbPricePerNFT}
                                                 type="number"
                                                 bg="white"
                                                 onChange={handleUpdatePrice}
@@ -443,6 +453,20 @@ const ProjectDetails = () => {
                                             </FormHelperText>
                                         </FormControl>
                                     </HStack>
+                                    <FormControl alignSelf="baseline" mt="25px">
+                                        <FormLabel>Withdrawal Rate</FormLabel>
+                                        <Input
+                                            type="number"
+                                            bg="white"
+                                            onChange={handleUpdateWithdrawal}
+                                            value={projectInfo.withdrawalRate}
+                                        ></Input>
+                                        <FormHelperText>
+                                            After campaign, withdrawals are
+                                            subjected to a rate limit (unit: ICX
+                                            / sec).
+                                        </FormHelperText>
+                                    </FormControl>
                                     <Box mt="25px">
                                         <FormControl alignSelf="baseline">
                                             <FormLabel>
