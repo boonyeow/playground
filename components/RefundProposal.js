@@ -25,7 +25,6 @@ import {
     VisuallyHiddenInput,
     Select,
 } from "@chakra-ui/react";
-import { Form, Formik } from 'formik';
 import CustomAlert from "./CustomAlert";
 import { useEffect, useRef, useState } from "react";
 
@@ -56,42 +55,37 @@ const RefundProposal = () => {
     };
     return (
         <div>
-            <Formik
-                onSubmit={(values, actions) => {
-                    handleSave();
-                }}
-            >
-                <Form>
-                    <Box mt="25px">
-                        <FormControl alignSelf="baseline" isRequired>
-                            <FormLabel>Title</FormLabel>
-                            <Input></Input>
-                        </FormControl>
-                    </Box>
-                    <Box mt="25px">
-                        <FormControl alignSelf="baseline" isRequired>
-                            <FormLabel>Description</FormLabel>
-                            <Textarea></Textarea>
-                        </FormControl>
-                    </Box>
-                    <Box mt="25px">
-                        <FormControl alignSelf="baseline">
-                            <FormLabel>Forum Link</FormLabel>
-                            <Input></Input>
-                            <FormHelperText>
-                                Optional: You can include a link for discussions to be held
-                            </FormHelperText>
-                        </FormControl>
-                    </Box>
 
-                    <Box mt="25px" width="100%" textAlign="right">
-                        <Button type="submit" variant="action-button"
-                            onClick={handleSave}
-                        >Submit</Button>
-                    </Box>
+            <Box mt="25px">
+                <FormControl alignSelf="baseline" isRequired>
+                    <FormLabel>Title</FormLabel>
+                    <Input></Input>
+                </FormControl>
+            </Box>
+            <Box mt="25px">
+                <FormControl alignSelf="baseline" isRequired>
+                    <FormLabel>Description</FormLabel>
+                    <Textarea></Textarea>
+                </FormControl>
+            </Box>
+            <Box mt="25px">
+                <FormControl alignSelf="baseline">
+                    <FormLabel>Forum Link</FormLabel>
+                    <Input></Input>
+                    <FormHelperText>
+                        Optional: You can include a link for discussions to be held
+                    </FormHelperText>
+                </FormControl>
+            </Box>
 
-                </Form>
-            </Formik>
+            <Box mt="25px" width="100%" textAlign="right">
+                <Button type="submit" variant="action-button"
+                    onClick={handleSave}
+                >Submit</Button>
+            </Box>
+
+
+
             <CustomAlert
                 showStatus={showStatus}
                 onClose={() => {
@@ -107,7 +101,6 @@ const RefundProposal = () => {
                 status={statusInfo.type}
                 showClose={showClose}
             />
-
 
         </div >
 

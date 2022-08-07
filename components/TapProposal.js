@@ -25,11 +25,8 @@ import {
     VisuallyHiddenInput,
     Select,
 } from "@chakra-ui/react";
-import { Form, Formik } from 'formik';
 import CustomAlert from "./CustomAlert";
 import { useEffect, useRef, useState } from "react";
-
-
 
 
 const TapProposal = () => {
@@ -54,63 +51,58 @@ const TapProposal = () => {
 
     return (
         <div>
-            <Formik
-                onSubmit={(values, actions) => {
-                    handleSave();
-                }}
-            >
-                <Form>
-                    <Box mt="25px">
-                        <FormControl alignSelf="baseline" isRequired>
-                            <FormLabel>Title</FormLabel>
-                            <Input></Input>
-                        </FormControl>
-                    </Box>
-                    <Box mt="25px">
-                        <FormControl alignSelf="baseline" isRequired>
-                            <FormLabel>Description</FormLabel>
-                            <Textarea></Textarea>
-                        </FormControl>
-                    </Box>
-                    <Box mt="25px">
-                        <FormControl alignSelf="baseline">
-                            <FormLabel>Forum Link</FormLabel>
-                            <Input></Input>
-                            <FormHelperText>
-                                Optional: You can include a link for discussions to be held
-                            </FormHelperText>
-                        </FormControl>
-                    </Box>
-                    <HStack spacing="25px" mt="30px">
-                        <FormControl alignSelf="baseline">
-                            <FormLabel>Current Tap Rate</FormLabel>
-                            <Input
-                                value='200'
-                            >
-                            </Input>
-                            <FormHelperText>
-                                Current Tap Rate (ICX) per Second
-                            </FormHelperText>
-                        </FormControl>
-                        <FormControl alignSelf="baseline" isRequired>
-                            <FormLabel>New Tap Rate</FormLabel>
-                            <Input
-                                type="number"
-                                bg="white"
-                            ></Input>
-                            <FormHelperText>
-                                Set a new Tap Rate (ICX) per Second
-                            </FormHelperText>
-                        </FormControl>
-                    </HStack>
-                    <Box mt="25px" width="100%" textAlign="right">
-                        <Button type="submit" variant="action-button"
-                        // onClick={handleSave}
-                        >Submit</Button>
-                    </Box>
 
-                </Form>
-            </Formik>
+            <Box mt="25px">
+                <FormControl alignSelf="baseline" isRequired>
+                    <FormLabel>Title</FormLabel>
+                    <Input></Input>
+                </FormControl>
+            </Box>
+            <Box mt="25px">
+                <FormControl alignSelf="baseline" isRequired>
+                    <FormLabel>Description</FormLabel>
+                    <Textarea></Textarea>
+                </FormControl>
+            </Box>
+            <Box mt="25px">
+                <FormControl alignSelf="baseline">
+                    <FormLabel>Forum Link</FormLabel>
+                    <Input></Input>
+                    <FormHelperText>
+                        Optional: You can include a link for discussions to be held
+                    </FormHelperText>
+                </FormControl>
+            </Box>
+            <HStack spacing="25px" mt="30px">
+                <FormControl alignSelf="baseline">
+                    <FormLabel>Current Tap Rate</FormLabel>
+                    <Input
+                        value='200'
+                    >
+                    </Input>
+                    <FormHelperText>
+                        Current Tap Rate (ICX) per Second
+                    </FormHelperText>
+                </FormControl>
+                <FormControl alignSelf="baseline" isRequired>
+                    <FormLabel>New Tap Rate</FormLabel>
+                    <Input
+                        type="number"
+                        bg="white"
+                    ></Input>
+                    <FormHelperText>
+                        Set a new Tap Rate (ICX) per Second
+                    </FormHelperText>
+                </FormControl>
+            </HStack>
+            <Box mt="25px" width="100%" textAlign="right">
+                <Button type="submit" variant="action-button"
+                    onClick={handleSave}
+                >Submit</Button>
+            </Box>
+
+
+
             <CustomAlert
                 showStatus={showStatus}
                 onClose={() => {
