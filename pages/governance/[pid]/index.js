@@ -20,6 +20,7 @@ import FeaturedProject from "../../../components/FeaturedProject";
 import axios from "axios";
 import ProposalCollection from "../../../components/ProposalCollection";
 import cfg from "../../../util/config";
+import dynamic from "next/dynamic";
 import HolderList from "../../../components/HolderList";
 
 const {
@@ -96,15 +97,6 @@ const ProjectGovernance = () => {
                 return await connection.iconService.call(call).execute();
             };
 
-            const getDelegate = async () => {
-                const call = new IconBuilder.CallBuilder()
-                    .method("getDelegate")
-                    .to(pid)
-                    .params({ user: temp.userAddress })
-                    .build();
-                return await connection.iconService.call(call).execute();
-            };
-
             const getTotalSupply = async () => {
                 const call = new IconBuilder.CallBuilder()
                     .method("totalSupply")
@@ -130,9 +122,7 @@ const ProjectGovernance = () => {
                 getAllVoters(),
                 getContractBalance(),
                 fetchProjectInfo(),
-                getDelegate(),
             ]).then((res) => {
-                // setProposalInfo(res[0]);
                 setVoterInfo(res[0]);
                 setContractBalance(IconConverter.toNumber(res[1]));
 
@@ -149,12 +139,11 @@ const ProjectGovernance = () => {
                     endTimestamp: IconConverter.toNumber(res[2].endTimestamp),
                 };
                 setProjectInfo(pi);
-                setDelegate(res[3]);
+                // setDelegate(res[3]);
             });
 
             getProposals();
             checkOwner();
-            getDelegate();
             getTotalSupply();
         }
     }, [router.isReady]);
@@ -326,7 +315,6 @@ const ProjectGovernance = () => {
                                 voterInfo={voterInfo}
                                 userInfo={userInfo}
                                 pid={pid}
-                                delegate={delegate}
                                 totalSupply={totalSupply}
                             />
                         </Box>

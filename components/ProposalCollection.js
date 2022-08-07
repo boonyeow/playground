@@ -28,7 +28,6 @@ const {
 
 const connection = new ICONexConnection();
 const ProposalCollection = ({ proposalInfo }) => {
-    console.log("proposalcol", proposalInfo);
     const statusInfo = {
         0: {
             status: "Active",

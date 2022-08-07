@@ -84,7 +84,7 @@ const DataTable = ({ columns, data }) => {
 
 const connection = new ICONexConnection();
 
-const HolderList = ({ voterInfo, userInfo, pid, delegate, totalSupply }) => {
+const HolderList = ({ voterInfo, userInfo, pid, totalSupply }) => {
     const [showStatus, setShowStatus] = useState(false);
     const [statusInfo, setStatusInfo] = useState({
         type: "loading",
@@ -93,7 +93,8 @@ const HolderList = ({ voterInfo, userInfo, pid, delegate, totalSupply }) => {
     });
     const [showClose, setShowClose] = useState(true);
     const [data, setData] = useState([{}]);
-    const [_delegate, _setDelegate] = useState(delegate);
+    const [delegate, setDelegate] = useState(null);
+    const [delegateVisibility, setDelegateVisibility] = useState(false);
     const delegateToUser = async (user) => {
         setShowStatus(true);
         setShowClose(false);
@@ -153,7 +154,7 @@ const HolderList = ({ voterInfo, userInfo, pid, delegate, totalSupply }) => {
                         title: "success",
                         desc: "votes have been delegated",
                     });
-                    _setDelegate(user);
+                    setDelegate(user);
                 } else {
                     console.log("FAILED BOI", txResult);
                     setShowClose(true);
@@ -208,30 +209,32 @@ const HolderList = ({ voterInfo, userInfo, pid, delegate, totalSupply }) => {
                 Header: "",
                 accessor: "action",
                 Cell: (props) => {
-                    if (props.row.original.holderAddress === _delegate) {
-                        return (
-                            <Button variant="outside-button" disabled>
-                                Delegate
-                            </Button>
-                        );
-                    } else {
-                        return (
-                            <Button
-                                variant="outside-button"
-                                onClick={() => {
-                                    delegateToUser(
-                                        props.row.original.holderAddress
-                                    );
-                                }}
-                            >
-                                Delegate
-                            </Button>
-                        );
+                    if (delegateVisibility) {
+                        if (props.row.original.holderAddress === delegate) {
+                            return (
+                                <Button variant="outside-button" disabled>
+                                    Delegate
+                                </Button>
+                            );
+                        } else {
+                            return (
+                                <Button
+                                    variant="outside-button"
+                                    onClick={() => {
+                                        delegateToUser(
+                                            props.row.original.holderAddress
+                                        );
+                                    }}
+                                >
+                                    Delegate
+                                </Button>
+                            );
+                        }
                     }
                 },
             },
         ],
-        [_delegate, voterInfo]
+        [delegate, voterInfo, delegateVisibility]
     );
 
     useEffect(() => {
@@ -248,8 +251,32 @@ const HolderList = ({ voterInfo, userInfo, pid, delegate, totalSupply }) => {
         }
 
         setData(temp);
-        _setDelegate(delegate);
-    }, [_delegate, voterInfo]);
+
+        const getUserBalance = async (user) => {
+            const call = new IconBuilder.CallBuilder()
+                .to(pid)
+                .method("balanceOf")
+                .params({ _owner: user })
+                .build();
+            let res = await connection.iconService.call(call).execute();
+            if (res > 0) {
+                setDelegateVisibility(true);
+            }
+        };
+
+        const getDelegate = async (user) => {
+            const call = new IconBuilder.CallBuilder()
+                .to(pid)
+                .method("getDelegate")
+                .params({ user: user })
+                .build();
+            let res = await connection.iconService.call(call).execute();
+            setDelegate(res);
+        };
+
+        getUserBalance(userInfo.userAddress);
+        getDelegate(userInfo.userAddress);
+    }, [delegate, voterInfo]);
 
     return (
         <>
