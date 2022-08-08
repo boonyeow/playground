@@ -24,85 +24,91 @@ import {
     NumberInputField,
     VisuallyHiddenInput,
     Select,
+    FormErrorMessage,
 } from "@chakra-ui/react";
 import CustomAlert from "./CustomAlert";
 import { useEffect, useRef, useState } from "react";
+import { Formik, Field, Form } from 'formik';
 
+const RefundProposal = ({ pid }) => {
+    const [remainingChar, setRemainingChar] = useState(50);
 
+    const validateTitle = (value) => {
+        let error
+        setRemainingChar(50 - value.length)
+        if (value.length > 50) {
+            error = "Maximum character limit exceeded"
+        }
+        return error
+    }
 
-const RefundProposal = () => {
-    // const handleSubmit = (e) => {
-    //     e.preventDefault();
-    //     alert(`Email: ${Title} & Password: ${Description}`);
-    // };
-    const [showStatus, setShowStatus] = useState(false);
-    const [statusInfo, setStatusInfo] = useState({
-        type: "loading",
-        title: "updating contract",
-        desc: "awaiting tx approval...",
-    });
-    const [showClose, setShowClose] = useState(true);
-
-
-    const handleSave = async () => {
-        setShowStatus(true);
-        setShowClose(true);
-        setStatusInfo({
-            type: "success",
-            title: "success",
-            desc: "your contract has been updated!",
-        });
-    };
     return (
-        <div>
+        <>
+            <Formik
+                initialValues={{ title: '', description: '', forumLink: '' }}
+                onSubmit={async (values, actions) => {
+                    console.log('act', actions);
+                    alert(values.title)
+                    alert(JSON.stringify(values, null, 2))
 
-            <Box mt="25px">
-                <FormControl alignSelf="baseline" isRequired>
-                    <FormLabel>Title</FormLabel>
-                    <Input></Input>
-                </FormControl>
-            </Box>
-            <Box mt="25px">
-                <FormControl alignSelf="baseline" isRequired>
-                    <FormLabel>Description</FormLabel>
-                    <Textarea></Textarea>
-                </FormControl>
-            </Box>
-            <Box mt="25px">
-                <FormControl alignSelf="baseline">
-                    <FormLabel>Forum Link</FormLabel>
-                    <Input></Input>
-                    <FormHelperText>
-                        Optional: You can include a link for discussions to be held
-                    </FormHelperText>
-                </FormControl>
-            </Box>
+                    // call the proposal collection
 
-            <Box mt="25px" width="100%" textAlign="right">
-                <Button type="submit" variant="action-button"
-                    onClick={handleSave}
-                >Submit</Button>
-            </Box>
-
-
-
-            <CustomAlert
-                showStatus={showStatus}
-                onClose={() => {
-                    setShowStatus(false);
-                    setStatusInfo({
-                        type: "loading",
-                        title: "updating contract",
-                        desc: "awaiting tx approval",
-                    }); //revert everything to default
                 }}
-                title={statusInfo.title}
-                desc={statusInfo.desc}
-                status={statusInfo.type}
-                showClose={showClose}
-            />
-
-        </div >
+            >
+                {(props) => {
+                    return (
+                        <Form>
+                            <Box mt="25px">
+                                <Field name='title' validate={validateTitle}>
+                                    {({ field, form }) => {
+                                        // console.log("test", { ...field })
+                                        // console.log(field.onChange)
+                                        return (
+                                            < FormControl alignSelf="baseline" isInvalid={form.errors.title && form.touched.title} isRequired >
+                                                <FormLabel>Title</FormLabel>
+                                                <Input {...field}></Input>
+                                                <Flex>
+                                                    <FormHelperText paddingRight="20px">Character limit: {remainingChar}    </FormHelperText>
+                                                    <FormErrorMessage>({form.errors.title})</FormErrorMessage>
+                                                </Flex>
+                                            </FormControl>
+                                        )
+                                    }}
+                                </Field>
+                            </Box>
+                            <Box mt="25px">
+                                <Field name='description'>
+                                    {({ field, form }) => (
+                                        <FormControl alignSelf="baseline" isRequired>
+                                            <FormLabel>Description</FormLabel>
+                                            <Textarea {...field}></Textarea>
+                                        </FormControl>
+                                    )}
+                                </Field>
+                            </Box>
+                            <Box mt="25px">
+                                <Field name='forumLink'>
+                                    {({ field }) => (
+                                        <FormControl alignSelf="baseline">
+                                            <FormLabel>Forum Link</FormLabel>
+                                            <Input {...field}></Input>
+                                            <FormHelperText>
+                                                Optional: You can include a link for discussions to be held
+                                            </FormHelperText>
+                                        </FormControl>
+                                    )}
+                                </Field>
+                            </Box>
+                            <Box mt="25px" width="100%" textAlign="right">
+                                <Button type="submit" variant="action-button">
+                                    Submit
+                                </Button>
+                            </Box>
+                        </Form>
+                    )
+                }}
+            </Formik>
+        </>
 
     );
 };

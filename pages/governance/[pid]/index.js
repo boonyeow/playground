@@ -262,12 +262,6 @@ const ProjectGovernance = () => {
                                             bg: "blue.100",
                                             color: "#000000",
                                         }}
-                                        onClick={() => {
-                                            localStorage.setItem(
-                                                "lastEvent",
-                                                pid
-                                            );
-                                        }}
                                     >
                                         Create Proposal
                                     </Button>
@@ -281,12 +275,6 @@ const ProjectGovernance = () => {
                                             _hover={{
                                                 bg: "blue.100",
                                                 color: "#000000",
-                                            }}
-                                            onClick={() => {
-                                                localStorage.setItem(
-                                                    "lastEvent",
-                                                    pid
-                                                );
                                             }}
                                         >
                                             Create Proposal

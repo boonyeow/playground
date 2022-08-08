@@ -34,10 +34,12 @@ import { ChevronRightIcon } from "@chakra-ui/icons";
 import DatePicker from "../../../components/DatePicker";
 import TapProposal from "../../../components/TapProposal";
 import RefundProposal from "../../../components/RefundProposal";
-
+import { useRouter } from "next/router";
 
 
 const createProposal = () => {
+    const router = useRouter();
+    const { pid } = router.query;
     const [userInfo, setUserInfo] = useState({
         userAddress: 0,
         projectsDeployed: [],
@@ -48,16 +50,10 @@ const createProposal = () => {
     const [tapVisible, setTapVisible] = useState(true);
     const [refundVisible, setRefundVisible] = useState(false);
 
-
     useEffect(() => {
-        setProposalId(localStorage.getItem("lastEvent"));
         const temp = localStorage.getItem("_persist");
         temp = temp == null ? userInfo : JSON.parse(temp);
         setUserInfo(temp);
-
-    }, []);
-
-    useEffect(() => {
         for (const project of userInfo.projectsDeployed) {
             console.log(project)
             if (proposalId == project.contractAddress) {
@@ -65,7 +61,17 @@ const createProposal = () => {
             }
         }
         console.log(iam)
-    }, [userInfo]);
+    }, [router.isReady]);
+
+    // useEffect(() => {
+    //     for (const project of userInfo.projectsDeployed) {
+    //         console.log(project)
+    //         if (proposalId == project.contractAddress) {
+    //             setIAM("Owner")
+    //         }
+    //     }
+    //     console.log(iam)
+    // }, [userInfo]);
 
     useEffect(() => {
         proposaltype == "tap"
@@ -94,8 +100,8 @@ const createProposal = () => {
                             Governance
                         </NextLink>
                         <ChevronRightIcon alignSelf="center" mx="10px" />
-                        <NextLink href={`/governance/${proposalId}`} color="gray.600">
-                            {proposalId}
+                        <NextLink href={`/governance/${pid}`} color="gray.600">
+                            {router.isReady ? pid : ""}
                         </NextLink>
                         <ChevronRightIcon alignSelf="center" mx="10px" />
                         <Text color="gray.600" fontWeight="semibold">
@@ -126,7 +132,7 @@ const createProposal = () => {
                                     </FormHelperText>
                                 </FormControl>
                                 {tapVisible && <TapProposal />}
-                                {refundVisible && <RefundProposal />}
+                                {refundVisible && <RefundProposal pid={pid} />}
                             </Box>
                         </Flex>
                     </Box>
