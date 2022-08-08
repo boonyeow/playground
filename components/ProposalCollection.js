@@ -28,6 +28,7 @@ const {
 
 const connection = new ICONexConnection();
 const ProposalCollection = ({ proposalInfo }) => {
+    console.log("proposalcol", proposalInfo);
     const statusInfo = {
         0: {
             status: "Active",
@@ -90,10 +91,6 @@ const ProposalCollection = ({ proposalInfo }) => {
                 </Thead>
                 <Tbody>
                     {Object.keys(proposalInfo).map((index) => {
-                        // console.log(
-                        //     "hehe",
-                        //     getBlockInfo(proposalInfo[index].startBlockHeight)
-                        // );
                         const totalVotes =
                             parseInt(proposalInfo[index].disagreeVotes) +
                             parseInt(proposalInfo[index].agreeVotes) +

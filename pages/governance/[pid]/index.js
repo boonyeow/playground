@@ -20,7 +20,6 @@ import FeaturedProject from "../../../components/FeaturedProject";
 import axios from "axios";
 import ProposalCollection from "../../../components/ProposalCollection";
 import cfg from "../../../util/config";
-import dynamic from "next/dynamic";
 import HolderList from "../../../components/HolderList";
 
 const {
@@ -56,7 +55,6 @@ const ProjectGovernance = () => {
     });
 
     const [contractBalance, setContractBalance] = useState(0);
-    const [delegate, setDelegate] = useState(null);
     const [totalSupply, setTotalSupply] = useState(0);
 
     const [voterInfo, setVoterInfo] = useState({});
@@ -123,6 +121,7 @@ const ProjectGovernance = () => {
                 getContractBalance(),
                 fetchProjectInfo(),
             ]).then((res) => {
+                // setProposalInfo(res[0]);
                 setVoterInfo(res[0]);
                 setContractBalance(IconConverter.toNumber(res[1]));
 
@@ -139,7 +138,6 @@ const ProjectGovernance = () => {
                     endTimestamp: IconConverter.toNumber(res[2].endTimestamp),
                 };
                 setProjectInfo(pi);
-                // setDelegate(res[3]);
             });
 
             getProposals();
