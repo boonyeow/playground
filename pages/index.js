@@ -20,7 +20,7 @@ const Home = () => {
     useEffect(() => {
         const fetchProjects = async () => {
             let res = await axios.get(
-                "http://localhost:3000/api/projects/fetch"
+                "http://localhost:3000/api/projects/fetchHome"
             );
             setProjectList(res.data);
         };
@@ -145,6 +145,7 @@ const Home = () => {
                                             src={currentProject.thumbnailSrc}
                                             actionLabel="View Project"
                                             href={`explore/${currentProject.contractAddress}`}
+                                            contractAdd={currentProject.contractAddress}
                                         />
                                     </>
                                 ))}

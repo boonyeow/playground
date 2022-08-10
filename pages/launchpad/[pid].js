@@ -519,6 +519,7 @@ const ProjectDetails = () => {
                                             desc={projectInfo.description}
                                             actionLabel="View Project"
                                             href={""}
+                                            contractAdd={projectInfo.contractAddress}
                                         />
                                     </FormControl>
                                 </Box>

@@ -124,6 +124,7 @@ const Explore = () => {
                                         src={currentProject.thumbnailSrc}
                                         actionLabel="View Project"
                                         href={`explore/${currentProject.contractAddress}`}
+                                        contractAdd={currentProject.contractAddress}
                                     />
                                 ))}
                             {projectList.length == 0 &&

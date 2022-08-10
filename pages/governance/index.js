@@ -59,6 +59,7 @@ const Governance = () => {
                                 src="/../public/unnamed.jpg"
                                 actionLabel="View Activity"
                                 href={""}
+                                contractAdd=""
                             />
                         </SimpleGrid>
                     </Box>
@@ -76,6 +77,7 @@ const Governance = () => {
                                         src={currentProject.thumbnailSrc}
                                         actionLabel="View Activity"
                                         href={`governance/${currentProject.contractAddress}`}
+                                        contractAdd={currentProject.contractAddress}
                                     />
                                 ))}
                             {projectList.length === 0 &&

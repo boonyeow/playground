@@ -1,7 +1,8 @@
-import { Box, Text, VStack, Button, Flex, Skeleton } from "@chakra-ui/react";
+import { Box, Text, VStack, Button, Flex, Skeleton, Center } from "@chakra-ui/react";
 import NextImage from "next/image";
 import NextLink from "next/link";
 import { useEffect, useState } from "react";
+import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
 
 const AdditionalInfo = ({ title, value }) => {
     return (
@@ -71,10 +72,10 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
     };
 
     const currentTimestamp = new Date().getTime();
-    const src =
-        projectInfo.thumbnailSrc == ""
-            ? "/../../4.avif"
-            : projectInfo.thumbnailSrc; // to remove;
+    // const src =
+    //     projectInfo.thumbnailSrc == ""
+    //         ? "/../../4.avif"
+    //         : projectInfo.thumbnailSrc; // to remove;
 
     return (
         <Flex borderRadius="15px" p="30px" shadow="md" bg="#0e0e0e" w="100%">
@@ -93,14 +94,29 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
                         // p="2px"
                         borderRadius={"50px"}
                     >
-                        <NextImage
+                        {
+                            projectInfo.thumbnailSrc == "" ?
+                            <Center>
+                                <Jazzicon diameter={75} seed={jsNumberForAddress(addr)} />
+                            </Center>
+                            :
+                            <NextImage
+                                layout="responsive"
+                                objectFit="contain"
+                                width="100%"
+                                height="100%"
+                                src={projectInfo.thumbnailSrc}
+                                style={{ borderRadius: "50px" }}
+                            />
+                        }
+                        {/* <NextImage
                             layout="responsive"
                             objectFit="contain"
                             width="100%"
                             height="100%"
                             src={src}
                             style={{ borderRadius: "50px" }}
-                        />
+                        /> */}
                     </Box>
                     <NextLink href={`/governance/${addr}`}>
                         <Button borderRadius="50px" color="black" fontSize="sm">

@@ -1,8 +1,10 @@
-import { Box, Text, Button, Flex } from "@chakra-ui/react";
+import { Box, Text, Button, Flex, Center } from "@chakra-ui/react";
 import NextImage from "next/image";
 import NextLink from "next/link";
-const Project = ({ src, title, desc, actionLabel, href }) => {
-    src = src == "" ? "/../../4.avif" : src; // to remove;
+import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
+
+const Project = ({ src, title, desc, actionLabel, href, contractAdd }) => {
+    //src = src == "" ? "/../../4.avif" : src; // to remove;
     return (
         <Flex
             mt="10px"
@@ -23,14 +25,29 @@ const Project = ({ src, title, desc, actionLabel, href }) => {
                         // p="2px"
                         borderRadius={"50px"}
                     >
-                        <NextImage
+                        {
+                            src == "" ?
+                            <Center>
+                                <Jazzicon diameter={75} seed={jsNumberForAddress(contractAdd)} />
+                            </Center>
+                            :
+                            <NextImage
+                                layout="responsive"
+                                objectFit="contain"
+                                width="100%"
+                                height="100%"
+                                src={src}
+                                style={{ borderRadius: "50px" }}
+                            />
+                        }
+                        {/* <NextImage
                             layout="responsive"
                             objectFit="contain"
                             width="100%"
                             height="100%"
                             src={src}
                             style={{ borderRadius: "50px" }}
-                        />
+                        /> */}
                     </Box>
                     <NextLink href={href}>
                         <Button variant="action-button">{actionLabel}</Button>

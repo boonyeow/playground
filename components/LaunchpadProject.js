@@ -1,10 +1,10 @@
-import { Box, Text, VStack, Button, Flex } from "@chakra-ui/react";
+import { Box, Text, VStack, Button, Flex, Center } from "@chakra-ui/react";
 import NextImage from "next/image";
 import NextLink from "next/link";
 const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
-    if (src == "") {
-        src = "/../public/4.avif";
-    }
+    // if (src == "") {
+    //     src = "/../public/4.avif";
+    // }
     return (
         <Flex
             mt="10px"
@@ -23,14 +23,29 @@ const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
                         mr="30px"
                         borderRadius={"50px"}
                     >
-                        <NextImage
+                        {
+                            src == "" ?
+                            <Center>
+                                <Jazzicon diameter={75} seed={jsNumberForAddress(contractAdd)} />
+                            </Center>
+                            :
+                            <NextImage
+                                layout="responsive"
+                                objectFit="contain"
+                                width="100%"
+                                height="100%"
+                                src={src}
+                                style={{ borderRadius: "50px" }}
+                            />
+                        }
+                        {/* <NextImage
                             layout="responsive"
                             objectFit="contain"
                             width="100%"
                             height="100%"
                             src={src}
                             style={{ borderRadius: "50px" }}
-                        />
+                        /> */}
                     </Box>
                     <NextLink href={`/launchpad/${addr}`}>
                         <Button variant="action-button">{actionLabel}</Button>
