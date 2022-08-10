@@ -43,11 +43,13 @@ import {
     AiOutlineHome,
 } from "react-icons/ai";
 import axios from "axios";
+import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
 
 const PageHeader = ({ title, userInfo, setUserInfo }) => {
     const connection = new ICONexConnection();
     const toast = useToast();
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [userAdd, setuserAdd] = useState("");
 
     const connectWallet = async () => {
         let userAddress = await connection.getWalletAddress();
@@ -104,7 +106,10 @@ const PageHeader = ({ title, userInfo, setUserInfo }) => {
         <Menu>
             <MenuButton my="auto">
                 <Flex padding="2px" borderRadius="25px">
-                    <Avatar size={"sm"} bg="black" />
+                    {/* <Avatar size={"sm"} bg="black" /> */}
+                    {
+                        userInfo.userAddress && <Jazzicon diameter={40} seed={jsNumberForAddress(userInfo.userAddress)} />
+                    }
                 </Flex>
             </MenuButton>
             <Portal>
