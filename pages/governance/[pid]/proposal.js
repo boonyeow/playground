@@ -56,7 +56,7 @@ const createProposal = () => {
         setUserInfo(temp);
         for (const project of userInfo.projectsDeployed) {
             console.log(project)
-            if (proposalId == project.contractAddress) {
+            if (pid == project.contractAddress) {
                 setIAM("Owner")
             }
         }
