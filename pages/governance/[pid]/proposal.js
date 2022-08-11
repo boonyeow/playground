@@ -131,7 +131,7 @@ const createProposal = () => {
                                         Please select a proposal type.
                                     </FormHelperText>
                                 </FormControl>
-                                {tapVisible && <TapProposal />}
+                                {tapVisible && <TapProposal pid={pid} />}
                                 {refundVisible && <RefundProposal pid={pid} />}
                             </Box>
                         </Flex>
