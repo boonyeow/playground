@@ -56,12 +56,12 @@ function Headers() {
 
         // Retrieve record with userAddress from DynamoDB
         let res = await axios.get(
-            `http://localhost:3000/api/users?userAddress=${userAddress}`
+            `${cfg.BASE_URL}/api/users?userAddress=${userAddress}`
         );
 
         // Check if user is registered. If not, onboard them
         if (res.data === "") {
-            res = await axios.post("http://localhost:3000/api/users", {
+            res = await axios.post(`${cfg.BASE_URL}/api/users`, {
                 userAddress: userAddress,
             });
             console.log("not found hehe", res);
@@ -98,7 +98,7 @@ function Headers() {
         }
 
         // Proceed to retrieve signature, txhash, address and send POST to /auth
-        let authRes = await axios.post("http://localhost:3000/api/auth", {
+        let authRes = await axios.post(`${cfg.BASE_URL}/api/auth`, {
             userAddress: userAddress,
             signature: rpcResponse,
             txHash: txHash,

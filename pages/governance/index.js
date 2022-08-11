@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import SkeletonProject from "../../components/SkeletonProject";
 import Footer from "../../components/Footer";
+import cfg from "../../util/config";
 const Governance = () => {
     const [userInfo, setUserInfo] = useState({
         userAddress: 0,
@@ -16,9 +17,7 @@ const Governance = () => {
 
     useEffect(() => {
         const fetchProjects = async () => {
-            let res = await axios.get(
-                "http://localhost:3000/api/projects/fetch"
-            );
+            let res = await axios.get(`${cfg.BASE_URL}/api/projects/fetch`);
             setProjectList(res.data);
         };
         const temp = localStorage.getItem("_persist");
@@ -30,7 +29,7 @@ const Governance = () => {
     return (
         <>
             <Box
-                maxWidth={"6xl"}
+                maxWidth={"8xl"}
                 width="100%"
                 m="auto"
                 minHeight="100vh"
@@ -59,7 +58,7 @@ const Governance = () => {
                                 src="/../public/unnamed.jpg"
                                 actionLabel="View Activity"
                                 href={""}
-                                contractAdd=""
+                                contractAddr=""
                             />
                         </SimpleGrid>
                     </Box>
@@ -77,7 +76,9 @@ const Governance = () => {
                                         src={currentProject.thumbnailSrc}
                                         actionLabel="View Activity"
                                         href={`governance/${currentProject.contractAddress}`}
-                                        contractAdd={currentProject.contractAddress}
+                                        contractAddr={
+                                            currentProject.contractAddress
+                                        }
                                     />
                                 ))}
                             {projectList.length === 0 &&

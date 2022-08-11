@@ -20,7 +20,8 @@ import PageHeader from "../../components/PageHeader";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import SkeletonProject from "../../components/SkeletonProject";
-import React from 'react'
+import React from "react";
+import cfg from "../../util/config";
 
 const Explore = () => {
     const [userInfo, setUserInfo] = useState({
@@ -32,13 +33,20 @@ const Explore = () => {
 
     const fetchProjects = async () => {
         let res = await axios.get(
-            `http://localhost:3000/api/projects/pagination?lastEvaluatedKey=${JSON.stringify(lastKey)}`
+            `${
+                cfg.BASE_URL
+            }/api/projects/pagination?lastEvaluatedKey=${JSON.stringify(
+                lastKey
+            )}`
         );
 
         //Merge the new project list with the current project list
         var newProjectList = projectList;
-        const data = res['data']['projects'];
-        if (Object.keys(data).length > 0 && Object.keys(projectList).length > 0) {
+        const data = res["data"]["projects"];
+        if (
+            Object.keys(data).length > 0 &&
+            Object.keys(projectList).length > 0
+        ) {
             var startKey = Object.keys(newProjectList).length;
             for (var project in data) {
                 newProjectList[startKey] = data[project];
@@ -46,9 +54,9 @@ const Explore = () => {
             }
         }
 
-        setLastKey(res['data']['lastEvaluatedKey']);
+        setLastKey(res["data"]["lastEvaluatedKey"]);
         if (Object.keys(projectList).length == 0) {
-            setProjectList(res['data']['projects']);
+            setProjectList(res["data"]["projects"]);
         } else {
             setProjectList(newProjectList);
         }
@@ -62,26 +70,28 @@ const Explore = () => {
     }, []);
 
     useEffect(() => {
-        window.addEventListener('scroll', handleScroll, {
-            passive: true
+        window.addEventListener("scroll", handleScroll, {
+            passive: true,
         });
         return () => {
-            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener("scroll", handleScroll);
         };
-    },[lastKey])
+    }, [lastKey]);
 
     const handleScroll = () => {
-        const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight
+        const bottom =
+            Math.ceil(window.innerHeight + window.scrollY) >=
+            document.documentElement.scrollHeight;
         if (bottom) {
-          if (lastKey != undefined ) {
-            fetchProjects()
-          }
+            if (lastKey != undefined) {
+                fetchProjects();
+            }
         }
     };
 
     return (
         <>
-            <Box maxWidth={"6xl"} width="100%" m="auto" minH="110vh" pt="2.5vh">
+            <Box maxWidth={"8xl"} width="100%" m="auto" minH="110vh" pt="2.5vh">
                 <Sidebar active="Explore" />
                 <Box
                     width="100%"
@@ -124,24 +134,33 @@ const Explore = () => {
                                         src={currentProject.thumbnailSrc}
                                         actionLabel="View Project"
                                         href={`explore/${currentProject.contractAddress}`}
-                                        contractAdd={currentProject.contractAddress}
+                                        contractAddr={
+                                            currentProject.contractAddress
+                                        }
                                     />
                                 ))}
                             {projectList.length == 0 &&
                                 [0, 1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                                     <SkeletonProject key={n} />
                                 ))}
-                            {!(lastKey == undefined || lastKey == []) ?
+                            {!(lastKey == undefined || lastKey == []) ? (
                                 [0, 1, 2].map((n) => (
                                     <SkeletonProject key={n} />
-                                )):<></>
-                            }
-                        </SimpleGrid >
-                        {(lastKey == undefined || lastKey == []) ?
-                            <Center w='100%' m='2.5rem'>
-                                <Text fontWeight='semibold'>End of list! You've viewed {Object.keys(projectList).length} projects.</Text>
-                            </Center>:<></>
-                        }
+                                ))
+                            ) : (
+                                <></>
+                            )}
+                        </SimpleGrid>
+                        {lastKey == undefined || lastKey == [] ? (
+                            <Center w="100%" m="2.5rem">
+                                <Text fontWeight="semibold">
+                                    End of list! You've viewed{" "}
+                                    {Object.keys(projectList).length} projects.
+                                </Text>
+                            </Center>
+                        ) : (
+                            <></>
+                        )}
                     </Box>
                 </Box>
             </Box>

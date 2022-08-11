@@ -7,10 +7,12 @@ import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import axios from "axios";
 import SkeletonProject from "../components/SkeletonProject";
+import cfg from "../util/config";
 
 const FeaturedProject = dynamic(() => import("../components/FeaturedProject"), {
     ssr: false,
 });
+
 const Home = () => {
     const [userInfo, setUserInfo] = useState({
         userAddress: 0,
@@ -19,9 +21,7 @@ const Home = () => {
     const [projectList, setProjectList] = useState([]);
     useEffect(() => {
         const fetchProjects = async () => {
-            let res = await axios.get(
-                "http://localhost:3000/api/projects/fetchHome"
-            );
+            let res = await axios.get(`${cfg.BASE_URL}/api/projects/fetch`);
             setProjectList(res.data);
         };
 
@@ -30,7 +30,6 @@ const Home = () => {
         temp = temp == null ? userInfo : JSON.parse(temp);
         setUserInfo(temp);
         setTimeout(fetchProjects, 500);
-        //        fetchProjects();
     }, []);
 
     const projectInfo = {
@@ -46,7 +45,7 @@ const Home = () => {
 
     return (
         <>
-            <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
+            <Box maxWidth={"8xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
                 <Sidebar active="Home" />
                 <Box
                     width="100%"
@@ -145,7 +144,9 @@ const Home = () => {
                                             src={currentProject.thumbnailSrc}
                                             actionLabel="View Project"
                                             href={`explore/${currentProject.contractAddress}`}
-                                            contractAdd={currentProject.contractAddress}
+                                            contractAddr={
+                                                currentProject.contractAddress
+                                            }
                                         />
                                     </>
                                 ))}

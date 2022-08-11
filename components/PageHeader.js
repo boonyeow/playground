@@ -43,7 +43,8 @@ import {
     AiOutlineHome,
 } from "react-icons/ai";
 import axios from "axios";
-import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
+import cfg from "../util/config.js";
+import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 
 const PageHeader = ({ title, userInfo, setUserInfo }) => {
     const connection = new ICONexConnection();
@@ -55,7 +56,7 @@ const PageHeader = ({ title, userInfo, setUserInfo }) => {
         let userAddress = await connection.getWalletAddress();
         if (userAddress) {
             let res = await axios.get(
-                `http://localhost:3000/api/projects?userAddress=${userAddress}`
+                `${cfg.BASE_URL}/api/projects?userAddress=${userAddress}`
             );
 
             const temp = {
@@ -107,9 +108,12 @@ const PageHeader = ({ title, userInfo, setUserInfo }) => {
             <MenuButton my="auto">
                 <Flex padding="2px" borderRadius="25px">
                     {/* <Avatar size={"sm"} bg="black" /> */}
-                    {
-                        userInfo.userAddress && <Jazzicon diameter={40} seed={jsNumberForAddress(userInfo.userAddress)} />
-                    }
+                    {userInfo.userAddress && (
+                        <Jazzicon
+                            diameter={40}
+                            seed={jsNumberForAddress(userInfo.userAddress)}
+                        />
+                    )}
                 </Flex>
             </MenuButton>
             <Portal>

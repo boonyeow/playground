@@ -24,26 +24,6 @@ export const theme = extendTheme(
                     },
                 },
             },
-            Text: {
-                variants: {
-                    "card-header": {
-                        textAlign: "center",
-                        display: "block",
-                        color: "gray.800",
-                        fontWeight: "bold",
-                        fontSize: "2xl",
-                    },
-                    "card-item-header": {
-                        color: "#676767",
-                        fontSize: "sm",
-                    },
-                    "card-item-value": {
-                        color: "#3d3d3d",
-                        fontWeight: "bold",
-                        fontSize: "large",
-                    },
-                },
-            },
             Button: {
                 baseStyle: {
                     _focus: {

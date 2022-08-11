@@ -1,3 +1,4 @@
+import cfg from "../util/config";
 class MyUploadAdapter {
     constructor(loader) {
         // The file loader instance to use during the upload.
@@ -31,7 +32,7 @@ class MyUploadAdapter {
         // integration to choose the right communication channel. This example uses
         // a POST request with JSON as a data structure but your configuration
         // could be different.
-        xhr.open("POST", "http://localhost:3000/api/upload", true); //to do list: implement filebase
+        xhr.open("POST", `${cfg.BASE_URL}/api/upload`, true);
         xhr.responseType = "json";
     }
 
@@ -45,7 +46,6 @@ class MyUploadAdapter {
         xhr.addEventListener("abort", () => reject());
         xhr.addEventListener("load", () => {
             const response = xhr.response;
-
             // This example assumes the XHR server's "response" object will come with
             // an "error" which has its own "message" that can be passed to reject()
             // in the upload promise.
@@ -64,9 +64,7 @@ class MyUploadAdapter {
             // at least the "default" URL, pointing to the image on the server.
             // This URL will be used to display the image in the content. Learn more in the
             // UploadAdapter#upload documentation.
-            resolve({
-                default: response.url,
-            });
+            resolve(response);
         });
 
         // Upload progress when it is supported. The file loader has the #uploadTotal and #uploaded
@@ -86,9 +84,7 @@ class MyUploadAdapter {
     _sendRequest(file) {
         // Prepare the form data.
         const data = new FormData();
-
         data.append("upload", file);
-
         // Important note: This is the right place to implement security mechanisms
         // like authentication and CSRF protection. For instance, you can use
         // XMLHttpRequest.setRequestHeader() to set the request headers containing

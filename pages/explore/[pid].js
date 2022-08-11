@@ -100,7 +100,7 @@ const ProjectDetail = () => {
 
     return (
         <>
-            <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
+            <Box maxWidth={"8xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
                 <Sidebar active="Explore" />
                 <Box w="100%" h="100%" ml="75px" p="1.5rem 3rem 3rem 3rem">
                     <PageHeader

@@ -1,8 +1,16 @@
-import { Box, Text, VStack, Button, Flex, Skeleton, Center } from "@chakra-ui/react";
+import {
+    Box,
+    Text,
+    VStack,
+    Button,
+    Flex,
+    Skeleton,
+    Center,
+} from "@chakra-ui/react";
 import NextImage from "next/image";
 import NextLink from "next/link";
 import { useEffect, useState } from "react";
-import Jazzicon, { jsNumberForAddress } from 'react-jazzicon'
+import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 
 const AdditionalInfo = ({ title, value }) => {
     return (
@@ -94,12 +102,14 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
                         // p="2px"
                         borderRadius={"50px"}
                     >
-                        {
-                            projectInfo.thumbnailSrc == "" ?
+                        {projectInfo.thumbnailSrc == "" ? (
                             <Center>
-                                <Jazzicon diameter={75} seed={jsNumberForAddress(addr)} />
+                                <Jazzicon
+                                    diameter={75}
+                                    seed={jsNumberForAddress(addr || "")}
+                                />
                             </Center>
-                            :
+                        ) : (
                             <NextImage
                                 layout="responsive"
                                 objectFit="contain"
@@ -108,7 +118,7 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
                                 src={projectInfo.thumbnailSrc}
                                 style={{ borderRadius: "50px" }}
                             />
-                        }
+                        )}
                         {/* <NextImage
                             layout="responsive"
                             objectFit="contain"
@@ -155,11 +165,15 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
                             <>
                                 <AdditionalInfo
                                     title="Price per NFT"
-                                    value={`${projectInfo.pricePerNFT} ICX`}
+                                    value={`${
+                                        projectInfo.pricePerNFT / 10 ** 18
+                                    } ICX`}
                                 />
                                 <AdditionalInfo
                                     title="Funding Goal"
-                                    value={`${projectInfo.fundingGoal} ICX`}
+                                    value={`${
+                                        projectInfo.fundingGoal / 10 ** 18
+                                    } ICX`}
                                 />
                                 {currentTimestamp -
                                     projectInfo.startTimestamp <=

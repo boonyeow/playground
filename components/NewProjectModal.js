@@ -113,7 +113,7 @@ const NewProjectModal = ({ onClose, isOpen, userInfo, setUserInfo }) => {
                         endTimestamp: "",
                     };
                     let response = await axios.post(
-                        "http://localhost:3000/api/projects/add", //change it to {endpoint}/api/projects/add
+                        `${cfg.BASE_URL}/api/projects/add`,
                         params
                     );
                     console.log("res", response);

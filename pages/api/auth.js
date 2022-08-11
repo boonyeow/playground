@@ -12,6 +12,8 @@ const {
     IconWallet,
 } = IconService;
 
+import cfg from "../../util/config";
+
 const getUserAddress = (hashcode, signature) => {
     const hashcodeBuffer = Buffer.from(hashcode, "hex");
 
@@ -34,7 +36,7 @@ const getUserAddress = (hashcode, signature) => {
 };
 
 const createUser = async (userAddress) => {
-    let res = await axios.post("http://localhost:3000/api/users", {
+    let res = await axios.post(`${cfg.BASE_URL}/api/users`, {
         userAddress: userAddress,
     });
     return res;
@@ -53,7 +55,7 @@ export default async function handler(req, res) {
             console.log("token", token);
 
             // proceed to update nonce
-            await axios.post("http://localhost:3000/api/users", {
+            await axios.post(`${cfg.BASE_URL}/api/users`, {
                 userAddress: data.userAddress,
             });
             res.status(200).send({ success: 1, token: token });

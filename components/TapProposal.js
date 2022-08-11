@@ -30,7 +30,7 @@ import CustomAlert from "./CustomAlert";
 import ICONexConnection from "../util/interact";
 import IconService from "icon-sdk-js";
 import { useEffect, useRef, useState } from "react";
-import { Formik, Field, form, useFormik, ErrorMessage } from 'formik';
+import { Formik, Field, form, useFormik, ErrorMessage } from "formik";
 
 const {
     IconConverter,
@@ -39,8 +39,6 @@ const {
     SignedTransaction,
     IconWallet,
 } = IconService;
-
-
 
 const TapProposal = () => {
     const connection = new ICONexConnection();
@@ -61,17 +59,17 @@ const TapProposal = () => {
     //     }
     //     return error
     // }
-    const validate = values => {
+    const validate = (values) => {
         const errors = {};
-        setRemainingChar(50 - values.title.length)
+        setRemainingChar(50 - values.title.length);
         if (values.title.length > 50) {
-            errors.title = "Maximum character limit exceeded"
+            errors.title = "Maximum character limit exceeded";
         }
         if (values.tapRate < 0) {
-            errors.tapRate = "Tap Rate cannot be less than Zero"
+            errors.tapRate = "Tap Rate cannot be less than Zero";
         }
-        console.log(errors)
-        return errors
+        console.log(errors);
+        return errors;
     };
     // useEffect(() => {
     //     const fetchProjectInfo = async () => {
@@ -107,28 +105,24 @@ const TapProposal = () => {
         });
     };
 
-
     const formik = useFormik({
         initialValues: {
-            title: '',
-            description: '',
-            forumLink: '',
-            tapRate: '',
+            title: "",
+            description: "",
+            forumLink: "",
+            tapRate: "",
         },
         validate,
-        onSubmit: values => {
+        onSubmit: (values) => {
             alert(JSON.stringify(values, null, 2));
             // call the proposal collection
-
         },
     });
-
 
     return (
         <div>
             <form onSubmit={formik.handleSubmit}>
                 <Box mt="25px">
-
                     <FormControl isRequired>
                         <FormLabel htmlFor="title">Title</FormLabel>
                         <Input
@@ -140,14 +134,17 @@ const TapProposal = () => {
                             value={formik.values.title}
                         ></Input>
                         <Flex>
-                            <FormHelperText paddingRight="10px">Character limit: {remainingChar}</FormHelperText>
+                            <FormHelperText paddingRight="10px">
+                                Character limit: {remainingChar}
+                            </FormHelperText>
 
                             {formik.errors.title ? (
-                                <FormHelperText color={"red"}>({formik.errors.title})</FormHelperText>
+                                <FormHelperText color={"red"}>
+                                    ({formik.errors.title})
+                                </FormHelperText>
                             ) : null}
                         </Flex>
                     </FormControl>
-
                 </Box>
                 <Box mt="25px">
                     <FormControl isRequired>
@@ -174,7 +171,11 @@ const TapProposal = () => {
                             value={formik.values.forumLink}
                         ></Input>
                         <Flex>
-                            <FormHelperText paddingRight="10px"> Optional: You can include a link for discussions to be held.</FormHelperText>
+                            <FormHelperText paddingRight="10px">
+                                {" "}
+                                Optional: You can include a link for discussions
+                                to be held.
+                            </FormHelperText>
                         </Flex>
                     </FormControl>
                 </Box>
@@ -182,13 +183,8 @@ const TapProposal = () => {
                 <HStack spacing="25px" mt="30px">
                     <FormControl alignSelf="baseline">
                         <FormLabel>Current Tap Rate Limit</FormLabel>
-                        <Input
-                            value='200'
-                        >
-                        </Input>
-                        <FormHelperText>
-                            Unit: ICX / sec.
-                        </FormHelperText>
+                        <Input value="200"></Input>
+                        <FormHelperText>Unit: ICX / sec.</FormHelperText>
                     </FormControl>
 
                     <FormControl isRequired>
@@ -203,20 +199,26 @@ const TapProposal = () => {
                         ></Input>
 
                         <Flex>
-                            <FormHelperText paddingRight="10px">Set a new Tap Rate Limit (unit: ICX / sec).</FormHelperText>
+                            <FormHelperText paddingRight="10px">
+                                Set a new Tap Rate Limit (unit: ICX / sec).
+                            </FormHelperText>
                         </Flex>
                         {formik.errors.tapRate ? (
-                            <FormHelperText color={"red"}>({formik.errors.tapRate})</FormHelperText>
+                            <FormHelperText color={"red"}>
+                                ({formik.errors.tapRate})
+                            </FormHelperText>
                         ) : null}
                     </FormControl>
                 </HStack>
                 <Box mt="25px" width="100%" textAlign="right">
                     {/* <Button type="submit" variant="action-button" */}
-                    <Button type="submit"
-                    // onClick={handleSave}
-                    >Submit</Button>
+                    <Button
+                        type="submit"
+                        // onClick={handleSave}
+                    >
+                        Submit
+                    </Button>
                 </Box>
-
 
                 {/* 
                 <CustomAlert
@@ -234,11 +236,9 @@ const TapProposal = () => {
                     status={statusInfo.type}
                     showClose={showClose}
                 /> */}
-
             </form>
-
-        </div >
+        </div>
     );
 };
 
-export default TapProposal
+export default TapProposal;

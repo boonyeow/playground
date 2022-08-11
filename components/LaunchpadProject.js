@@ -1,7 +1,9 @@
 import { Box, Text, VStack, Button, Flex, Center } from "@chakra-ui/react";
 import NextImage from "next/image";
 import NextLink from "next/link";
-const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
+import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
+
+const LaunchpadProject = ({ src, title, desc, actionLabel, contractAddr }) => {
     // if (src == "") {
     //     src = "/../public/4.avif";
     // }
@@ -23,12 +25,14 @@ const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
                         mr="30px"
                         borderRadius={"50px"}
                     >
-                        {
-                            src == "" ?
+                        {src == "" ? (
                             <Center>
-                                <Jazzicon diameter={75} seed={jsNumberForAddress(contractAdd)} />
+                                <Jazzicon
+                                    diameter={75}
+                                    seed={jsNumberForAddress(contractAddr)}
+                                />
                             </Center>
-                            :
+                        ) : (
                             <NextImage
                                 layout="responsive"
                                 objectFit="contain"
@@ -37,7 +41,7 @@ const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
                                 src={src}
                                 style={{ borderRadius: "50px" }}
                             />
-                        }
+                        )}
                         {/* <NextImage
                             layout="responsive"
                             objectFit="contain"
@@ -47,7 +51,7 @@ const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
                             style={{ borderRadius: "50px" }}
                         /> */}
                     </Box>
-                    <NextLink href={`/launchpad/${addr}`}>
+                    <NextLink href={`/launchpad/${contractAddr}`}>
                         <Button variant="action-button">{actionLabel}</Button>
                     </NextLink>
                 </Flex>
@@ -67,7 +71,7 @@ const LaunchpadProject = ({ src, title, desc, actionLabel, addr }) => {
                         fontFamily="mono"
                         noOfLines={1}
                     >
-                        {addr}
+                        {contractAddr}
                     </Text>
                 </Box>
             </Box>

@@ -184,7 +184,7 @@ const ProjectGovernance = () => {
 
     return (
         <>
-            <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
+            <Box maxWidth={"8xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
                 <Sidebar active="Governance" />
                 <Box
                     width="100%"
@@ -251,20 +251,8 @@ const ProjectGovernance = () => {
                                 >
                                     Proposals
                                 </Text>
-                                {/* {isOwner === false && ( // need edit */}
-                                <NextLink href={`${pid}/proposal`}>
-                                    <Button
-                                        bg="transparent"
-                                        color="#3D5CC3"
-                                        _hover={{
-                                            bg: "blue.100",
-                                            color: "#000000",
-                                        }}
-                                    >
-                                        Create Proposal
-                                    </Button>
-                                </NextLink>
-                                <Button onClick={test}> createetest</Button>
+
+                                {/* <Button onClick={test}> createetest</Button> */}
                                 {isOwner === true && (
                                     <NextLink href={`${pid}/proposal`}>
                                         <Button
@@ -295,7 +283,7 @@ const ProjectGovernance = () => {
                                 fontWeight="bold"
                                 paddingBottom="12px"
                             >
-                                Holders
+                                Leaderboard
                             </Text>
                             <HolderList
                                 voterInfo={voterInfo}

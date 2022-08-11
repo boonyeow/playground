@@ -14,6 +14,7 @@ import {
     NumberInputField,
     VisuallyHiddenInput,
     Tbody,
+    FormErrorMessage,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import PageHeader from "../../components/PageHeader";
@@ -30,6 +31,8 @@ import ICONexConnection, { sleep } from "../../util/interact";
 import cfg from "../../util/config";
 import CustomAlert from "../../components/CustomAlert";
 import axios from "axios";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 const Editor = dynamic(() => import("../../components/MyEditor"), {
     ssr: false,
@@ -46,8 +49,6 @@ const {
 const ProjectDetails = () => {
     const connection = new ICONexConnection();
     const hiddenUploadFile = useRef(null);
-    const tbDescription = useRef(null);
-    const tbFundingGoal = useRef(null);
 
     const router = useRouter();
     const { pid } = router.query;
@@ -68,21 +69,15 @@ const ProjectDetails = () => {
         to: "",
     });
 
-    // my editor settings
-    const [editorLoaded, setEditorLoaded] = useState(false);
-    const [data, setData] = useState("");
+    const [projectOverview, setProjectOverview] = useState("");
 
     const [projectInfo, setProjectInfo] = useState({
-        name: "",
         thumbnailSrc: "",
-        description: "",
-        details: "",
-        fundingGoal: "",
-        pricePerNFT: "",
-        startTimestamp: "",
-        endTimestamp: "",
-        withdrawalRate: "",
+        name: "",
     });
+
+    // thumbnail file upload state
+    const [toUpload, setToUpload] = useState(null);
 
     const [showStatus, setShowStatus] = useState(false);
     const [statusInfo, setStatusInfo] = useState({
@@ -100,114 +95,67 @@ const ProjectDetails = () => {
                 .method("getProjectInfo")
                 .build();
             let res = await connection.iconService.call(call).execute();
-            console.log("res", res);
-            let pi = {
-                name: res.name,
-                thumbnailSrc: res.thumbnailSrc,
-                description: res.description,
-                details: res.details,
-                fundingGoal: IconConverter.toNumber(res.fundingGoal),
-                pricePerNFT: IconConverter.toNumber(res.pricePerNFT),
-                startTimestamp: IconConverter.toNumber(res.startTimestamp),
-                endTimestamp: IconConverter.toNumber(res.endTimestamp),
-                withdrawalRate: IconConverter.toNumber(res.withdrawalRate),
-            };
 
-            setProjectInfo(pi);
+            let startTimestamp = IconConverter.toNumber(res.startTimestamp);
+            let endTimestamp = IconConverter.toNumber(res.endTimestamp);
 
             let range = {};
-            range.from =
-                pi.startTimestamp == "" ? "" : new Date(pi.startTimestamp);
-            range.to = pi.endTimestamp == "" ? "" : new Date(pi.endTimestamp);
-
+            range.from = startTimestamp == "" ? "" : new Date(startTimestamp);
+            range.to = endTimestamp == "" ? "" : new Date(endTimestamp);
             setSelectedRange(range);
+            setProjectInfo({
+                thumbnailSrc: res.thumbnailSrc,
+                name: res.name,
+            });
+
+            setProjectOverview(res.details);
+
+            formik.setValues({
+                description: res.description,
+                fundingGoal: IconConverter.toNumber(res.fundingGoal) / 10 ** 18,
+                pricePerNFT: IconConverter.toNumber(res.pricePerNFT) / 10 ** 18,
+                withdrawalRate:
+                    IconConverter.toNumber(res.withdrawalRate) / 10 ** 18,
+                selectedRange: range,
+            });
         };
 
         const temp = localStorage.getItem("_persist");
         temp = temp == null ? userInfo : JSON.parse(temp);
         setUserInfo(temp);
-        setEditorLoaded(true);
         // add check if user is not deployer, not allowed to view
-        //
         if (router.isReady) {
             // fetch project info
             fetchProjectInfo();
         }
     }, [router.isReady]);
 
-    const handleUploadFile = (e) => {
-        if (e.target.files.length != 1) {
-            console.log("invalid length");
-            return;
-        }
-
-        var re = new RegExp("image/*");
-        const uploadedFile = e.target.files[0];
-        if (!re.test(uploadedFile.type)) {
-            console.log("invalid file type");
-            return;
-        }
-
-        // https://stackoverflow.com/questions/38049966/get-image-preview-before-uploading-in-react
-        const objectURL = URL.createObjectURL(uploadedFile);
-        // setThumbnailSrc(objectURL);
-        setPreviewInfo({
-            thumbnailSrc: objectURL,
-            shortDesc: previewInfo.shortDesc,
-        });
-
-        return () => URL.revokeObjectURL(objectURL);
-    };
-
-    const handleUpdateDesc = (e) => {
-        const temp = { ...projectInfo };
-        temp.description = e.target.value;
-        setProjectInfo(temp);
-    };
-
-    const handleUpdateGoal = (e) => {
-        const temp = { ...projectInfo };
-        temp.fundingGoal = Number(e.target.value);
-        setProjectInfo(temp);
-    };
-
-    const handleUpdatePrice = (e) => {
-        const temp = { ...projectInfo };
-        temp.pricePerNFT = Number(e.target.value);
-        setProjectInfo(temp);
-    };
-
-    const handleUpdateWithdrawal = (e) => {
-        const temp = { ...projectInfo };
-        temp.withdrawalRate = Number(e.target.value);
-        setProjectInfo(temp);
-    };
-
-    const handleSave = async () => {
-        if (projectInfo.fundingGoal == 0 || projectInfo.pricePerNFT == 0) {
-            alert("not allowed");
-            return;
-        }
-
+    const handleSave = async (v) => {
         setShowStatus(true);
 
-        const data = {
-            name: projectInfo.name,
-            thumbnailSrc: projectInfo.thumbnailSrc,
-            description: projectInfo.description,
-            details: projectInfo.details,
-            fundingGoal: IconConverter.toHexNumber(projectInfo.fundingGoal),
-            pricePerNFT: IconConverter.toHexNumber(projectInfo.pricePerNFT),
-            startTimestamp: IconConverter.toHex(
-                new Date(selectedRange.from).getTime()
-            ),
-            endTimestamp: IconConverter.toHex(
-                new Date(selectedRange.to).getTime()
-            ),
-            withdrawalRate: IconConverter.toHexNumber(
-                projectInfo.withdrawalRate
-            ),
-        };
+        // Constructing params for call transaction
+        let data = { ...projectInfo };
+        data.details = projectOverview;
+        data.description = v.description;
+        data.fundingGoal = IconConverter.toHexNumber(v.fundingGoal * 10 ** 18);
+        data.pricePerNFT = IconConverter.toHexNumber(v.pricePerNFT * 10 ** 18);
+        data.startTimestamp = IconConverter.toHex(
+            new Date(v.selectedRange.from).getTime()
+        );
+        data.endTimestamp = IconConverter.toHex(
+            new Date(v.selectedRange.to).getTime()
+        );
+        data.withdrawalRate = IconConverter.toHexNumber(
+            v.withdrawalRate * 10 ** 18
+        );
+
+        if (toUpload !== null) {
+            // user has uploaded file, proceed to generate url
+            const formData = new FormData();
+            formData.append("upload", toUpload);
+            let res = await axios.post(`${cfg.BASE_URL}/api/upload`, formData);
+            data.thumbnailSrc = res.data.default;
+        }
 
         const txObj = new IconBuilder.CallTransactionBuilder()
             .from(userInfo.userAddress)
@@ -244,6 +192,60 @@ const ProjectDetails = () => {
         getTransactionResult(rpcResponse, 5);
     };
 
+    const formik = useFormik({
+        initialValues: {
+            description: "",
+            fundingGoal: "",
+            pricePerNFT: "",
+            withdrawalRate: "",
+            selectedRange: "",
+        },
+        validationSchema: Yup.object({
+            description: Yup.string()
+                .max(80, "Must be 80 characters or less")
+                .required("Required field"),
+            fundingGoal: Yup.number()
+                .positive("Must be a positive number")
+                .min(100, "Minimum funding goal is 100 ICX")
+                .required("Required field"),
+            pricePerNFT: Yup.number()
+                .positive("Must be a positive number")
+                .min(100, "Minimum price per NFT is 100 ICX")
+                .required("Required field"),
+            withdrawalRate: Yup.number().required("Required field"),
+            selectedRange: Yup.object().shape({
+                from: Yup.string().required("Required field"),
+                to: Yup.string().required("Required field"),
+            }),
+        }),
+        onSubmit: handleSave,
+    });
+
+    const handleUploadFile = (e) => {
+        if (e.target.files.length != 1) {
+            console.log("invalid length");
+            return;
+        }
+
+        var re = new RegExp("image/*");
+        const uploadedFile = e.target.files[0];
+        if (!re.test(uploadedFile.type)) {
+            console.log("invalid file type");
+            return;
+        }
+
+        // https://stackoverflow.com/questions/38049966/get-image-preview-before-uploading-in-react
+        const objectURL = URL.createObjectURL(uploadedFile);
+        // setThumbnailSrc(objectURL);
+        setPreviewInfo({
+            thumbnailSrc: objectURL,
+            shortDesc: previewInfo.shortDesc,
+        });
+
+        setToUpload(uploadedFile);
+        return () => URL.revokeObjectURL(objectURL);
+    };
+
     const getTransactionResult = async (rpcResponse, maxRetry) => {
         console.log("trying...", maxRetry);
         if (rpcResponse.error) {
@@ -263,17 +265,11 @@ const ProjectDetails = () => {
                         userAddress: userInfo.userAddress,
                         contractAddress: pid,
                         name: projectInfo.name,
-                        description: projectInfo.description,
-                        details: projectInfo.details,
+                        description: formik.values.description,
                         thumbnailSrc: projectInfo.thumbnailSrc,
-                        fundingGoal: projectInfo.fundingGoal,
-                        pricePerNFT: projectInfo.pricePerNFT,
-                        startTimestamp: new Date(selectedRange.from).getTime(),
-                        endTimestamp: new Date(selectedRange.to).getTime(),
-                        withdrawalRate: projectInfo.withdrawalRate,
                     };
-                    let response = await axios.post(
-                        "http://localhost:3000/api/projects/add", //change it to {endpoint}/api/projects/add
+                    await axios.post(
+                        `${cfg.BASE_URL}/api/projects/add`,
                         params
                     );
 
@@ -328,9 +324,24 @@ const ProjectDetails = () => {
         }
     };
 
+    const isInvalid = (key) => {
+        if (key == "description") {
+            return formik.touched.description && formik.errors.description;
+        } else if (key == "fundingGoal") {
+            return formik.touched.fundingGoal && formik.errors.fundingGoal;
+        } else if (key == "pricePerNFT") {
+            return formik.touched.pricePerNFT && formik.errors.pricePerNFT;
+        } else if (key == "withdrawalRate") {
+            return (
+                formik.touched.withdrawalRate && formik.errors.withdrawalRate
+            );
+        } else if (key == "selectedRange") {
+            return formik.touched.selectedRange && formik.errors.selectedRange;
+        }
+    };
     return (
         <>
-            <Box maxWidth={"6xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
+            <Box maxWidth={"8xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
                 <Sidebar active="Launchpad" />
                 <Box
                     width="100%"
@@ -361,151 +372,273 @@ const ProjectDetails = () => {
                                     maxWidth="calc(100% / 3 * 2 - 12.5px)"
                                     mr="25px"
                                 >
-                                    <FormControl>
-                                        <Flex>
-                                            <Box
-                                                minWidth="75px"
-                                                width="75px"
-                                                height="75px"
-                                                bg="#272727"
-                                                mr="30px"
-                                                borderRadius={"50px"}
-                                            >
-                                                <NextImage
-                                                    layout="responsive"
-                                                    objectFit="contain"
-                                                    width="100%"
-                                                    height="100%"
-                                                    src={
-                                                        previewInfo.thumbnailSrc
-                                                    }
-                                                    style={{
-                                                        borderRadius: "50px",
-                                                    }}
-                                                />
-                                            </Box>
-                                            <Box>
-                                                <FormLabel>
-                                                    Upload project thumbnail
-                                                </FormLabel>
-                                                <Button
-                                                    variant="action-button"
-                                                    onClick={() => {
-                                                        hiddenUploadFile.current.click();
-                                                    }}
+                                    <form onSubmit={formik.handleSubmit}>
+                                        <FormControl>
+                                            <Flex>
+                                                <Box
+                                                    minWidth="75px"
+                                                    width="75px"
+                                                    height="75px"
+                                                    bg="#272727"
+                                                    mr="30px"
+                                                    borderRadius={"50px"}
                                                 >
-                                                    Change thumbnail
-                                                </Button>
-                                                <VisuallyHiddenInput
-                                                    type="file"
-                                                    ref={hiddenUploadFile}
-                                                    accept="image/*"
-                                                    onChange={handleUploadFile}
-                                                />
-                                            </Box>
-                                        </Flex>
-                                        <FormHelperText>
-                                            1:1 aspect ratio recommended.
-                                        </FormHelperText>
-                                    </FormControl>
-                                    <FormControl mt="25px">
-                                        <FormLabel>Description</FormLabel>
-                                        <Input
-                                            ref={tbDescription}
-                                            type="text"
-                                            bg="white"
-                                            onChange={handleUpdateDesc}
-                                            value={projectInfo.description}
-                                        ></Input>
-                                        <FormHelperText>
-                                            Tell us about your project in a
-                                            sentence.
-                                        </FormHelperText>
-                                    </FormControl>
-                                    <HStack spacing="25px" mt="25px">
-                                        <FormControl alignSelf="baseline">
-                                            <FormLabel>Funding goal</FormLabel>
-                                            <Input
-                                                ref={tbFundingGoal}
-                                                type="number"
-                                                bg="white"
-                                                onChange={handleUpdateGoal}
-                                                value={projectInfo.fundingGoal}
-                                            ></Input>
+                                                    <NextImage
+                                                        layout="responsive"
+                                                        objectFit="contain"
+                                                        width="100%"
+                                                        height="100%"
+                                                        src={
+                                                            previewInfo.thumbnailSrc
+                                                        }
+                                                        style={{
+                                                            borderRadius:
+                                                                "50px",
+                                                        }}
+                                                    />
+                                                </Box>
+                                                <Box>
+                                                    <FormLabel>
+                                                        Upload project thumbnail
+                                                    </FormLabel>
+                                                    <Button
+                                                        variant="action-button"
+                                                        onClick={() => {
+                                                            hiddenUploadFile.current.click();
+                                                        }}
+                                                    >
+                                                        Change thumbnail
+                                                    </Button>
+                                                    <VisuallyHiddenInput
+                                                        type="file"
+                                                        ref={hiddenUploadFile}
+                                                        accept="image/*"
+                                                        onChange={
+                                                            handleUploadFile
+                                                        }
+                                                    />
+                                                </Box>
+                                            </Flex>
                                             <FormHelperText>
-                                                Upon reaching funding goal,
-                                                subsequent mints are priced at a
-                                                50% premium.
+                                                1:1 aspect ratio recommended.
                                             </FormHelperText>
                                         </FormControl>
-                                        <FormControl alignSelf="baseline">
-                                            <FormLabel>Price per NFT</FormLabel>
+
+                                        <FormControl
+                                            mt="25px"
+                                            isInvalid={
+                                                isInvalid("description")
+                                                    ? true
+                                                    : false
+                                            }
+                                        >
+                                            <FormLabel>Description</FormLabel>
                                             <Input
-                                                type="number"
+                                                name="description"
+                                                id="description"
+                                                type="text"
                                                 bg="white"
-                                                onChange={handleUpdatePrice}
-                                                value={projectInfo.pricePerNFT}
-                                                min={100}
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={
+                                                    formik.values.description
+                                                }
                                             ></Input>
-                                            <FormHelperText>
-                                                Minimum price per NFT fixed at
-                                                100 ICX.
-                                            </FormHelperText>
+                                            {isInvalid("description") ? (
+                                                <FormErrorMessage>
+                                                    {formik.errors.description}
+                                                </FormErrorMessage>
+                                            ) : (
+                                                <FormHelperText>
+                                                    Tell us about your project
+                                                    in a sentence.
+                                                </FormHelperText>
+                                            )}
                                         </FormControl>
-                                    </HStack>
-                                    <FormControl alignSelf="baseline" mt="25px">
-                                        <FormLabel>Withdrawal Rate</FormLabel>
-                                        <Input
-                                            type="number"
-                                            bg="white"
-                                            onChange={handleUpdateWithdrawal}
-                                            value={projectInfo.withdrawalRate}
-                                        ></Input>
-                                        <FormHelperText>
-                                            After campaign, withdrawals are
-                                            subjected to a rate limit (unit: ICX
-                                            / sec).
-                                        </FormHelperText>
-                                    </FormControl>
-                                    <Box mt="25px">
-                                        <FormControl alignSelf="baseline">
+                                        <HStack spacing="25px" mt="25px">
+                                            <FormControl
+                                                alignSelf="baseline"
+                                                isInvalid={
+                                                    isInvalid("fundingGoal")
+                                                        ? true
+                                                        : false
+                                                }
+                                            >
+                                                <FormLabel>
+                                                    Funding Goal
+                                                </FormLabel>
+                                                <Input
+                                                    name="fundingGoal"
+                                                    id="fundingGoal"
+                                                    type="number"
+                                                    bg="white"
+                                                    onChange={
+                                                        formik.handleChange
+                                                    }
+                                                    onBlur={formik.handleBlur}
+                                                    value={
+                                                        formik.values
+                                                            .fundingGoal
+                                                    }
+                                                ></Input>
+                                                {isInvalid("fundingGoal") ? (
+                                                    <FormErrorMessage>
+                                                        {
+                                                            formik.errors
+                                                                .fundingGoal
+                                                        }
+                                                    </FormErrorMessage>
+                                                ) : (
+                                                    <FormHelperText>
+                                                        Upon reaching funding
+                                                        goal, subsequent mints
+                                                        are priced at a 50%
+                                                        premium.
+                                                    </FormHelperText>
+                                                )}
+                                            </FormControl>
+                                            <FormControl
+                                                alignSelf="baseline"
+                                                isInvalid={
+                                                    isInvalid("pricePerNFT")
+                                                        ? true
+                                                        : false
+                                                }
+                                            >
+                                                <FormLabel>
+                                                    Price per NFT
+                                                </FormLabel>
+                                                <Input
+                                                    name="pricePerNFT"
+                                                    id="pricePerNFT"
+                                                    type="number"
+                                                    bg="white"
+                                                    onChange={
+                                                        formik.handleChange
+                                                    }
+                                                    onBlur={formik.handleBlur}
+                                                    value={
+                                                        formik.values
+                                                            .pricePerNFT
+                                                    }
+                                                ></Input>
+                                                {isInvalid("pricePerNFT") ? (
+                                                    <FormErrorMessage>
+                                                        {
+                                                            formik.errors
+                                                                .pricePerNFT
+                                                        }
+                                                    </FormErrorMessage>
+                                                ) : (
+                                                    <FormHelperText>
+                                                        Configure mint price for
+                                                        initial offering.
+                                                    </FormHelperText>
+                                                )}
+                                            </FormControl>
+                                        </HStack>
+
+                                        <FormControl
+                                            alignSelf="baseline"
+                                            mt="25px"
+                                            isInvalid={
+                                                isInvalid("withdrawalRate")
+                                                    ? true
+                                                    : false
+                                            }
+                                        >
                                             <FormLabel>
-                                                Campaign Duration
+                                                Withdrawal Rate
                                             </FormLabel>
-                                            <DatePicker
-                                                selectedRange={selectedRange}
-                                                setSelectedRange={
-                                                    setSelectedRange
+                                            <Input
+                                                name="withdrawalRate"
+                                                id="withdrawalRate"
+                                                type="number"
+                                                bg="white"
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                value={
+                                                    formik.values.withdrawalRate
+                                                }
+                                            ></Input>
+
+                                            {isInvalid("withdrawalRate") ? (
+                                                <FormErrorMessage>
+                                                    {
+                                                        formik.errors
+                                                            .withdrawalRate
+                                                    }
+                                                </FormErrorMessage>
+                                            ) : (
+                                                <FormHelperText>
+                                                    After campaign, withdrawals
+                                                    are subjected to a rate
+                                                    limit (unit: ICX / sec).
+                                                </FormHelperText>
+                                            )}
+                                        </FormControl>
+
+                                        <Box mt="25px">
+                                            <FormControl
+                                                alignSelf="baseline"
+                                                isInvalid={
+                                                    isInvalid("selectedRange")
+                                                        ? true
+                                                        : false
+                                                }
+                                            >
+                                                <FormLabel>
+                                                    Campaign Duration
+                                                </FormLabel>
+                                                <DatePicker
+                                                    selectedRange={
+                                                        selectedRange
+                                                    }
+                                                    setSelectedRange={
+                                                        setSelectedRange
+                                                    }
+                                                    formik={formik}
+                                                />
+                                                {isInvalid("selectedRange") ? (
+                                                    <FormErrorMessage>
+                                                        Required field
+                                                    </FormErrorMessage>
+                                                ) : (
+                                                    ""
+                                                )}
+                                            </FormControl>
+                                        </Box>
+                                        <FormControl mt="25px">
+                                            <FormLabel>
+                                                Project Overview
+                                            </FormLabel>
+
+                                            <Editor
+                                                value={projectOverview}
+                                                onChange={(v) =>
+                                                    setProjectOverview(v)
                                                 }
                                             />
+
+                                            <FormHelperText>
+                                                Tell us about your project,
+                                                team, and milestones you intend
+                                                to achieve with the funding.
+                                            </FormHelperText>
                                         </FormControl>
-                                    </Box>
-                                    <FormControl mt="25px">
-                                        <FormLabel>Project Overview</FormLabel>
-
-                                        <Editor
-                                            value=""
-                                            onChange={(v) => console.log(v)}
-                                        />
-
-                                        <FormHelperText>
-                                            Tell us about your project, team,
-                                            and milestones you intend to achieve
-                                            with the funding.
-                                        </FormHelperText>
-                                    </FormControl>
-                                    <Box
-                                        mt="25px"
-                                        width="100%"
-                                        textAlign="right"
-                                    >
-                                        <Button
-                                            variant="action-button"
-                                            onClick={handleSave}
+                                        <Box
+                                            mt="25px"
+                                            width="100%"
+                                            textAlign="right"
                                         >
-                                            Save Changes
-                                        </Button>
-                                    </Box>
+                                            <Button
+                                                type="submit"
+                                                variant="action-button"
+                                            >
+                                                Save Changes
+                                            </Button>
+                                        </Box>
+                                    </form>
                                 </Box>
                                 <Box
                                     maxWidth="calc(100% / 3 - 12.5px)"
@@ -516,10 +649,10 @@ const ProjectDetails = () => {
                                         <Project
                                             src={projectInfo.thumbnailSrc}
                                             title={projectInfo.name}
-                                            desc={projectInfo.description}
+                                            desc={formik.values.description}
                                             actionLabel="View Project"
                                             href={""}
-                                            contractAdd={projectInfo.contractAddress}
+                                            contractAddr={pid || ""}
                                         />
                                     </FormControl>
                                 </Box>
