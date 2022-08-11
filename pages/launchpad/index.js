@@ -18,6 +18,7 @@ import PageHeader from "../../components/PageHeader";
 import LaunchpadProject from "../../components/LaunchpadProject";
 import NewProjectModal from "../../components/NewProjectModal";
 import { useEffect, useState } from "react";
+import Footer from "../../components/Footer";
 
 const Launchpad = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -102,6 +103,7 @@ const Launchpad = () => {
                     </Box>
                 </Box>
             </Box>
+            <Footer />
         </>
     );
 };

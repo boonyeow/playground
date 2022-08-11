@@ -22,6 +22,7 @@ import axios from "axios";
 import SkeletonProject from "../../components/SkeletonProject";
 import React from "react";
 import cfg from "../../util/config";
+import Footer from "../../components/Footer";
 
 const Explore = () => {
     const [userInfo, setUserInfo] = useState({
@@ -164,7 +165,7 @@ const Explore = () => {
                     </Box>
                 </Box>
             </Box>
-            {/* <Footer /> */}
+            <Footer />
         </>
     );
 };

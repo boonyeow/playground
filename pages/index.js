@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import axios from "axios";
 import SkeletonProject from "../components/SkeletonProject";
 import cfg from "../util/config";
+import Footer from "../components/Footer";
 
 const FeaturedProject = dynamic(() => import("../components/FeaturedProject"), {
     ssr: false,
@@ -45,7 +46,7 @@ const Home = () => {
 
     return (
         <>
-            <Box maxWidth={"8xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
+            <Box maxWidth={"8xl"} width="100%" m="auto" min="100vh" py="2.5vh">
                 <Sidebar active="Home" />
                 <Box
                     width="100%"
@@ -158,7 +159,7 @@ const Home = () => {
                     </Box>
                 </Box>
             </Box>
-            {/* <Footer /> */}
+            <Footer />
         </>
     );
 };

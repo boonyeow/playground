@@ -21,6 +21,7 @@ import IconService from "icon-sdk-js";
 import ICONexConnection from "../../util/interact";
 import Dispenser from "../../components/Dispenser";
 import dynamic from "next/dynamic";
+import Footer from "../../components/Footer";
 
 const FeaturedProject = dynamic(
     () => import("../../components/FeaturedProject"),
@@ -140,6 +141,7 @@ const ProjectDetail = () => {
                     </Box>
                 </Box>
             </Box>
+            <Footer />
         </>
     );
 };

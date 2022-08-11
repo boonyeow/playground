@@ -24,6 +24,7 @@ import {
     NumberInputField,
     VisuallyHiddenInput,
     Select,
+    FormErrorMessage,
 } from "@chakra-ui/react";
 import axios from "axios";
 import Sidebar from "../../../components/Sidebar";
@@ -31,9 +32,8 @@ import PageHeader from "../../../components/PageHeader";
 import { useEffect, useState } from "react";
 import NextLink from "next/link";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import DatePicker from "../../../components/DatePicker";
-
-import { Formik, Field, form, useFormik, ErrorMessage } from "formik";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import { useRouter } from "next/router";
 
 const Proposal = () => {
@@ -43,137 +43,246 @@ const Proposal = () => {
         userAddress: 0,
         projectsDeployed: [],
     });
-    const [proposalId, setProposalId] = useState("");
-    const [iam, setIAM] = useState("contributor");
-    const [proposaltype, setProposaltype] = useState("tap");
-    const [tapVisible, setTapVisible] = useState(true);
-    const [refundVisible, setRefundVisible] = useState(false);
 
     useEffect(() => {
         const temp = localStorage.getItem("_persist");
         temp = temp == null ? userInfo : JSON.parse(temp);
         setUserInfo(temp);
-        for (const project of userInfo.projectsDeployed) {
-            console.log(project);
-            if (pid == project.contractAddress) {
-                setIAM("Owner");
-            }
-        }
-        console.log(iam);
     }, [router.isReady]);
-
-    useEffect(() => {
-        proposaltype == "tap" ? setTapVisible(true) : setTapVisible(false);
-        proposaltype == "refund"
-            ? setRefundVisible(true)
-            : setRefundVisible(false);
-    }, [proposaltype]);
-
-    const handleOnChange = (e) => {
-        setProposaltype(e.target.value);
-    };
 
     const formik = useFormik({
         initialValues: {
             title: "",
             description: "",
-            forumLink: "",
-            tapRate: "",
+            discussionUrl: "",
+            proposalType: "",
+            withdrawalRate: "",
         },
+        validationSchema: Yup.object({
+            title: Yup.string()
+                .max(50, "Must be 50 characters or less")
+                .required("Required field"),
+            description: Yup.string().required("Required field"),
+            withdrawalRate: Yup.number().when("proposalType", {
+                is: "tap",
+                then: Yup.number()
+                    .required("Required field")
+                    .min(0, "Minimum withdrawal rate must be 0"),
+            }),
+        }),
         onSubmit: (values) => {
             alert(JSON.stringify(values, null, 2));
             // call the proposal collection
         },
     });
 
+    const isInvalid = (key) => {
+        if (key == "title") {
+            return formik.touched.title && formik.errors.title;
+        } else if (key == "description") {
+            return formik.touched.description && formik.errors.description;
+        } else if (key == "withdrawalRate") {
+            return (
+                formik.touched.withdrawalRate && formik.errors.withdrawalRate
+            );
+        }
+    };
+
     return (
-        <Box
-            maxWidth={"8xl"}
-            width="100%"
-            m="auto"
-            minHeight="100vh"
-            py="2.5vh"
-        >
-            <Sidebar active="Governance" />
-            <Box width="100%" height="100%" ml="75px" p="1.5rem 3rem 3rem 3rem">
-                <PageHeader
-                    title="Create Proposal"
-                    userInfo={userInfo}
-                    setUserInfo={setUserInfo}
-                />
-                <Box w="100%" mt="15px">
-                    <Flex>
-                        <NextLink href="/governance" color="gray.600">
-                            Governance
-                        </NextLink>
-                        <ChevronRightIcon alignSelf="center" mx="10px" />
-                        <NextLink href={`/governance/${pid}`} color="gray.600">
-                            {router.isReady ? pid : ""}
-                        </NextLink>
-                        <ChevronRightIcon alignSelf="center" mx="10px" />
-                        <Text color="gray.600" fontWeight="semibold">
-                            Create Proposal
-                        </Text>
-                    </Flex>
+        <>
+            <Box
+                maxWidth={"8xl"}
+                width="100%"
+                m="auto"
+                minHeight="100vh"
+                py="2.5vh"
+            >
+                <Sidebar active="Governance" />
+                <Box
+                    width="100%"
+                    height="100%"
+                    ml="75px"
+                    p="1.5rem 3rem 3rem 3rem"
+                >
+                    <PageHeader
+                        title="Create Proposal"
+                        userInfo={userInfo}
+                        setUserInfo={setUserInfo}
+                    />
+                    <Box w="100%" mt="15px">
+                        <Flex>
+                            <NextLink href="/governance" color="gray.600">
+                                Governance
+                            </NextLink>
+                            <ChevronRightIcon alignSelf="center" mx="10px" />
+                            <NextLink
+                                href={`/governance/${pid}`}
+                                color="gray.600"
+                            >
+                                {router.isReady ? pid : ""}
+                            </NextLink>
+                            <ChevronRightIcon alignSelf="center" mx="10px" />
+                            <Text color="gray.600" fontWeight="semibold">
+                                Create Proposal
+                            </Text>
+                        </Flex>
 
-                    <Box
-                        width="100%"
-                        maxWidth="calc(100% / 3 * 2 - 12.5px)"
-                        mr="25px"
-                        mt="15px"
-                    >
-                        <form onSubmit={formik.handleSubmit}>
-                            <FormControl>
-                                <FormLabel htmlFor="title">Title</FormLabel>
-                                <Input
-                                    bg="white"
-                                    id="title"
-                                    name="title"
-                                    type="text"
-                                    onChange={formik.handleChange}
-                                    value={formik.values.title}
-                                ></Input>
-                                <Flex>
-                                    {/* <FormHelperText paddingRight="10px">
-                                        Enter the title of your proposal.
-                                    </FormHelperText> */}
-                                </Flex>
-                            </FormControl>
-                        </form>
-
-                        {/* <FormControl>
-                            <FormLabel>Proposal Type</FormLabel>
-                            {iam === "Owner" ? (
-                                <Select
-                                    value={proposaltype}
-                                    onChange={handleOnChange}
+                        <Box
+                            width="100%"
+                            maxWidth="calc(100% / 3 * 2 - 12.5px)"
+                            mr="25px"
+                            mt="25px"
+                        >
+                            <form onSubmit={formik.handleSubmit}>
+                                <FormControl
+                                    isInvalid={
+                                        isInvalid("title") ? true : false
+                                    }
                                 >
-                                    <option selected value="tap">
-                                        Increase / Decrease Tap Rate
-                                    </option>
-                                </Select>
-                            ) : (
-                                <Select
-                                    value={proposaltype}
-                                    onChange={handleOnChange}
+                                    <FormLabel htmlFor="title">Title</FormLabel>
+                                    <Input
+                                        bg="white"
+                                        id="title"
+                                        name="title"
+                                        type="text"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.title}
+                                    />
+                                    {isInvalid("title") ? (
+                                        <FormErrorMessage>
+                                            {formik.errors.title}
+                                        </FormErrorMessage>
+                                    ) : (
+                                        <FormHelperText>
+                                            Enter the title of your proposal.
+                                        </FormHelperText>
+                                    )}
+                                </FormControl>
+                                <FormControl
+                                    mt="25px"
+                                    isInvalid={
+                                        isInvalid("description") ? true : false
+                                    }
                                 >
-                                    <option value="refund">Refund</option>
-                                    <option selected value="tap">
-                                        Increase / Decrease Tap Rate
-                                    </option>
-                                </Select>
-                            )}
+                                    <FormLabel>Description</FormLabel>
+                                    <Textarea
+                                        bg="white"
+                                        id="description"
+                                        name="description"
+                                        height="150px"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.onChange}
+                                    />
+                                    {isInvalid("description") ? (
+                                        <FormErrorMessage>
+                                            {formik.errors.description}
+                                        </FormErrorMessage>
+                                    ) : (
+                                        <FormHelperText>
+                                            Tell us about your proposal.
+                                        </FormHelperText>
+                                    )}
+                                </FormControl>
 
-                            <FormHelperText>
-                                Please select a proposal type.
-                            </FormHelperText>
-                        </FormControl>
-                        {tapVisible && <TapProposal />}
-                        {refundVisible && <RefundProposal pid={pid} />} */}
+                                <FormControl mt="25px">
+                                    <FormLabel>Proposal Type</FormLabel>
+                                    <Select
+                                        name="proposalType"
+                                        id="proposalType"
+                                        value={formik.values.proposalType}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        bg="white"
+                                    >
+                                        <option selected value="refund">
+                                            Initiate Refund
+                                        </option>
+                                        <option value="tap">
+                                            Adjust Withdrawal Rate
+                                        </option>
+                                    </Select>
+                                </FormControl>
+
+                                {formik.values.proposalType == "tap" ? (
+                                    <HStack mt="15px" spacing="25px">
+                                        <FormControl>
+                                            <FormLabel>Current Rate</FormLabel>
+                                            <Input
+                                                bg="white"
+                                                isDisabled
+                                            ></Input>
+                                            <FormHelperText>
+                                                ICX / second
+                                            </FormHelperText>
+                                        </FormControl>
+                                        <FormControl
+                                            isInvalid={
+                                                isInvalid("withdrawalRate")
+                                                    ? true
+                                                    : false
+                                            }
+                                        >
+                                            <FormLabel>Proposed Rate</FormLabel>
+                                            <Input
+                                                id="withdrawalRate"
+                                                name="withdrawalRate"
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                bg="white"
+                                                type="number"
+                                            ></Input>
+                                            {isInvalid("withdrawalRate") ? (
+                                                <FormErrorMessage>
+                                                    {
+                                                        formik.errors
+                                                            .withdrawalRate
+                                                    }
+                                                </FormErrorMessage>
+                                            ) : (
+                                                <FormHelperText>
+                                                    ICX / second
+                                                </FormHelperText>
+                                            )}
+                                        </FormControl>
+                                    </HStack>
+                                ) : (
+                                    ""
+                                )}
+
+                                <FormControl mt="25px">
+                                    <FormLabel>Discussion</FormLabel>
+                                    <Input
+                                        bg="white"
+                                        id="discussionUrl"
+                                        name="discussionUrl"
+                                        type="text"
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        value={formik.values.discussionUrl}
+                                        placeholder="https://c9.app/discussion/2okao"
+                                    />
+                                    <FormHelperText>
+                                        Share your discussion URL here.
+                                        Optional.
+                                    </FormHelperText>
+                                </FormControl>
+
+                                <Box mt="25px" width="100%" textAlign="right">
+                                    <Button
+                                        type="submit"
+                                        variant="action-button"
+                                    >
+                                        Publish
+                                    </Button>
+                                </Box>
+                            </form>
+                        </Box>
                     </Box>
                 </Box>
             </Box>
-        </Box>
+        </>
     );
 };
 

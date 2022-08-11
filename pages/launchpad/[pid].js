@@ -33,6 +33,7 @@ import CustomAlert from "../../components/CustomAlert";
 import axios from "axios";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import Footer from "../../components/Footer";
 
 const Editor = dynamic(() => import("../../components/MyEditor"), {
     ssr: false,

@@ -21,6 +21,7 @@ import axios from "axios";
 import ProposalCollection from "../../../components/ProposalCollection";
 import cfg from "../../../util/config";
 import HolderList from "../../../components/HolderList";
+import Footer from "../../../components/Footer";
 
 const {
     IconConverter,
@@ -295,6 +296,7 @@ const ProjectGovernance = () => {
                     </Box>
                 </Box>
             </Box>
+            <Footer />
         </>
     );
 };
