@@ -40,7 +40,9 @@ const {
     IconWallet,
 } = IconService;
 
-const TapProposal = () => {
+
+
+const TapProposal = ({ pid }) => {
     const connection = new ICONexConnection();
     const [showStatus, setShowStatus] = useState(false);
     const [statusInfo, setStatusInfo] = useState({
@@ -50,16 +52,10 @@ const TapProposal = () => {
     });
     const [showClose, setShowClose] = useState(true);
     const [remainingChar, setRemainingChar] = useState(50);
+    const [currentTapRate, setcurrentTapRate] = useState('');
 
-    // const validateTitle = (value) => {
-    //     let error
-    //     setRemainingChar(50 - value.length)
-    //     if (value.length > 50) {
-    //         error = "Maximum character limit exceeded"
-    //     }
-    //     return error
-    // }
-    const validate = (values) => {
+
+    const validate = values => {
         const errors = {};
         setRemainingChar(50 - values.title.length);
         if (values.title.length > 50) {
@@ -71,29 +67,31 @@ const TapProposal = () => {
         console.log(errors);
         return errors;
     };
-    // useEffect(() => {
-    //     const fetchProjectInfo = async () => {
-    //         const call = new IconBuilder.CallBuilder()
-    //             .to(pid)
-    //             .method("getProjectInfo")
-    //             .build();
-    //         let res = await connection.iconService.call(call).execute();
-    //         console.log("res", res);
-    //         // let pi = {
-    //         //     name: res.name,
-    //         //     thumbnailSrc: res.thumbnailSrc,
-    //         //     description: res.description,
-    //         //     details: res.details,
-    //         //     fundingGoal: IconConverter.toNumber(res.fundingGoal),
-    //         //     pricePerNFT: IconConverter.toNumber(res.pricePerNFT),
-    //         //     startTimestamp: IconConverter.toNumber(res.startTimestamp),
-    //         //     endTimestamp: IconConverter.toNumber(res.endTimestamp),
-    //         //     withdrawalRate: IconConverter.toNumber(res.withdrawalRate),
-    //         // };
-    //         // setProjectInfo(pi);
-    //     };
-    //     fetchProjectInfo();
-    // }, []);
+    useEffect(() => {
+        const fetchProjectInfo = async () => {
+            const call = new IconBuilder.CallBuilder()
+                .to(pid)
+                .method("getProjectInfo")
+                .build();
+            let res = await connection.iconService.call(call).execute();
+            console.log("res", res);
+            setcurrentTapRate(IconConverter.toNumber(res.withdrawalRate));
+
+            // let pi = {
+            //     name: res.name,
+            //     thumbnailSrc: res.thumbnailSrc,
+            //     description: res.description,
+            //     details: res.details,
+            //     fundingGoal: IconConverter.toNumber(res.fundingGoal),
+            //     pricePerNFT: IconConverter.toNumber(res.pricePerNFT),
+            //     startTimestamp: IconConverter.toNumber(res.startTimestamp),
+            //     endTimestamp: IconConverter.toNumber(res.endTimestamp),
+            //     withdrawalRate: IconConverter.toNumber(res.withdrawalRate),
+            // };
+            // setProjectInfo(pi);
+        };
+        fetchProjectInfo();
+    }, []);
 
     const handleSave = async () => {
         setShowStatus(true);
@@ -160,7 +158,7 @@ const TapProposal = () => {
                     </FormControl>
                 </Box>
                 <Box mt="25px">
-                    <FormControl isRequired>
+                    <FormControl>
                         <FormLabel htmlFor="forumLink">Forum Link</FormLabel>
                         <Input
                             bg="white"
@@ -183,9 +181,14 @@ const TapProposal = () => {
                 <HStack spacing="25px" mt="30px">
                     <FormControl alignSelf="baseline">
                         <FormLabel>Current Tap Rate Limit</FormLabel>
-                        <Input value="200"></Input>
-                        <FormHelperText>Unit: ICX / sec.</FormHelperText>
-                    </FormControl>
+                        <Input
+                            value={currentTapRate}
+                        >
+                        </Input>
+                        <FormHelperText>
+                            Unit: ICX / sec.
+                        </FormHelperText>
+                    </FormControl >
 
                     <FormControl isRequired>
                         <FormLabel htmlFor="tapRate">New Tap Rate</FormLabel>
@@ -209,12 +212,12 @@ const TapProposal = () => {
                             </FormHelperText>
                         ) : null}
                     </FormControl>
-                </HStack>
+                </HStack >
                 <Box mt="25px" width="100%" textAlign="right">
                     {/* <Button type="submit" variant="action-button" */}
                     <Button
                         type="submit"
-                        // onClick={handleSave}
+                    // onClick={handleSave}
                     >
                         Submit
                     </Button>
@@ -236,8 +239,8 @@ const TapProposal = () => {
                     status={statusInfo.type}
                     showClose={showClose}
                 /> */}
-            </form>
-        </div>
+            </form >
+        </div >
     );
 };
 
