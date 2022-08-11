@@ -255,7 +255,7 @@ const ProjectGovernance = () => {
 
                                 {/* <Button onClick={test}> createetest</Button> */}
                                 {isOwner === true && (
-                                    <NextLink href={`${pid}/proposal`}>
+                                    <NextLink href={`${pid}/create`}>
                                         <Button
                                             bg="transparent"
                                             color="#3D5CC3"

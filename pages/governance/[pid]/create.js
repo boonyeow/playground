@@ -35,19 +35,47 @@ import { ChevronRightIcon } from "@chakra-ui/icons";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/router";
+import ICONexConnection from "../../../util/interact";
+import IconService from "icon-sdk-js";
+import cfg from "../../../util/config";
 
+
+const {
+    IconConverter,
+    IconBuilder,
+    HttpProvider,
+    SignedTransaction,
+    IconWallet,
+} = IconService;
+
+const TAP = 1;
+const REFUND = 2;
 const Proposal = () => {
+    const connection = new ICONexConnection();
     const router = useRouter();
     const { pid } = router.query;
     const [userInfo, setUserInfo] = useState({
         userAddress: 0,
         projectsDeployed: [],
     });
+    const [currentTapRate, setcurrentTapRate] = useState('');
+
 
     useEffect(() => {
         const temp = localStorage.getItem("_persist");
         temp = temp == null ? userInfo : JSON.parse(temp);
         setUserInfo(temp);
+
+        const fetchProjectInfo = async () => {
+            const call = new IconBuilder.CallBuilder()
+                .to(pid)
+                .method("getProjectInfo")
+                .build();
+            let res = await connection.iconService.call(call).execute();
+            console.log("res", res);
+            setcurrentTapRate(IconConverter.toNumber(res.withdrawalRate) / 10 ** 18);
+        };
+        fetchProjectInfo();
     }, [router.isReady]);
 
     const formik = useFormik({
@@ -55,7 +83,7 @@ const Proposal = () => {
             title: "",
             description: "",
             discussionUrl: "",
-            proposalType: "",
+            proposalType: "2",
             withdrawalRate: "",
         },
         validationSchema: Yup.object({
@@ -64,15 +92,57 @@ const Proposal = () => {
                 .required("Required field"),
             description: Yup.string().required("Required field"),
             withdrawalRate: Yup.number().when("proposalType", {
-                is: "tap",
+                is: '1',
                 then: Yup.number()
                     .required("Required field")
                     .min(0, "Minimum withdrawal rate must be 0"),
             }),
         }),
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             alert(JSON.stringify(values, null, 2));
             // call the proposal collection
+            console.log(values)
+            let data = {};
+            data.title = values.title;
+            data.description = values.description;
+            data.proposalType = IconConverter.toHexNumber(parseInt(values.proposalType));
+            // data.withdrawalRate = IconConverter.toHexNumber(values.withdrawalRate * 10 ** 18);
+            // data.discussion = values.discussionUrl;
+
+            const txObj = new IconBuilder.CallTransactionBuilder()
+                .from(userInfo.userAddress)
+                .to(pid)
+                .nid(cfg.NID)
+                .nonce(IconConverter.toBigNumber(1))
+                .version(IconConverter.toBigNumber(3))
+                .timestamp(new Date().getTime() * 1000)
+                .method("createProposal")
+                .params(data)
+                .build();
+            console.log("txobj", txObj);
+            const estimatedSteps = IconConverter.toBigNumber(
+                await connection.debugService.estimateStep(txObj).execute()
+            );
+            console.log("estimatedSteps", estimatedSteps);
+
+            txObj.stepLimit = IconService.IconConverter.toHex(
+                estimatedSteps.plus(IconConverter.toBigNumber(10000)) // prevent out of step
+            );
+
+            const payload = {
+                jsonrpc: "2.0",
+                method: "icx_sendTransaction",
+                id: 6639,
+                params: IconConverter.toRawTransaction(txObj),
+            };
+
+            let rpcResponse = await connection.ICONexRequest(
+                "REQUEST_JSON-RPC",
+                payload
+            );
+
+            getTransactionResult(rpcResponse, 5);
+            console.log("done")
         },
     });
 
@@ -196,21 +266,22 @@ const Proposal = () => {
                                         onBlur={formik.handleBlur}
                                         bg="white"
                                     >
-                                        <option selected value="refund">
+                                        <option selected value={REFUND}>
                                             Initiate Refund
                                         </option>
-                                        <option value="tap">
+                                        <option value={TAP}>
                                             Adjust Withdrawal Rate
                                         </option>
                                     </Select>
                                 </FormControl>
 
-                                {formik.values.proposalType == "tap" ? (
+                                {formik.values.proposalType == TAP ? (
                                     <HStack mt="15px" spacing="25px">
                                         <FormControl>
                                             <FormLabel>Current Rate</FormLabel>
                                             <Input
                                                 bg="white"
+                                                value={currentTapRate}
                                                 isDisabled
                                             ></Input>
                                             <FormHelperText>

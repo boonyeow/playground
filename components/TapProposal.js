@@ -75,7 +75,7 @@ const TapProposal = ({ pid }) => {
                 .build();
             let res = await connection.iconService.call(call).execute();
             console.log("res", res);
-            setcurrentTapRate(IconConverter.toNumber(res.withdrawalRate));
+            setcurrentTapRate(IconConverter.toNumber(res.withdrawalRate) / 10 ** 18);
 
             // let pi = {
             //     name: res.name,
@@ -91,7 +91,7 @@ const TapProposal = ({ pid }) => {
             // setProjectInfo(pi);
         };
         fetchProjectInfo();
-    }, []);
+    }, [pid]);
 
     const handleSave = async () => {
         setShowStatus(true);
