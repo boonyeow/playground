@@ -26,7 +26,6 @@ import {
     Select,
     FormErrorMessage,
 } from "@chakra-ui/react";
-import axios from "axios";
 import Sidebar from "../../../components/Sidebar";
 import PageHeader from "../../../components/PageHeader";
 import CustomAlert from "../../../components/CustomAlert";
@@ -39,7 +38,6 @@ import { useRouter } from "next/router";
 import ICONexConnection from "../../../util/interact";
 import IconService from "icon-sdk-js";
 import cfg from "../../../util/config";
-
 
 const {
     IconConverter,
@@ -59,7 +57,7 @@ const Proposal = () => {
         userAddress: 0,
         projectsDeployed: [],
     });
-    const [currentTapRate, setcurrentTapRate] = useState('');
+    const [currentTapRate, setcurrentTapRate] = useState("");
     const [showStatus, setShowStatus] = useState(false);
     const [statusInfo, setStatusInfo] = useState({
         type: "loading",
@@ -68,7 +66,6 @@ const Proposal = () => {
     });
 
     const [showClose, setShowClose] = useState(true);
-
 
     useEffect(() => {
         const temp = localStorage.getItem("_persist");
@@ -82,9 +79,14 @@ const Proposal = () => {
                 .build();
             let res = await connection.iconService.call(call).execute();
             console.log("res", res);
-            setcurrentTapRate(IconConverter.toNumber(res.withdrawalRate) / 10 ** 18);
+            setcurrentTapRate(
+                IconConverter.toNumber(res.withdrawalRate) / 10 ** 18
+            );
         };
-        fetchProjectInfo();
+
+        if (router.isReady) {
+            fetchProjectInfo();
+        }
     }, [router.isReady]);
 
     const formik = useFormik({
@@ -101,7 +103,7 @@ const Proposal = () => {
                 .required("Required field"),
             description: Yup.string().required("Required field"),
             withdrawalRate: Yup.number().when("proposalType", {
-                is: '1',
+                is: "1",
                 then: Yup.number()
                     .required("Required field")
                     .min(0, "Minimum withdrawal rate must be 0"),
@@ -109,14 +111,17 @@ const Proposal = () => {
         }),
         onSubmit: async (values) => {
             setShowStatus(true);
-            alert(JSON.stringify(values, null, 2));
             // call the proposal collection
-            console.log(values)
+            console.log(values);
             let data = {};
             data.title = values.title;
             data.description = values.description;
-            data.proposalType = IconConverter.toHexNumber(parseInt(values.proposalType));
-            data.withdrawalRate = IconConverter.toHexNumber(values.withdrawalRate * 10 ** 18);
+            data.proposalType = IconConverter.toHexNumber(
+                parseInt(values.proposalType)
+            );
+            data.withdrawalRate = IconConverter.toHexNumber(
+                values.withdrawalRate * 10 ** 18
+            );
             data.discussion = values.discussionUrl;
 
             const txObj = new IconBuilder.CallTransactionBuilder()
@@ -152,7 +157,7 @@ const Proposal = () => {
             );
 
             getTransactionResult(rpcResponse, 5, values);
-            console.log("done")
+            console.log("done");
         },
     });
 
@@ -177,7 +182,7 @@ const Proposal = () => {
                         title: "success",
                         desc: "your proposal has been created!",
                     });
-                    formik.resetForm({ values: '' });
+                    formik.resetForm({ values: "" });
                 } else {
                     console.log("FAILED BOI", txResult);
                     setShowClose(true);
@@ -235,14 +240,14 @@ const Proposal = () => {
                     p="1.5rem 3rem 3rem 3rem"
                 >
                     <PageHeader
-                        title="Create Proposal"
+                        title="Governance"
                         userInfo={userInfo}
                         setUserInfo={setUserInfo}
                     />
                     <Box w="100%" mt="15px">
                         <Flex>
                             <NextLink href="/governance" color="gray.600">
-                                Governance
+                                Explore DAOs
                             </NextLink>
                             <ChevronRightIcon alignSelf="center" mx="10px" />
                             <NextLink

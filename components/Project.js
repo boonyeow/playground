@@ -42,14 +42,6 @@ const Project = ({ src, title, desc, actionLabel, href, contractAddr }) => {
                                 style={{ borderRadius: "50px" }}
                             />
                         )}
-                        {/* <NextImage
-                            layout="responsive"
-                            objectFit="contain"
-                            width="100%"
-                            height="100%"
-                            src={src}
-                            style={{ borderRadius: "50px" }}
-                        /> */}
                     </Box>
                     <NextLink href={href}>
                         <Button variant="action-button">{actionLabel}</Button>

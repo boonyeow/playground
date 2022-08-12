@@ -67,13 +67,6 @@ const ProposalCollection = ({ proposalInfo }) => {
         },
     };
 
-    const getBlockInfo = async (blockHeight) => {
-        let res = await connection.iconService
-            .getBlockByHeight(IconConverter.toHexNumber(blockHeight))
-            .execute();
-        return new Date((res.timeStamp / 1e6) * 1000);
-    };
-
     const formatTimestamp = (timestamp) => {
         return new Date((timestamp / 1e6) * 1000).toUTCString();
     };

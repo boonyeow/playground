@@ -185,7 +185,13 @@ const ProjectGovernance = () => {
 
     return (
         <>
-            <Box maxWidth={"8xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
+            <Box
+                maxWidth={"8xl"}
+                width="100%"
+                m="auto"
+                minHeight="100vh"
+                py="2.5vh"
+            >
                 <Sidebar active="Governance" />
                 <Box
                     width="100%"
@@ -201,7 +207,7 @@ const ProjectGovernance = () => {
                     <Box w="100%" mt="15px">
                         <Flex>
                             <NextLink href="/governance" color="gray.600">
-                                Governance
+                                Explore DAOs
                             </NextLink>
                             <ChevronRightIcon alignSelf="center" mx="10px" />
                             <Text color="gray.600" fontWeight="semibold">

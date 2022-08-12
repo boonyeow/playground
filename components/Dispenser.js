@@ -53,7 +53,7 @@ const Dispenser = ({ projectInfo, contractBalance, pid }) => {
     }, []);
 
     const handleUpdatePrice = (e) => {
-        setTotalPrice(projectInfo.pricePerNFT * e.target.value);
+        setTotalPrice((projectInfo.pricePerNFT * e.target.value) / 10 ** 18);
     };
 
     const handleMint = async () => {
@@ -75,11 +75,7 @@ const Dispenser = ({ projectInfo, contractBalance, pid }) => {
             .params({
                 quantity: IconConverter.toHexNumber(quantity),
             })
-            .value(
-                IconConverter.toHexNumber(
-                    quantity * projectInfo.pricePerNFT * 10 ** 18
-                )
-            )
+            .value(IconConverter.toHexNumber(totalPrice * 10 ** 18))
             .build();
 
         const estimatedSteps = IconConverter.toBigNumber(

@@ -211,7 +211,7 @@ const ProjectDetails = () => {
                 .required("Required field"),
             pricePerNFT: Yup.number()
                 .positive("Must be a positive number")
-                .min(100, "Minimum price per NFT is 100 ICX")
+                .min(10, "Minimum price per NFT is 10 ICX")
                 .required("Required field"),
             withdrawalRate: Yup.number().required("Required field"),
             selectedRange: Yup.object().shape({

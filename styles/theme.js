@@ -58,6 +58,17 @@ export const theme = extendTheme(
                             },
                         },
                     },
+                    "outside-button-rev": {
+                        fontSize: "sm",
+                        bg: "#303030",
+                        color: "white",
+                        _hover: {
+                            bg: "#303030",
+                            _disabled: {
+                                bg: "#303030",
+                            },
+                        },
+                    },
                     "cw-button": {
                         // Connect Wallet Modal > Connect Wallet Button
                         bgColor: "white",
