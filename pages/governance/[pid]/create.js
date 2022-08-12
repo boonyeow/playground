@@ -29,6 +29,7 @@ import {
 import axios from "axios";
 import Sidebar from "../../../components/Sidebar";
 import PageHeader from "../../../components/PageHeader";
+import CustomAlert from "../../../components/CustomAlert";
 import { useEffect, useState } from "react";
 import NextLink from "next/link";
 import { ChevronRightIcon } from "@chakra-ui/icons";
@@ -59,6 +60,14 @@ const Proposal = () => {
         projectsDeployed: [],
     });
     const [currentTapRate, setcurrentTapRate] = useState('');
+    const [showStatus, setShowStatus] = useState(false);
+    const [statusInfo, setStatusInfo] = useState({
+        type: "loading",
+        title: "creating proposal",
+        desc: "awaiting tx approval...",
+    });
+
+    const [showClose, setShowClose] = useState(true);
 
 
     useEffect(() => {
@@ -99,6 +108,7 @@ const Proposal = () => {
             }),
         }),
         onSubmit: async (values) => {
+            setShowStatus(true);
             alert(JSON.stringify(values, null, 2));
             // call the proposal collection
             console.log(values)
@@ -106,8 +116,8 @@ const Proposal = () => {
             data.title = values.title;
             data.description = values.description;
             data.proposalType = IconConverter.toHexNumber(parseInt(values.proposalType));
-            // data.withdrawalRate = IconConverter.toHexNumber(values.withdrawalRate * 10 ** 18);
-            // data.discussion = values.discussionUrl;
+            data.withdrawalRate = IconConverter.toHexNumber(values.withdrawalRate * 10 ** 18);
+            data.discussion = values.discussionUrl;
 
             const txObj = new IconBuilder.CallTransactionBuilder()
                 .from(userInfo.userAddress)
@@ -141,10 +151,60 @@ const Proposal = () => {
                 payload
             );
 
-            getTransactionResult(rpcResponse, 5);
+            getTransactionResult(rpcResponse, 5, values);
             console.log("done")
         },
     });
+
+    const getTransactionResult = async (rpcResponse, maxRetry, values) => {
+        console.log("trying...", maxRetry);
+        if (rpcResponse.error) {
+            setShowClose(true);
+            setStatusInfo({
+                type: "failure",
+                title: "ooops",
+                desc: "your transaction was not approved",
+            });
+        } else {
+            try {
+                const txResult = await connection.iconService
+                    .getTransactionResult(rpcResponse.result)
+                    .execute();
+                if (txResult.status === 1) {
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "success",
+                        title: "success",
+                        desc: "your proposal has been created!",
+                    });
+                    formik.resetForm({ values: '' });
+                } else {
+                    console.log("FAILED BOI", txResult);
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "failure",
+                        title: "ooops",
+                        desc: "your transaction has failed, please try again",
+                    });
+                }
+            } catch (err) {
+                if (maxRetry > 0) {
+                    setTimeout(
+                        () => getTransactionResult(rpcResponse, maxRetry - 1),
+                        2200
+                    );
+                } else {
+                    console.log(err);
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "failure",
+                        title: "ooops",
+                        desc: "your transaction has failed, please try again",
+                    });
+                }
+            }
+        }
+    };
 
     const isInvalid = (key) => {
         if (key == "title") {
@@ -243,7 +303,7 @@ const Proposal = () => {
                                         height="150px"
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
-                                        value={formik.values.onChange}
+                                        value={formik.values.description}
                                     />
                                     {isInvalid("description") ? (
                                         <FormErrorMessage>
@@ -353,6 +413,22 @@ const Proposal = () => {
                     </Box>
                 </Box>
             </Box>
+
+            <CustomAlert
+                showStatus={showStatus}
+                onClose={() => {
+                    setShowStatus(false);
+                    setStatusInfo({
+                        type: "loading",
+                        title: "creating proposal",
+                        desc: "awaiting tx approval",
+                    }); //revert everything to default
+                }}
+                title={statusInfo.title}
+                desc={statusInfo.desc}
+                status={statusInfo.type}
+                showClose={showClose}
+            />
         </>
     );
 };
