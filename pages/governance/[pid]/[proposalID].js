@@ -23,8 +23,8 @@ import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { TiTick, TiTimes } from "react-icons/ti";
 import IconService from "icon-sdk-js";
 import ICONexConnection, { sleep } from "../../../util/interact";
-import { set } from "date-fns";
-
+import cfg from "../../../util/config";
+import CustomAlert from "../../../components/CustomAlert";
 const {
     IconConverter,
     IconBuilder,
@@ -38,36 +38,25 @@ const RadioCard = (props) => {
 
     const input = getInputProps();
     const checkbox = getCheckboxProps();
-
-    let theme =
-        input.value == "Approve"
-            ? {
-                  color: "#2F855A",
-                  bg: "#C6F6D5",
-              }
-            : {
-                  bg: "#FED7D7",
-                  color: "#C53030",
-              };
-
     return (
-        <Box as="label" w="125px">
+        <Box as="label" w="100%">
             <input {...input} />
             <Flex
                 {...checkbox}
                 cursor="pointer"
                 borderRadius="15px"
                 _checked={{
-                    bg: `${theme.color}`,
+                    // bg: "#1e86ff",
                     color: "white",
                     fontWeight: "bold",
+                    border: "1px solid #c3c3c3",
                 }}
                 px={5}
                 py={3}
                 fontSize="sm"
                 textAlign="center"
-                color={theme.color}
-                bg={theme.bg}
+                color="#8e8e8e"
+                bg="#1c1c1c"
                 justifyContent="center"
             >
                 {input.value == "Approve" ? (
@@ -91,6 +80,28 @@ const ProposalDetail = () => {
     });
 
     const [proposalInfo, setProposalInfo] = useState({});
+    const [voteChoice, setVoteChoice] = useState(null);
+
+    const [showStatus, setShowStatus] = useState(false);
+    const [statusInfo, setStatusInfo] = useState({
+        type: "loading",
+        title: "submitting vote",
+        desc: "awaiting tx approval...",
+    });
+    const [showClose, setShowClose] = useState(true);
+
+    const options = ["Approve", "Reject"];
+    const { getRootProps, getRadioProps } = useRadioGroup({
+        onChange: (v) => {
+            if (v === "Approve") {
+                setVoteChoice(1);
+            } else if (v == "Reject") {
+                setVoteChoice(0);
+            }
+        },
+    });
+
+    const group = getRootProps();
 
     useEffect(() => {
         const getProposalInfo = async (proposalID) => {
@@ -114,17 +125,8 @@ const ProposalDetail = () => {
         }
     }, [router.isReady]);
 
-    const options = ["Approve", "Reject"];
-    const { getRootProps, getRadioProps } = useRadioGroup();
-
-    const group = getRootProps();
-
     const formatTimestamp = (timestamp) => {
         return new Date((timestamp / 1e6) * 1000).toUTCString();
-    };
-
-    const handleCastVote = () => {
-        console.log();
     };
 
     const getEstimatedEnd = (proposalInfo) => {
@@ -140,6 +142,95 @@ const ProposalDetail = () => {
                 diff) *
                 1000
         ).toUTCString();
+    };
+
+    const submitVote = async () => {
+        setShowStatus(true);
+        const txObj = new IconBuilder.CallTransactionBuilder()
+            .from(userInfo.userAddress)
+            .to(pid)
+            .nid(cfg.NID)
+            .nonce(IconConverter.toBigNumber(1))
+            .version(IconConverter.toBigNumber(3))
+            .timestamp(new Date().getTime() * 1000)
+            .method("voteProposal")
+            .params({
+                id: IconConverter.toHexNumber(proposalID),
+                voteChoice: IconConverter.toHexNumber(voteChoice),
+            })
+            .build();
+
+        const estimatedSteps = IconConverter.toBigNumber(
+            await connection.debugService.estimateStep(txObj).execute()
+        );
+        console.log("estimatedSteps", estimatedSteps);
+
+        txObj.stepLimit = IconService.IconConverter.toHex(
+            estimatedSteps.plus(IconConverter.toBigNumber(10000)) // prevent out of step
+        );
+
+        const payload = {
+            jsonrpc: "2.0",
+            method: "icx_sendTransaction",
+            id: 6639,
+            params: IconConverter.toRawTransaction(txObj),
+        };
+
+        let rpcResponse = await connection.ICONexRequest(
+            "REQUEST_JSON-RPC",
+            payload
+        );
+
+        getTransactionResult(rpcResponse, 5);
+    };
+
+    const getTransactionResult = async (rpcResponse, maxRetry) => {
+        console.log("trying...", maxRetry);
+        if (rpcResponse.error) {
+            setShowClose(true);
+            setStatusInfo({
+                type: "failure",
+                title: "ooops",
+                desc: "your transaction was not approved",
+            });
+        } else {
+            try {
+                const txResult = await connection.iconService
+                    .getTransactionResult(rpcResponse.result)
+                    .execute();
+                if (txResult.status === 1) {
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "success",
+                        title: "success",
+                        desc: "your vote has been submitted!",
+                    });
+                } else {
+                    console.log("FAILED BOI", txResult);
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "failure",
+                        title: "ooops",
+                        desc: "your transaction has failed, please try again",
+                    });
+                }
+            } catch (err) {
+                if (maxRetry > 0) {
+                    setTimeout(
+                        () => getTransactionResult(rpcResponse, maxRetry - 1),
+                        2200
+                    );
+                } else {
+                    console.log(err);
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "failure",
+                        title: "ooops",
+                        desc: "your transaction has failed, please try again",
+                    });
+                }
+            }
+        }
     };
 
     return (
@@ -196,29 +287,65 @@ const ProposalDetail = () => {
                                     w="100%"
                                 >
                                     <Box color="white" w="100%">
-                                        <Text
-                                            fontWeight="bold"
-                                            fontSize="3xl"
-                                            mt="10px"
-                                        >
-                                            {Object.keys(proposalInfo).length >
-                                                0 && proposalInfo.info.title}
-                                        </Text>
-                                        <Flex
-                                            fontFamily="mono"
-                                            lineHeight={1}
-                                            color="#686868"
-                                        >
-                                            <Text>proposed by</Text>&nbsp;
-                                            <NextLink href={"google.com"}>
-                                                <Link color="#1e86ff">
+                                        <Flex justifyContent={"space-between"}>
+                                            <Box>
+                                                <Text
+                                                    fontWeight="bold"
+                                                    fontSize="3xl"
+                                                    mt="10px"
+                                                >
                                                     {Object.keys(proposalInfo)
                                                         .length > 0 &&
-                                                        proposalInfo.info
-                                                            .proposer}
-                                                </Link>
-                                            </NextLink>
+                                                        proposalInfo.info.title}
+                                                </Text>
+                                                <Flex
+                                                    fontFamily="mono"
+                                                    lineHeight={1}
+                                                    color="#686868"
+                                                >
+                                                    <Text>proposed by</Text>
+                                                    &nbsp;
+                                                    <NextLink
+                                                        href={"google.com"}
+                                                    >
+                                                        <Link color="#1e86ff">
+                                                            {Object.keys(
+                                                                proposalInfo
+                                                            ).length > 0 &&
+                                                                proposalInfo
+                                                                    .info
+                                                                    .proposer}
+                                                        </Link>
+                                                    </NextLink>
+                                                </Flex>
+                                            </Box>
+                                            {Object.keys(proposalInfo).length >
+                                                0 &&
+                                                proposalInfo.info
+                                                    .discussion && (
+                                                    <Box
+                                                        textAlign="right"
+                                                        alignSelf="center"
+                                                    >
+                                                        <NextLink
+                                                            href={
+                                                                proposalInfo
+                                                                    .info
+                                                                    .discussion
+                                                            }
+                                                        >
+                                                            <Button
+                                                                borderRadius="50px"
+                                                                color="black"
+                                                                fontSize="sm"
+                                                            >
+                                                                View Discussion
+                                                            </Button>
+                                                        </NextLink>
+                                                    </Box>
+                                                )}
                                         </Flex>
+
                                         <Text color="#8e8e8e" mt="25px">
                                             {Object.keys(proposalInfo).length >
                                                 0 &&
@@ -231,27 +358,21 @@ const ProposalDetail = () => {
                                             mt="25px"
                                             w="500px"
                                         >
-                                            <Text fontWeight={"bold"}>
+                                            <Text
+                                                fontWeight={"bold"}
+                                                fontSize="2xl"
+                                            >
                                                 Additional Information
                                             </Text>
                                             <Box>
                                                 <Flex justifyContent="space-between">
-                                                    <Text color="#8e8e8e">
-                                                        Discussion URL
-                                                    </Text>
-                                                    <Text noOfLines={1}>
-                                                        {Object.keys(
-                                                            proposalInfo
-                                                        ).length > 0 &&
-                                                            proposalInfo.info
-                                                                .discussion}
-                                                    </Text>
-                                                </Flex>
-                                                <Flex justifyContent="space-between">
-                                                    <Text color="#8e8e8e">
+                                                    <Text
+                                                        color="#c7c7c7"
+                                                        fontWeight="semibold"
+                                                    >
                                                         Start Timestamp
                                                     </Text>
-                                                    <Text>
+                                                    <Text color="#8e8e8e">
                                                         {Object.keys(
                                                             proposalInfo
                                                         ).length > 0 &&
@@ -264,10 +385,13 @@ const ProposalDetail = () => {
                                                 </Flex>
 
                                                 <Flex justifyContent="space-between">
-                                                    <Text color="#8e8e8e">
+                                                    <Text
+                                                        color="#c7c7c7"
+                                                        fontWeight="semibold"
+                                                    >
                                                         Estimated End Timestamp
                                                     </Text>
-                                                    <Text>
+                                                    <Text color="#8e8e8e">
                                                         {Object.keys(
                                                             proposalInfo
                                                         ).length > 0 &&
@@ -277,10 +401,13 @@ const ProposalDetail = () => {
                                                     </Text>
                                                 </Flex>
                                                 <Flex justifyContent="space-between">
-                                                    <Text color="#8e8e8e">
+                                                    <Text
+                                                        color="#c7c7c7"
+                                                        fontWeight="semibold"
+                                                    >
                                                         Snapshot Block
                                                     </Text>
-                                                    <Text>
+                                                    <Text color="#8e8e8e">
                                                         {Object.keys(
                                                             proposalInfo
                                                         ).length > 0 &&
@@ -313,14 +440,15 @@ const ProposalDetail = () => {
                                     borderRadius="15px"
                                     p="30px"
                                     bg="#0e0e0e"
-                                    border="1px solid var(--chakra-colors-blackAlpha-200);"
+                                    border="1px solid var(--chakra-colors-blackAlpha-50);"
                                     shadow="sm"
                                     display="inline-block"
+                                    w="100%"
                                 >
                                     <FormLabel color="white">
                                         Cast your vote
                                     </FormLabel>
-                                    <HStack spacing="25px" mt="25px" px="15px">
+                                    <VStack spacing="15px" mt="25px" px="15px">
                                         {options.map((value) => {
                                             const radio = getRadioProps({
                                                 value,
@@ -334,7 +462,7 @@ const ProposalDetail = () => {
                                                 </RadioCard>
                                             );
                                         })}
-                                    </HStack>
+                                    </VStack>
                                     <Box
                                         width="100%"
                                         textAlign="right"
@@ -343,10 +471,18 @@ const ProposalDetail = () => {
                                     >
                                         <Button
                                             variant="outside-button-rev"
-                                            w="100%"
-                                            onClick={handleCastVote}
+                                            onClick={submitVote}
+                                            disabled={
+                                                voteChoice === null
+                                                    ? true
+                                                    : false
+                                            }
+                                            _disabled={{
+                                                opacity: 1,
+                                                cursor: "not-allowed",
+                                            }}
                                         >
-                                            Submit Vote
+                                            Submit
                                         </Button>
                                     </Box>
                                 </Box>
@@ -355,6 +491,21 @@ const ProposalDetail = () => {
                     </Box>
                 </Box>
             </Box>
+            <CustomAlert
+                showStatus={showStatus}
+                onClose={() => {
+                    setShowStatus(false);
+                    setStatusInfo({
+                        type: "loading",
+                        title: "submitting vote",
+                        desc: "awaiting tx approval",
+                    }); //revert everything to default
+                }}
+                title={statusInfo.title}
+                desc={statusInfo.desc}
+                status={statusInfo.type}
+                showClose={showClose}
+            />
         </>
     );
 };

@@ -193,60 +193,6 @@ const ProjectDetails = () => {
         getTransactionResult(rpcResponse, 5);
     };
 
-    const formik = useFormik({
-        initialValues: {
-            description: "",
-            fundingGoal: "",
-            pricePerNFT: "",
-            withdrawalRate: "",
-            selectedRange: "",
-        },
-        validationSchema: Yup.object({
-            description: Yup.string()
-                .max(80, "Must be 80 characters or less")
-                .required("Required field"),
-            fundingGoal: Yup.number()
-                .positive("Must be a positive number")
-                .min(100, "Minimum funding goal is 100 ICX")
-                .required("Required field"),
-            pricePerNFT: Yup.number()
-                .positive("Must be a positive number")
-                .min(10, "Minimum price per NFT is 10 ICX")
-                .required("Required field"),
-            withdrawalRate: Yup.number().required("Required field"),
-            selectedRange: Yup.object().shape({
-                from: Yup.string().required("Required field"),
-                to: Yup.string().required("Required field"),
-            }),
-        }),
-        onSubmit: handleSave,
-    });
-
-    const handleUploadFile = (e) => {
-        if (e.target.files.length != 1) {
-            console.log("invalid length");
-            return;
-        }
-
-        var re = new RegExp("image/*");
-        const uploadedFile = e.target.files[0];
-        if (!re.test(uploadedFile.type)) {
-            console.log("invalid file type");
-            return;
-        }
-
-        // https://stackoverflow.com/questions/38049966/get-image-preview-before-uploading-in-react
-        const objectURL = URL.createObjectURL(uploadedFile);
-        // setThumbnailSrc(objectURL);
-        setPreviewInfo({
-            thumbnailSrc: objectURL,
-            shortDesc: previewInfo.shortDesc,
-        });
-
-        setToUpload(uploadedFile);
-        return () => URL.revokeObjectURL(objectURL);
-    };
-
     const getTransactionResult = async (rpcResponse, maxRetry) => {
         console.log("trying...", maxRetry);
         if (rpcResponse.error) {
@@ -324,7 +270,59 @@ const ProjectDetails = () => {
             }
         }
     };
+    const formik = useFormik({
+        initialValues: {
+            description: "",
+            fundingGoal: "",
+            pricePerNFT: "",
+            withdrawalRate: "",
+            selectedRange: "",
+        },
+        validationSchema: Yup.object({
+            description: Yup.string()
+                .max(80, "Must be 80 characters or less")
+                .required("Required field"),
+            fundingGoal: Yup.number()
+                .positive("Must be a positive number")
+                .min(100, "Minimum funding goal is 100 ICX")
+                .required("Required field"),
+            pricePerNFT: Yup.number()
+                .positive("Must be a positive number")
+                .min(10, "Minimum price per NFT is 10 ICX")
+                .required("Required field"),
+            withdrawalRate: Yup.number().required("Required field"),
+            selectedRange: Yup.object().shape({
+                from: Yup.string().required("Required field"),
+                to: Yup.string().required("Required field"),
+            }),
+        }),
+        onSubmit: handleSave,
+    });
 
+    const handleUploadFile = (e) => {
+        if (e.target.files.length != 1) {
+            console.log("invalid length");
+            return;
+        }
+
+        var re = new RegExp("image/*");
+        const uploadedFile = e.target.files[0];
+        if (!re.test(uploadedFile.type)) {
+            console.log("invalid file type");
+            return;
+        }
+
+        // https://stackoverflow.com/questions/38049966/get-image-preview-before-uploading-in-react
+        const objectURL = URL.createObjectURL(uploadedFile);
+        // setThumbnailSrc(objectURL);
+        setPreviewInfo({
+            thumbnailSrc: objectURL,
+            shortDesc: previewInfo.shortDesc,
+        });
+
+        setToUpload(uploadedFile);
+        return () => URL.revokeObjectURL(objectURL);
+    };
     const isInvalid = (key) => {
         if (key == "description") {
             return formik.touched.description && formik.errors.description;
