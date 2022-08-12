@@ -68,7 +68,7 @@ const ProjectGovernance = () => {
             console.log("React 18 Application Re-Rendering");
             const getProposals = async () => {
                 const call = new IconBuilder.CallBuilder()
-                    .method("getAllProposals")
+                    .method("getAllProposalInfo")
                     .to(pid)
                     .build();
                 let res = await connection.iconService.call(call).execute();
@@ -275,7 +275,10 @@ const ProjectGovernance = () => {
                                     </NextLink>
                                 )}
                             </Flex>
-                            <ProposalCollection proposalInfo={proposalInfo} />
+                            <ProposalCollection
+                                proposalInfo={proposalInfo}
+                                pid={pid}
+                            />
                         </Box>
                         <Box
                             width="100%"

@@ -17,6 +17,7 @@ import {
 } from "@chakra-ui/react";
 import IconService from "icon-sdk-js";
 import ICONexConnection from "../util/interact";
+import NextLink from "next/link";
 
 const {
     IconConverter,
@@ -27,8 +28,7 @@ const {
 } = IconService;
 
 const connection = new ICONexConnection();
-const ProposalCollection = ({ proposalInfo }) => {
-    console.log("proposalcol", proposalInfo);
+const ProposalCollection = ({ proposalInfo, pid }) => {
     const statusInfo = {
         0: {
             status: "Active",
@@ -76,10 +76,9 @@ const ProposalCollection = ({ proposalInfo }) => {
             <Table variant="simple">
                 <Thead>
                     <Tr>
-                        <Th>Date</Th>
-                        <Th>Description</Th>
-                        <Th>Vote Summary</Th>
-                        <Th>Status</Th>
+                        <Th w="45%">Title</Th>
+                        <Th w="35%">Vote Summary</Th>
+                        <Th w="20%"></Th>
                     </Tr>
                 </Thead>
                 <Tbody>
@@ -106,11 +105,35 @@ const ProposalCollection = ({ proposalInfo }) => {
                         return (
                             <Tr key={index}>
                                 <Td>
-                                    {formatTimestamp(
-                                        proposalInfo[index].startTimestamp
-                                    )}
+                                    <Box
+                                        borderRadius="5px"
+                                        px="15px"
+                                        py="5px"
+                                        mr="15px"
+                                        textAlign="center"
+                                        display="inline-block"
+                                        fontWeight="semibold"
+                                        fontSize="sm"
+                                        sx={
+                                            statusInfo[
+                                                parseInt(
+                                                    proposalInfo[index].info
+                                                        .status
+                                                )
+                                            ].theme
+                                        }
+                                    >
+                                        {
+                                            statusInfo[
+                                                parseInt(
+                                                    proposalInfo[index].info
+                                                        .status
+                                                )
+                                            ].status
+                                        }
+                                    </Box>
+                                    {proposalInfo[index].info.title}
                                 </Td>
-                                <Td>{proposalInfo[index].id}</Td>
                                 <Td>
                                     <Box
                                         bg="#D9D9D9"
@@ -134,26 +157,13 @@ const ProposalCollection = ({ proposalInfo }) => {
                                     </Box>
                                 </Td>
                                 <Td>
-                                    <Box
-                                        borderRadius="5px"
-                                        px="15px"
-                                        py="5px"
-                                        textAlign="center"
-                                        display="inline-block"
-                                        fontWeight="semibold"
-                                        fontSize="sm"
-                                        sx={
-                                            statusInfo[
-                                                proposalInfo[index].status
-                                            ].theme
-                                        }
+                                    <NextLink
+                                        href={`/governance/${pid}/${index}`}
                                     >
-                                        {
-                                            statusInfo[
-                                                proposalInfo[index].status
-                                            ].status
-                                        }
-                                    </Box>
+                                        <Button variant="outside-button">
+                                            View more
+                                        </Button>
+                                    </NextLink>
                                 </Td>
                             </Tr>
                         );

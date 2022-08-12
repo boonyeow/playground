@@ -21,6 +21,17 @@ import NextLink from "next/link";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { TiTick, TiTimes } from "react-icons/ti";
+import IconService from "icon-sdk-js";
+import ICONexConnection, { sleep } from "../../../util/interact";
+import { set } from "date-fns";
+
+const {
+    IconConverter,
+    IconBuilder,
+    HttpProvider,
+    SignedTransaction,
+    IconWallet,
+} = IconService;
 
 const RadioCard = (props) => {
     const { getInputProps, getCheckboxProps } = useRadio(props);
@@ -71,6 +82,7 @@ const RadioCard = (props) => {
 };
 
 const ProposalDetail = () => {
+    const connection = new ICONexConnection();
     const router = useRouter();
     const { pid, proposalID } = router.query;
     const [userInfo, setUserInfo] = useState({
@@ -81,12 +93,24 @@ const ProposalDetail = () => {
     const [proposalInfo, setProposalInfo] = useState({});
 
     useEffect(() => {
+        const getProposalInfo = async (proposalID) => {
+            const call = new IconBuilder.CallBuilder()
+                .from(null)
+                .to(pid)
+                .method("getProposalInfo")
+                .params({ id: IconConverter.toHexNumber(proposalID) })
+                .build();
+            let res = await connection.iconService.call(call).execute();
+            console.log("inenr", res);
+            setProposalInfo(res);
+        };
+
         const temp = localStorage.getItem("_persist");
         temp = temp == null ? userInfo : JSON.parse(temp);
         setUserInfo(temp);
 
-        const getProposalInfo = (proposalID) => {};
         if (router.isReady) {
+            getProposalInfo(proposalID);
         }
     }, [router.isReady]);
 
@@ -94,6 +118,29 @@ const ProposalDetail = () => {
     const { getRootProps, getRadioProps } = useRadioGroup();
 
     const group = getRootProps();
+
+    const formatTimestamp = (timestamp) => {
+        return new Date((timestamp / 1e6) * 1000).toUTCString();
+    };
+
+    const handleCastVote = () => {
+        console.log();
+    };
+
+    const getEstimatedEnd = (proposalInfo) => {
+        let startBlockHeight = IconConverter.toNumber(
+            proposalInfo.info.startBlockHeight
+        );
+        let endBlockHeight = IconConverter.toNumber(
+            proposalInfo.info.endBlockHeight
+        );
+        let diff = (endBlockHeight - startBlockHeight) * 2;
+        return new Date(
+            (IconConverter.toNumber(proposalInfo.info.startTimestamp) / 1e6 +
+                diff) *
+                1000
+        ).toUTCString();
+    };
 
     return (
         <>
@@ -154,7 +201,8 @@ const ProposalDetail = () => {
                                             fontSize="3xl"
                                             mt="10px"
                                         >
-                                            Adjust Withdrawal Rate
+                                            {Object.keys(proposalInfo).length >
+                                                0 && proposalInfo.info.title}
                                         </Text>
                                         <Flex
                                             fontFamily="mono"
@@ -164,33 +212,86 @@ const ProposalDetail = () => {
                                             <Text>proposed by</Text>&nbsp;
                                             <NextLink href={"google.com"}>
                                                 <Link color="#1e86ff">
-                                                    {pid}
+                                                    {Object.keys(proposalInfo)
+                                                        .length > 0 &&
+                                                        proposalInfo.info
+                                                            .proposer}
                                                 </Link>
                                             </NextLink>
                                         </Flex>
                                         <Text color="#8e8e8e" mt="25px">
-                                            This is an initial funding proposal
-                                            for the Gitcoin Product Collective
-                                            (GPC) Workstream requesting
-                                            ratification as a structured
-                                            workstream and budgetary funds for
-                                            Season 15 (1 August 2022 through 31
-                                            October 2022). The full governance
-                                            post can be found here:
-                                            https://gov.gitcoin.co/t/s15-proposal-gitcoin-product-collective-workstream-proposal-budget-request
+                                            {Object.keys(proposalInfo).length >
+                                                0 &&
+                                                proposalInfo.info.description}
                                         </Text>
                                         <Text textAlign="center">See more</Text>
 
-                                        <Box borderRadius="15px" mt="25px">
-                                            <Text fontWeight={"semibold"}>
+                                        <Box
+                                            borderRadius="15px"
+                                            mt="25px"
+                                            w="500px"
+                                        >
+                                            <Text fontWeight={"bold"}>
                                                 Additional Information
                                             </Text>
-                                            <Text color="#8e8e8e">
-                                                Start Block
-                                            </Text>
-                                            <Text color="#8e8e8e">
-                                                End Block
-                                            </Text>
+                                            <Box>
+                                                <Flex justifyContent="space-between">
+                                                    <Text color="#8e8e8e">
+                                                        Discussion URL
+                                                    </Text>
+                                                    <Text noOfLines={1}>
+                                                        {Object.keys(
+                                                            proposalInfo
+                                                        ).length > 0 &&
+                                                            proposalInfo.info
+                                                                .discussion}
+                                                    </Text>
+                                                </Flex>
+                                                <Flex justifyContent="space-between">
+                                                    <Text color="#8e8e8e">
+                                                        Start Timestamp
+                                                    </Text>
+                                                    <Text>
+                                                        {Object.keys(
+                                                            proposalInfo
+                                                        ).length > 0 &&
+                                                            formatTimestamp(
+                                                                proposalInfo
+                                                                    .info
+                                                                    .startTimestamp
+                                                            )}
+                                                    </Text>
+                                                </Flex>
+
+                                                <Flex justifyContent="space-between">
+                                                    <Text color="#8e8e8e">
+                                                        Estimated End Timestamp
+                                                    </Text>
+                                                    <Text>
+                                                        {Object.keys(
+                                                            proposalInfo
+                                                        ).length > 0 &&
+                                                            getEstimatedEnd(
+                                                                proposalInfo
+                                                            )}
+                                                    </Text>
+                                                </Flex>
+                                                <Flex justifyContent="space-between">
+                                                    <Text color="#8e8e8e">
+                                                        Snapshot Block
+                                                    </Text>
+                                                    <Text>
+                                                        {Object.keys(
+                                                            proposalInfo
+                                                        ).length > 0 &&
+                                                            IconConverter.toNumber(
+                                                                proposalInfo
+                                                                    .info
+                                                                    .endBlockHeight
+                                                            )}
+                                                    </Text>
+                                                </Flex>
+                                            </Box>
                                         </Box>
                                     </Box>
                                 </Box>
@@ -243,6 +344,7 @@ const ProposalDetail = () => {
                                         <Button
                                             variant="outside-button-rev"
                                             w="100%"
+                                            onClick={handleCastVote}
                                         >
                                             Submit Vote
                                         </Button>
