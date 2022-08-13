@@ -79,7 +79,7 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
         return `${daysDifference}D ${hoursDifference}H ${minutesDifference}m ${secondsDifference}s`;
     };
 
-    const currentTimestamp = new Date().getTime();
+
     // const src =
     //     projectInfo.thumbnailSrc == ""
     //         ? "/../../4.avif"
@@ -165,26 +165,24 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
                             <>
                                 <AdditionalInfo
                                     title="Price per NFT"
-                                    value={`${
-                                        projectInfo.pricePerNFT / 10 ** 18
-                                    } ICX`}
+                                    value={`${projectInfo.pricePerNFT / 10 ** 18
+                                        } ICX`}
                                 />
                                 <AdditionalInfo
                                     title="Funding Goal"
-                                    value={`${
-                                        projectInfo.fundingGoal / 10 ** 18
-                                    } ICX`}
+                                    value={`${projectInfo.fundingGoal / 10 ** 18
+                                        } ICX`}
                                 />
                                 {currentTimestamp -
                                     projectInfo.startTimestamp <=
-                                0 ? (
+                                    0 ? (
                                     <AdditionalInfo
                                         title="Starts In"
                                         value={formatTimestamp(startDifference)}
                                     />
                                 ) : projectInfo.endTimestamp -
-                                      currentTimestamp >=
-                                  0 ? (
+                                    currentTimestamp >=
+                                    0 ? (
                                     <AdditionalInfo
                                         title="Ends In"
                                         value={formatTimestamp(endDifference)}

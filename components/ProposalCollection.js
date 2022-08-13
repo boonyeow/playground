@@ -14,9 +14,18 @@ import {
     Th,
     Td,
     TableContainer,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    MenuItemOption,
+    MenuGroup,
+    MenuOptionGroup,
+    MenuDivider,
 } from "@chakra-ui/react";
 import IconService from "icon-sdk-js";
 import ICONexConnection from "../util/interact";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
 
 const {
@@ -29,6 +38,8 @@ const {
 
 const connection = new ICONexConnection();
 const ProposalCollection = ({ proposalInfo, pid }) => {
+    console.log(proposalInfo)
+    console.log(pid)
     const statusInfo = {
         0: {
             status: "Active",
@@ -71,6 +82,18 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
         return new Date((timestamp / 1e6) * 1000).toUTCString();
     };
 
+    const getlatestblockheight = async () => {
+        // Returns block information
+        const block = await IconService.getLastBlock().execute();
+        return block;
+    }
+    let latestblockheight = getlatestblockheight();
+    console.log(latestblockheight);
+
+    const check = (endbLockHeight, status, disagreePercentage) => {
+        //first check, if status = active
+
+    }
     return (
         <TableContainer>
             <Table variant="simple">
@@ -83,6 +106,12 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
                 </Thead>
                 <Tbody>
                     {Object.keys(proposalInfo).map((index) => {
+
+                        let endBlockHeight = IconConverter.toNumber(
+                            proposalInfo[index].info.endBlockHeight
+                        );
+                        console.log(endBlockHeight)
+
                         const totalVotes =
                             parseInt(proposalInfo[index].disagreeVotes) +
                             parseInt(proposalInfo[index].agreeVotes) +
@@ -157,20 +186,34 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
                                     </Box>
                                 </Td>
                                 <Td>
-                                    <NextLink
+                                    {/* <NextLink
                                         href={`/governance/${pid}/${index}`}
                                     >
                                         <Button variant="outside-button">
                                             View more
                                         </Button>
-                                    </NextLink>
+                                    </NextLink> */}
+                                    <Menu>
+                                        <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant='outside-button'>
+                                            Actions
+                                        </MenuButton>
+                                        <MenuList>
+                                            <NextLink
+                                                href={`/governance/${pid}/${index}`}
+                                            >
+                                                <MenuItem>View</MenuItem>
+                                            </NextLink>
+                                            <MenuItem>Execute</MenuItem>
+                                            <MenuItem>Cancel</MenuItem>
+                                        </MenuList>
+                                    </Menu>
                                 </Td>
                             </Tr>
                         );
                     })}
                 </Tbody>
             </Table>
-        </TableContainer>
+        </TableContainer >
     );
 };
 
