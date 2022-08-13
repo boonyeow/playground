@@ -38,8 +38,8 @@ const {
 
 const connection = new ICONexConnection();
 const ProposalCollection = ({ proposalInfo, pid }) => {
-    console.log(proposalInfo)
-    console.log(pid)
+    console.log(proposalInfo);
+    console.log(pid);
     const statusInfo = {
         0: {
             status: "Active",
@@ -84,16 +84,15 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
 
     const getlatestblockheight = async () => {
         // Returns block information
-        const block = await IconService.getLastBlock().execute();
+        const block = await connection.iconService.getLastBlock().execute();
         return block;
-    }
+    };
     let latestblockheight = getlatestblockheight();
     console.log(latestblockheight);
 
     const check = (endbLockHeight, status, disagreePercentage) => {
         //first check, if status = active
-
-    }
+    };
     return (
         <TableContainer>
             <Table variant="simple">
@@ -106,11 +105,10 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
                 </Thead>
                 <Tbody>
                     {Object.keys(proposalInfo).map((index) => {
-
                         let endBlockHeight = IconConverter.toNumber(
                             proposalInfo[index].info.endBlockHeight
                         );
-                        console.log(endBlockHeight)
+                        console.log(endBlockHeight);
 
                         const totalVotes =
                             parseInt(proposalInfo[index].disagreeVotes) +
@@ -194,7 +192,11 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
                                         </Button>
                                     </NextLink> */}
                                     <Menu>
-                                        <MenuButton as={Button} rightIcon={<ChevronDownIcon />} variant='outside-button'>
+                                        <MenuButton
+                                            as={Button}
+                                            rightIcon={<ChevronDownIcon />}
+                                            variant="outside-button"
+                                        >
                                             Actions
                                         </MenuButton>
                                         <MenuList>
@@ -213,7 +215,7 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
                     })}
                 </Tbody>
             </Table>
-        </TableContainer >
+        </TableContainer>
     );
 };
 
