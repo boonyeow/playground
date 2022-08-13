@@ -2,6 +2,7 @@ import {
     Box,
     Button,
     Flex,
+    Grid,
     Heading,
     HStack,
     Input,
@@ -22,6 +23,7 @@ import ICONexConnection from "../../util/interact";
 import Dispenser from "../../components/Dispenser";
 import dynamic from "next/dynamic";
 import Footer from "../../components/Footer";
+import SingleListing from "../../components/SingleListing";
 
 const FeaturedProject = dynamic(
     () => import("../../components/FeaturedProject"),
@@ -58,7 +60,7 @@ const ProjectDetail = () => {
         endTimestamp: "",
     });
 
-    const [contractBalance, setContractBalance] = useState(0);
+    const [totalSupply, setTotalSupply] = useState(0);
 
     useEffect(() => {
         const fetchProjectInfo = async () => {
@@ -82,17 +84,20 @@ const ProjectDetail = () => {
             setProjectInfo(pi);
         };
 
-        const getContractBalance = async () => {
-            const balance = await connection.iconService
-                .getBalance(pid)
-                .execute();
-            setContractBalance(IconConverter.toNumber(balance) / 10 ** 18);
+        const getTotalSupply = async () => {
+            const call = new IconBuilder.CallBuilder()
+                .from(null)
+                .to(pid)
+                .method("totalSupply")
+                .build();
+            let res = await connection.iconService.call(call).execute();
+            setTotalSupply(IconConverter.toNumber(res));
         };
 
         if (router.isReady) {
             //fetch contract data
             fetchProjectInfo();
-            getContractBalance();
+            getTotalSupply();
             const temp = localStorage.getItem("_persist");
             temp = temp == null ? userInfo : JSON.parse(temp);
             setUserInfo(temp);
@@ -133,11 +138,29 @@ const ProjectDetail = () => {
                                 />
                                 <Dispenser
                                     projectInfo={projectInfo}
-                                    contractBalance={contractBalance}
                                     pid={pid}
+                                    setTotalSupply={setTotalSupply}
                                 />
                             </SimpleGrid>
                         </Flex>
+
+                        <Box mt="25px">
+                            <Text fontWeight="semibold">Gallery</Text>
+
+                            <Grid
+                                templateColumns="repeat(5, 1fr)"
+                                templateRows="repeat(2, 1fr)"
+                                gap="25px"
+                                mt="15px"
+                            >
+                                {[...Array(totalSupply)].map((current, i) => (
+                                    <SingleListing
+                                        title={`${projectInfo.name} - ${i}`}
+                                        seed={pid}
+                                    ></SingleListing>
+                                ))}
+                            </Grid>
+                        </Box>
                     </Box>
                 </Box>
             </Box>

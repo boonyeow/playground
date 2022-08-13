@@ -126,6 +126,7 @@ const ProjectGovernance = () => {
                 setVoterInfo(res[0]);
                 setContractBalance(IconConverter.toNumber(res[1]));
 
+                console.log("res[2]", res[2]);
                 let pi = {
                     name: res[2].name,
                     thumbnailSrc: res[2].thumbnailSrc,
@@ -137,6 +138,9 @@ const ProjectGovernance = () => {
                         res[2].startTimestamp
                     ),
                     endTimestamp: IconConverter.toNumber(res[2].endTimestamp),
+                    withdrawalRate: IconConverter.toNumber(
+                        res[2].withdrawalRate
+                    ),
                 };
                 setProjectInfo(pi);
             });
@@ -146,42 +150,6 @@ const ProjectGovernance = () => {
             getTotalSupply();
         }
     }, [router.isReady]);
-
-    const test = async () => {
-        const txObj = new IconBuilder.CallTransactionBuilder()
-            .from(userInfo.userAddress)
-            .to(pid)
-            .nid(cfg.NID)
-            .nonce(IconConverter.toBigNumber(1))
-            .version(IconConverter.toBigNumber(3))
-            .timestamp(new Date().getTime() * 1000)
-            .method("createProposal")
-            .params({
-                startBlockHeight: IconConverter.toHexNumber(1000),
-            })
-            .build();
-        const estimatedSteps = IconConverter.toBigNumber(
-            await connection.debugService.estimateStep(txObj).execute()
-        );
-        console.log("estimatedSteps", estimatedSteps);
-
-        txObj.stepLimit = IconService.IconConverter.toHex(
-            estimatedSteps.plus(IconConverter.toBigNumber(10000)) // prevent out of step
-        );
-
-        const payload = {
-            jsonrpc: "2.0",
-            method: "icx_sendTransaction",
-            id: 6639,
-            params: IconConverter.toRawTransaction(txObj),
-        };
-
-        let rpcResponse = await connection.ICONexRequest(
-            "REQUEST_JSON-RPC",
-            payload
-        );
-        console.log(rpcResponse);
-    };
 
     return (
         <>
@@ -224,6 +192,7 @@ const ProjectGovernance = () => {
                                     projectInfo={projectInfo}
                                     addr={pid}
                                     actionLabel="View Activity"
+                                    contractBalance={contractBalance}
                                     isGovernance={true}
                                 />
                                 <HStack spacing="25px">

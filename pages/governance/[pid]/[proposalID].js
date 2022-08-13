@@ -12,6 +12,15 @@ import {
     HStack,
     Icon,
     VStack,
+    Grid,
+    GridItem,
+    Table,
+    Tr,
+    Th,
+    Td,
+    Thead,
+    TableContainer,
+    Tbody,
 } from "@chakra-ui/react";
 import Sidebar from "../../../components/Sidebar";
 import PageHeader from "../../../components/PageHeader";
@@ -23,8 +32,10 @@ import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { TiTick, TiTimes } from "react-icons/ti";
 import IconService from "icon-sdk-js";
 import ICONexConnection, { sleep } from "../../../util/interact";
+import { formatTimestamp, getEstimatedEnd } from "../../../util/helper";
 import cfg from "../../../util/config";
 import CustomAlert from "../../../components/CustomAlert";
+import VoterList from "../../../components/VoterList";
 const {
     IconConverter,
     IconBuilder,
@@ -45,11 +56,11 @@ const RadioCard = (props) => {
                 {...checkbox}
                 cursor="pointer"
                 borderRadius="15px"
+                border="1px solid #1c1c1c"
                 _checked={{
-                    // bg: "#1e86ff",
                     color: "white",
                     fontWeight: "bold",
-                    border: "1px solid #c3c3c3",
+                    borderColor: "#c3c3c3",
                 }}
                 px={5}
                 py={3}
@@ -70,6 +81,30 @@ const RadioCard = (props) => {
     );
 };
 
+const VotingProgressBar = ({ votePercentage, progressLabel }) => {
+    return (
+        <Box px="15px" mt="25px">
+            <Box
+                mt="15px"
+                height="5px"
+                w="100%"
+                bg="#303030"
+                borderRadius="15px"
+            >
+                <Box
+                    w={`${votePercentage}`}
+                    bg="white"
+                    h="100%"
+                    borderRadius="15px"
+                ></Box>
+            </Box>
+            <Text color="white" fontWeight="semibold" fontSize="sm" mt="5px">
+                {`${votePercentage}`} {progressLabel}
+            </Text>
+        </Box>
+    );
+};
+
 const ProposalDetail = () => {
     const connection = new ICONexConnection();
     const router = useRouter();
@@ -80,7 +115,13 @@ const ProposalDetail = () => {
     });
 
     const [proposalInfo, setProposalInfo] = useState({});
+    const [participationInfo, setParticipationInfo] = useState({});
     const [voteChoice, setVoteChoice] = useState(null);
+    const [progressBar, setProgressBar] = useState({
+        agree: 0,
+        disagree: 0,
+        noVotes: 0,
+    });
 
     const [showStatus, setShowStatus] = useState(false);
     const [statusInfo, setStatusInfo] = useState({
@@ -112,8 +153,28 @@ const ProposalDetail = () => {
                 .params({ id: IconConverter.toHexNumber(proposalID) })
                 .build();
             let res = await connection.iconService.call(call).execute();
-            console.log("inenr", res);
             setProposalInfo(res);
+
+            let a = IconConverter.toNumber(res.agreeVotes);
+            let d = IconConverter.toNumber(res.disagreeVotes);
+            let nv = IconConverter.toNumber(res.noVotes);
+            let total = a + d + nv;
+            setProgressBar({
+                agree: ((a / total) * 100).toFixed(),
+                disagree: ((d / total) * 100).toFixed(),
+                noVotes: ((nv / total) * 100).toFixed(),
+            });
+        };
+
+        const getParticipationInfo = async (proposalID) => {
+            const call = new IconBuilder.CallBuilder()
+                .from(null)
+                .to(pid)
+                .method("getParticipationInfo")
+                .params({ proposalID: IconConverter.toHexNumber(proposalID) })
+                .build();
+            let res = await connection.iconService.call(call).execute();
+            setParticipationInfo(res);
         };
 
         const temp = localStorage.getItem("_persist");
@@ -122,27 +183,9 @@ const ProposalDetail = () => {
 
         if (router.isReady) {
             getProposalInfo(proposalID);
+            getParticipationInfo(proposalID);
         }
     }, [router.isReady]);
-
-    const formatTimestamp = (timestamp) => {
-        return new Date((timestamp / 1e6) * 1000).toUTCString();
-    };
-
-    const getEstimatedEnd = (proposalInfo) => {
-        let startBlockHeight = IconConverter.toNumber(
-            proposalInfo.info.startBlockHeight
-        );
-        let endBlockHeight = IconConverter.toNumber(
-            proposalInfo.info.endBlockHeight
-        );
-        let diff = (endBlockHeight - startBlockHeight) * 2;
-        return new Date(
-            (IconConverter.toNumber(proposalInfo.info.startTimestamp) / 1e6 +
-                diff) *
-                1000
-        ).toUTCString();
-    };
 
     const submitVote = async () => {
         setShowStatus(true);
@@ -272,13 +315,13 @@ const ProposalDetail = () => {
                             </Text>
                         </Flex>
 
-                        <Flex>
-                            <Box
-                                width="100%"
-                                maxWidth="calc(100% / 3 * 2 - 12.5px)"
-                                mr="25px"
-                                mt="25px"
-                            >
+                        <Grid
+                            mt="25px"
+                            templateColumns="repeat(3, 1fr)"
+                            templateRows="repeat(2, 1fr)"
+                            gap="25px"
+                        >
+                            <GridItem colSpan={2} rowSpan={2}>
                                 <Box
                                     borderRadius="15px"
                                     p="50px"
@@ -306,7 +349,13 @@ const ProposalDetail = () => {
                                                     <Text>proposed by</Text>
                                                     &nbsp;
                                                     <NextLink
-                                                        href={"google.com"}
+                                                        href={
+                                                            (Object.keys(
+                                                                proposalInfo
+                                                            ).length > 0 &&
+                                                                `/profile/${proposalInfo.info.proposer}`) ||
+                                                            "#"
+                                                        }
                                                     >
                                                         <Link color="#1e86ff">
                                                             {Object.keys(
@@ -367,7 +416,7 @@ const ProposalDetail = () => {
                                             <Box>
                                                 <Flex justifyContent="space-between">
                                                     <Text
-                                                        color="#c7c7c7"
+                                                        color="white"
                                                         fontWeight="semibold"
                                                     >
                                                         Start Timestamp
@@ -386,7 +435,7 @@ const ProposalDetail = () => {
 
                                                 <Flex justifyContent="space-between">
                                                     <Text
-                                                        color="#c7c7c7"
+                                                        color="white"
                                                         fontWeight="semibold"
                                                     >
                                                         Estimated End Timestamp
@@ -397,12 +446,20 @@ const ProposalDetail = () => {
                                                         ).length > 0 &&
                                                             getEstimatedEnd(
                                                                 proposalInfo
+                                                                    .info
+                                                                    .startTimestamp,
+                                                                proposalInfo
+                                                                    .info
+                                                                    .startBlockHeight,
+                                                                proposalInfo
+                                                                    .info
+                                                                    .endBlockHeight
                                                             )}
                                                     </Text>
                                                 </Flex>
                                                 <Flex justifyContent="space-between">
                                                     <Text
-                                                        color="#c7c7c7"
+                                                        color="white"
                                                         fontWeight="semibold"
                                                     >
                                                         Snapshot Block
@@ -422,72 +479,151 @@ const ProposalDetail = () => {
                                         </Box>
                                     </Box>
                                 </Box>
-
+                            </GridItem>
+                            <GridItem colSpan={1} rowSpan={2}>
+                                <VStack spacing="25px">
+                                    <Box
+                                        borderRadius="15px"
+                                        p="30px"
+                                        bg="#0e0e0e"
+                                        border="1px solid var(--chakra-colors-blackAlpha-50);"
+                                        shadow="sm"
+                                        display="inline-block"
+                                        w="100%"
+                                    >
+                                        <FormLabel color="white">
+                                            Cast your vote
+                                        </FormLabel>
+                                        <VStack
+                                            spacing="15px"
+                                            mt="25px"
+                                            px="15px"
+                                        >
+                                            {options.map((value) => {
+                                                const radio = getRadioProps({
+                                                    value,
+                                                });
+                                                return (
+                                                    <RadioCard
+                                                        key={value}
+                                                        {...radio}
+                                                    >
+                                                        {value}
+                                                    </RadioCard>
+                                                );
+                                            })}
+                                        </VStack>
+                                        <Box
+                                            width="100%"
+                                            textAlign="right"
+                                            mt="25px"
+                                            px="15px"
+                                        >
+                                            <Button
+                                                variant="outside-button-rev"
+                                                onClick={submitVote}
+                                                disabled={
+                                                    voteChoice === null
+                                                        ? true
+                                                        : false
+                                                }
+                                                _disabled={{
+                                                    opacity: 1,
+                                                    cursor: "not-allowed",
+                                                }}
+                                            >
+                                                Submit
+                                            </Button>
+                                        </Box>
+                                    </Box>
+                                    <Box
+                                        borderRadius="15px"
+                                        p="30px"
+                                        bg="#0e0e0e"
+                                        border="1px solid var(--chakra-colors-blackAlpha-50);"
+                                        shadow="sm"
+                                        w="100%"
+                                    >
+                                        <FormLabel color="white">
+                                            Results
+                                        </FormLabel>
+                                        <VotingProgressBar
+                                            votePercentage={`${progressBar.agree}%`}
+                                            progressLabel="Approved"
+                                        />
+                                        <VotingProgressBar
+                                            votePercentage={`${progressBar.disagree}%`}
+                                            progressLabel="Rejected"
+                                        />
+                                        <VotingProgressBar
+                                            votePercentage={`${progressBar.noVotes}%`}
+                                            progressLabel="Not voted"
+                                        />
+                                    </Box>
+                                </VStack>
+                            </GridItem>
+                            <GridItem colSpan={2} rowSpan={1}>
                                 <Box
-                                    height="50px"
-                                    w="100%"
-                                    bg="#0e0e0e"
-                                    mt="25px"
                                     borderRadius="15px"
-                                ></Box>
-                            </Box>
-                            <Box
-                                maxWidth="calc(100% / 3 - 12.5px)"
-                                mt="25px"
-                                width="100%"
-                            >
-                                <Box
-                                    borderRadius="15px"
-                                    p="30px"
-                                    bg="#0e0e0e"
-                                    border="1px solid var(--chakra-colors-blackAlpha-50);"
-                                    shadow="sm"
-                                    display="inline-block"
+                                    p="30px 50px"
+                                    shadow="md"
+                                    bg="white"
                                     w="100%"
                                 >
-                                    <FormLabel color="white">
-                                        Cast your vote
-                                    </FormLabel>
-                                    <VStack spacing="15px" mt="25px" px="15px">
-                                        {options.map((value) => {
-                                            const radio = getRadioProps({
-                                                value,
-                                            });
-                                            return (
-                                                <RadioCard
-                                                    key={value}
-                                                    {...radio}
-                                                >
-                                                    {value}
-                                                </RadioCard>
-                                            );
-                                        })}
-                                    </VStack>
-                                    <Box
-                                        width="100%"
-                                        textAlign="right"
-                                        mt="25px"
-                                        px="15px"
-                                    >
-                                        <Button
-                                            variant="outside-button-rev"
-                                            onClick={submitVote}
-                                            disabled={
-                                                voteChoice === null
-                                                    ? true
-                                                    : false
-                                            }
-                                            _disabled={{
-                                                opacity: 1,
-                                                cursor: "not-allowed",
-                                            }}
-                                        >
-                                            Submit
-                                        </Button>
-                                    </Box>
+                                    <TableContainer mt="5px">
+                                        <Table>
+                                            <Thead>
+                                                <Tr>
+                                                    <Th>Address</Th>
+                                                    <Th>Votes</Th>
+                                                    <Th></Th>
+                                                </Tr>
+                                            </Thead>
+                                            <Tbody>
+                                                {Object.keys(
+                                                    participationInfo
+                                                ).map((outer, i) => {
+                                                    return Object.keys(
+                                                        participationInfo[outer]
+                                                    ).map((inner, j) => {
+                                                        return (
+                                                            <Tr>
+                                                                <Td
+                                                                    color="#3D5CC3"
+                                                                    fontWeight="semibold"
+                                                                >
+                                                                    <NextLink
+                                                                        href={`/profile/${inner}`}
+                                                                    >
+                                                                        {inner}
+                                                                    </NextLink>
+                                                                </Td>
+                                                                <Td>
+                                                                    {IconConverter.toNumber(
+                                                                        participationInfo[
+                                                                            outer
+                                                                        ][inner]
+                                                                    )}
+                                                                </Td>
+                                                                <Td>
+                                                                    {outer ==
+                                                                    "agree"
+                                                                        ? "Approved"
+                                                                        : outer ==
+                                                                          "disagree"
+                                                                        ? "Rejected"
+                                                                        : "No Vote"}
+                                                                </Td>
+                                                            </Tr>
+                                                        );
+                                                    });
+                                                })}
+                                            </Tbody>
+                                        </Table>
+                                    </TableContainer>
                                 </Box>
-                            </Box>
-                        </Flex>
+                            </GridItem>
+                        </Grid>
                     </Box>
                 </Box>
             </Box>

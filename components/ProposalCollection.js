@@ -18,10 +18,6 @@ import {
     MenuButton,
     MenuList,
     MenuItem,
-    MenuItemOption,
-    MenuGroup,
-    MenuOptionGroup,
-    MenuDivider,
 } from "@chakra-ui/react";
 import IconService from "icon-sdk-js";
 import ICONexConnection from "../util/interact";
@@ -76,10 +72,6 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
                 color: "#718096",
             },
         },
-    };
-
-    const formatTimestamp = (timestamp) => {
-        return new Date((timestamp / 1e6) * 1000).toUTCString();
     };
 
     const getlatestblockheight = async () => {

@@ -30,7 +30,13 @@ const AdditionalInfo = ({ title, value }) => {
     );
 };
 
-const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
+const FeaturedProject = ({
+    projectInfo,
+    addr,
+    actionLabel,
+    contractBalance,
+    isGovernance,
+}) => {
     const [endDifference, setEndDifference] = useState(
         projectInfo.endTimestamp - new Date().getTime()
     );
@@ -79,11 +85,7 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
         return `${daysDifference}D ${hoursDifference}H ${minutesDifference}m ${secondsDifference}s`;
     };
 
-
-    // const src =
-    //     projectInfo.thumbnailSrc == ""
-    //         ? "/../../4.avif"
-    //         : projectInfo.thumbnailSrc; // to remove;
+    const currentTimestamp = new Date().getTime();
 
     return (
         <Flex borderRadius="15px" p="30px" shadow="md" bg="#0e0e0e" w="100%">
@@ -154,35 +156,37 @@ const FeaturedProject = ({ projectInfo, addr, actionLabel, isGovernance }) => {
                             <>
                                 <AdditionalInfo
                                     title="Locked Balance"
-                                    value={`100 ICX`}
+                                    value={`${contractBalance / 10 ** 18} ICX`}
                                 />
                                 <AdditionalInfo
                                     title="Withdrawal Rate"
-                                    value={`100 ICX`}
+                                    value={`${projectInfo.withdrawalRate} ICX / sec`}
                                 />
                             </>
                         ) : (
                             <>
                                 <AdditionalInfo
                                     title="Price per NFT"
-                                    value={`${projectInfo.pricePerNFT / 10 ** 18
-                                        } ICX`}
+                                    value={`${
+                                        projectInfo.pricePerNFT / 10 ** 18
+                                    } ICX`}
                                 />
                                 <AdditionalInfo
                                     title="Funding Goal"
-                                    value={`${projectInfo.fundingGoal / 10 ** 18
-                                        } ICX`}
+                                    value={`${
+                                        projectInfo.fundingGoal / 10 ** 18
+                                    } ICX`}
                                 />
                                 {currentTimestamp -
                                     projectInfo.startTimestamp <=
-                                    0 ? (
+                                0 ? (
                                     <AdditionalInfo
                                         title="Starts In"
                                         value={formatTimestamp(startDifference)}
                                     />
                                 ) : projectInfo.endTimestamp -
-                                    currentTimestamp >=
-                                    0 ? (
+                                      currentTimestamp >=
+                                  0 ? (
                                     <AdditionalInfo
                                         title="Ends In"
                                         value={formatTimestamp(endDifference)}

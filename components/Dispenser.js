@@ -13,7 +13,8 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import IconService from "icon-sdk-js";
-import ICONexConnection, { numberWithCommas, sleep } from "../util/interact";
+import ICONexConnection from "../util/interact";
+import { numberWithCommas } from "../util/helper";
 import cfg from "../util/config";
 import CustomAlert from "./CustomAlert";
 
@@ -25,9 +26,10 @@ const {
     IconWallet,
 } = IconService;
 
-const Dispenser = ({ projectInfo, contractBalance, pid }) => {
+const Dispenser = ({ projectInfo, pid, setTotalSupply }) => {
     const connection = new ICONexConnection();
     const tbQuantity = useRef(null);
+    const [contractBalance, setContractBalance] = useState(0);
     let [campaignProgress, setCampaignProgress] = useState(0);
     let [totalPrice, setTotalPrice] = useState(0);
 
@@ -46,11 +48,31 @@ const Dispenser = ({ projectInfo, contractBalance, pid }) => {
     const [showClose, setShowClose] = useState(true);
 
     useEffect(() => {
+        const getContractBalance = async () => {
+            const balance = await connection.iconService
+                .getBalance(pid)
+                .execute();
+            setContractBalance(IconConverter.toNumber(balance) / 10 ** 18);
+        };
+
+        getContractBalance();
         const temp = localStorage.getItem("_persist");
         temp = temp == null ? userInfo : JSON.parse(temp);
         setUserInfo(temp);
-        setCampaignProgress(contractBalance / projectInfo.fundingGoal);
-    }, []);
+        setCampaignProgress(
+            (contractBalance / projectInfo.fundingGoal) * 10 ** 18 * 100
+        );
+    }, [projectInfo, contractBalance]);
+
+    const getTotalSupply = async () => {
+        const call = new IconBuilder.CallBuilder()
+            .from(null)
+            .to(pid)
+            .method("totalSupply")
+            .build();
+        let res = await connection.iconService.call(call).execute();
+        setTotalSupply(IconConverter.toNumber(res));
+    };
 
     const handleUpdatePrice = (e) => {
         setTotalPrice((projectInfo.pricePerNFT * e.target.value) / 10 ** 18);
@@ -115,6 +137,8 @@ const Dispenser = ({ projectInfo, contractBalance, pid }) => {
                     .getTransactionResult(rpcResponse.result)
                     .execute();
                 if (txResult.status === 1) {
+                    setContractBalance(contractBalance + totalPrice);
+                    getTotalSupply();
                     setShowClose(true);
                     setStatusInfo({
                         type: "success",
