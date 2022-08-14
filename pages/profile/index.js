@@ -44,11 +44,6 @@ const Profile = () => {
             setProjectList(res.data);
         };
 
-        const temp = localStorage.getItem("_persist");
-        temp = temp == null ? userInfo : JSON.parse(temp);
-        setUserInfo(temp);
-        fetchProjects();
-
         const getBalance = async (contractAddress) => {
             const call = new IconBuilder.CallBuilder()
                 .method("balanceOf")
@@ -58,23 +53,29 @@ const Profile = () => {
             return await connection.iconService.call(call).execute();
         };
 
-        if (projectList.length != 0) {
-            let counter = 0;
-            const involvedProjectsData = [];
+        if (userInfo.userAddress === 0) {
+            const temp = localStorage.getItem("_persist");
+            temp = temp == null ? userInfo : JSON.parse(temp);
+            setUserInfo(temp);
+            fetchProjects();
+        }
 
-            projectList.map((currentProject, index) => {
-                if (index != 0) {
-                    getBalance(currentProject.contractAddress).then((res) => {
-                        if (IconConverter.toNumber(res) > 0) {
-                            involvedProjectsData[counter] = JSON.parse(JSON.stringify(currentProject));
-                            counter++;
-                        }
-                    });
+        if (projectList.length > 0) {
+            const involvedProjectsData = [];
+            let promises = [];
+            for (var i = 0; i < projectList.length; i++) {
+                promises.push(getBalance(projectList[i].contractAddress));
+            }
+            Promise.all(promises).then((res) => {
+                for (var j = 0; j < res.length; j++) {
+                    if (IconConverter.toNumber(res[j]) > 0) {
+                        involvedProjectsData.push(projectList[j]);
+                    }
                 }
+                setInvolvedList(involvedProjectsData);
             });
-            setInvolvedList(involvedProjectsData);
-        };
-    }, []);
+        }
+    }, [projectList]);
 
     return (
         <>
@@ -103,24 +104,28 @@ const Profile = () => {
                             spacingY="20px"
                         >
                             {involvedProjects.length > 0 &&
-                                involvedProjects.map((currentProject, index) => {
-                                    return (
-                                        <>
+                                involvedProjects.map(
+                                    (currentProject, index) => {
+                                        return (
                                             <SingleListing
+                                                key={index}
                                                 title={currentProject.name}
-                                                src={currentProject.thumbnailSrc}
-                                                seed={currentProject.contractAddress}
+                                                src={
+                                                    currentProject.thumbnailSrc
+                                                }
+                                                seed={
+                                                    currentProject.contractAddress
+                                                }
                                             />
-                                        </>
-                                    )
-                                })
-                            }
+                                        );
+                                    }
+                                )}
                         </SimpleGrid>
                     </Box>
                 </Box>
             </Box>
         </>
-    )
-}
+    );
+};
 
-export default Profile
+export default Profile;

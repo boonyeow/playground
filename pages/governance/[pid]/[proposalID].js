@@ -131,7 +131,7 @@ const ProposalDetail = () => {
     });
     const [showClose, setShowClose] = useState(true);
 
-    const [showState,setShowState] = useState('more');
+    const [showState, setShowState] = useState("more");
     const textRef = useRef();
 
     const options = ["Approve", "Reject"];
@@ -321,183 +321,279 @@ const ProposalDetail = () => {
                         <Grid
                             mt="25px"
                             templateColumns="repeat(3, 1fr)"
-                            templateRows="repeat(2, 1fr)"
+                            templateRows="repeat(1, 1fr)"
                             gap="25px"
                         >
-                            <GridItem colSpan={2} rowSpan={2}>
-                                <Box
-                                    borderRadius="15px"
-                                    p="50px"
-                                    shadow="md"
-                                    bg="#0e0e0e"
-                                    w="100%"
-                                >
-                                    <Box color="white" w="100%">
-                                        <Flex justifyContent={"space-between"}>
-                                            <Box>
-                                                <Text
-                                                    fontWeight="bold"
-                                                    fontSize="3xl"
-                                                    mt="10px"
-                                                >
-                                                    {Object.keys(proposalInfo)
-                                                        .length > 0 &&
-                                                        proposalInfo.info.title}
-                                                </Text>
-                                                <Flex
-                                                    fontFamily="mono"
-                                                    lineHeight={1}
-                                                    color="#686868"
-                                                >
-                                                    <Text>proposed by</Text>
-                                                    &nbsp;
-                                                    <NextLink
-                                                        href={
-                                                            (Object.keys(
-                                                                proposalInfo
-                                                            ).length > 0 &&
-                                                                `/profile/${proposalInfo.info.proposer}`) ||
-                                                            "#"
-                                                        }
+                            <GridItem colSpan={2} rowSpan={1}>
+                                <VStack spacing="25px">
+                                    <Box
+                                        borderRadius="15px"
+                                        p="50px"
+                                        shadow="md"
+                                        bg="#0e0e0e"
+                                        w="100%"
+                                    >
+                                        <Box color="white" w="100%">
+                                            <Flex
+                                                justifyContent={"space-between"}
+                                            >
+                                                <Box>
+                                                    <Text
+                                                        fontWeight="bold"
+                                                        fontSize="3xl"
+                                                        mt="10px"
                                                     >
-                                                        <Link color="#1e86ff">
+                                                        {Object.keys(
+                                                            proposalInfo
+                                                        ).length > 0 &&
+                                                            proposalInfo.info
+                                                                .title}
+                                                    </Text>
+                                                    <Flex
+                                                        fontFamily="mono"
+                                                        lineHeight={1}
+                                                        color="#686868"
+                                                    >
+                                                        <Text>proposed by</Text>
+                                                        &nbsp;
+                                                        <NextLink
+                                                            href={
+                                                                (Object.keys(
+                                                                    proposalInfo
+                                                                ).length > 0 &&
+                                                                    `/profile/${proposalInfo.info.proposer}`) ||
+                                                                "#"
+                                                            }
+                                                        >
+                                                            <Link color="#1e86ff">
+                                                                {Object.keys(
+                                                                    proposalInfo
+                                                                ).length > 0 &&
+                                                                    proposalInfo
+                                                                        .info
+                                                                        .proposer}
+                                                            </Link>
+                                                        </NextLink>
+                                                    </Flex>
+                                                </Box>
+                                                {Object.keys(proposalInfo)
+                                                    .length > 0 &&
+                                                    proposalInfo.info
+                                                        .discussion && (
+                                                        <Box
+                                                            textAlign="right"
+                                                            alignSelf="center"
+                                                        >
+                                                            <NextLink
+                                                                href={
+                                                                    proposalInfo
+                                                                        .info
+                                                                        .discussion
+                                                                }
+                                                            >
+                                                                <Button
+                                                                    borderRadius="50px"
+                                                                    color="black"
+                                                                    fontSize="sm"
+                                                                >
+                                                                    View
+                                                                    Discussion
+                                                                </Button>
+                                                            </NextLink>
+                                                        </Box>
+                                                    )}
+                                            </Flex>
+
+                                            <Text
+                                                ref={textRef}
+                                                color="#8e8e8e"
+                                                mt="25px"
+                                                noOfLines={
+                                                    showState == "more" ? 4 : ""
+                                                }
+                                                li
+                                            >
+                                                {Object.keys(proposalInfo)
+                                                    .length > 0 &&
+                                                    proposalInfo.info
+                                                        .description}
+                                            </Text>
+                                            {Object.keys(proposalInfo).length >
+                                                0 &&
+                                                proposalInfo.info.description
+                                                    .length > 350 && (
+                                                    <Center>
+                                                        <Button
+                                                            variant="ghost"
+                                                            _hover={{
+                                                                color: "black",
+                                                                bg: "white",
+                                                            }}
+                                                            borderRadius="full"
+                                                            m="1rem"
+                                                            width="100px"
+                                                            onClick={() =>
+                                                                showState ==
+                                                                "more"
+                                                                    ? setShowState(
+                                                                          "less"
+                                                                      )
+                                                                    : setShowState(
+                                                                          "more"
+                                                                      )
+                                                            }
+                                                        >
+                                                            See {showState}
+                                                        </Button>
+                                                    </Center>
+                                                )}
+
+                                            <Box
+                                                borderRadius="15px"
+                                                mt="25px"
+                                                w="500px"
+                                            >
+                                                <Text
+                                                    fontWeight={"bold"}
+                                                    fontSize="2xl"
+                                                >
+                                                    Additional Information
+                                                </Text>
+                                                <Box>
+                                                    <Flex justifyContent="space-between">
+                                                        <Text
+                                                            color="white"
+                                                            fontWeight="semibold"
+                                                        >
+                                                            Start Timestamp
+                                                        </Text>
+                                                        <Text color="#8e8e8e">
                                                             {Object.keys(
                                                                 proposalInfo
                                                             ).length > 0 &&
-                                                                proposalInfo
-                                                                    .info
-                                                                    .proposer}
-                                                        </Link>
-                                                    </NextLink>
-                                                </Flex>
-                                            </Box>
-                                            {Object.keys(proposalInfo).length >
-                                                0 &&
-                                                proposalInfo.info
-                                                    .discussion && (
-                                                    <Box
-                                                        textAlign="right"
-                                                        alignSelf="center"
-                                                    >
-                                                        <NextLink
-                                                            href={
-                                                                proposalInfo
-                                                                    .info
-                                                                    .discussion
-                                                            }
+                                                                formatTimestamp(
+                                                                    proposalInfo
+                                                                        .info
+                                                                        .startTimestamp
+                                                                )}
+                                                        </Text>
+                                                    </Flex>
+
+                                                    <Flex justifyContent="space-between">
+                                                        <Text
+                                                            color="white"
+                                                            fontWeight="semibold"
                                                         >
-                                                            <Button
-                                                                borderRadius="50px"
-                                                                color="black"
-                                                                fontSize="sm"
-                                                            >
-                                                                View Discussion
-                                                            </Button>
-                                                        </NextLink>
-                                                    </Box>
-                                                )}
-                                        </Flex>
-
-                                        {/* <Text color="#8e8e8e" mt="25px">
-                                            {Object.keys(proposalInfo).length >
-                                                0 &&
-                                                proposalInfo.info.description}
-                                        </Text>
-                                        <Text textAlign="center">See more</Text> */}
-
-                                        <Text ref={textRef} color="#8e8e8e" mt="25px" noOfLines={showState == 'more' ? 4 : ''} li>
-                                            {Object.keys(proposalInfo).length >
-                                                0 &&
-                                                proposalInfo.info.description}
-                                        </Text>
-                                        {Object.keys(proposalInfo).length > 0 && 
-                                            proposalInfo.info.description.length > 350 &&
-                                            <Center>
-                                            <Button variant='ghost' _hover={{color:'black', bg:'white'}} borderRadius='full' m='1rem' width='100px' onClick={() => showState == 'more' ? setShowState('less') : setShowState('more')}>
-                                                See {showState}
-                                            </Button>
-                                            </Center>
-                                        }
-
-                                        <Box
-                                            borderRadius="15px"
-                                            mt="25px"
-                                            w="500px"
-                                        >
-                                            <Text
-                                                fontWeight={"bold"}
-                                                fontSize="2xl"
-                                            >
-                                                Additional Information
-                                            </Text>
-                                            <Box>
-                                                <Flex justifyContent="space-between">
-                                                    <Text
-                                                        color="white"
-                                                        fontWeight="semibold"
-                                                    >
-                                                        Start Timestamp
-                                                    </Text>
-                                                    <Text color="#8e8e8e">
-                                                        {Object.keys(
-                                                            proposalInfo
-                                                        ).length > 0 &&
-                                                            formatTimestamp(
+                                                            Estimated End
+                                                            Timestamp
+                                                        </Text>
+                                                        <Text color="#8e8e8e">
+                                                            {Object.keys(
                                                                 proposalInfo
-                                                                    .info
-                                                                    .startTimestamp
-                                                            )}
-                                                    </Text>
-                                                </Flex>
-
-                                                <Flex justifyContent="space-between">
-                                                    <Text
-                                                        color="white"
-                                                        fontWeight="semibold"
-                                                    >
-                                                        Estimated End Timestamp
-                                                    </Text>
-                                                    <Text color="#8e8e8e">
-                                                        {Object.keys(
-                                                            proposalInfo
-                                                        ).length > 0 &&
-                                                            getEstimatedEnd(
+                                                            ).length > 0 &&
+                                                                getEstimatedEnd(
+                                                                    proposalInfo
+                                                                        .info
+                                                                        .startTimestamp,
+                                                                    proposalInfo
+                                                                        .info
+                                                                        .startBlockHeight,
+                                                                    proposalInfo
+                                                                        .info
+                                                                        .endBlockHeight
+                                                                )}
+                                                        </Text>
+                                                    </Flex>
+                                                    <Flex justifyContent="space-between">
+                                                        <Text
+                                                            color="white"
+                                                            fontWeight="semibold"
+                                                        >
+                                                            Snapshot Block
+                                                        </Text>
+                                                        <Text color="#8e8e8e">
+                                                            {Object.keys(
                                                                 proposalInfo
-                                                                    .info
-                                                                    .startTimestamp,
-                                                                proposalInfo
-                                                                    .info
-                                                                    .startBlockHeight,
-                                                                proposalInfo
-                                                                    .info
-                                                                    .endBlockHeight
-                                                            )}
-                                                    </Text>
-                                                </Flex>
-                                                <Flex justifyContent="space-between">
-                                                    <Text
-                                                        color="white"
-                                                        fontWeight="semibold"
-                                                    >
-                                                        Snapshot Block
-                                                    </Text>
-                                                    <Text color="#8e8e8e">
-                                                        {Object.keys(
-                                                            proposalInfo
-                                                        ).length > 0 &&
-                                                            IconConverter.toNumber(
-                                                                proposalInfo
-                                                                    .info
-                                                                    .endBlockHeight
-                                                            )}
-                                                    </Text>
-                                                </Flex>
+                                                            ).length > 0 &&
+                                                                IconConverter.toNumber(
+                                                                    proposalInfo
+                                                                        .info
+                                                                        .endBlockHeight
+                                                                )}
+                                                        </Text>
+                                                    </Flex>
+                                                </Box>
                                             </Box>
                                         </Box>
+                                    </Box>{" "}
+                                    <Box
+                                        borderRadius="15px"
+                                        p="30px 50px"
+                                        shadow="md"
+                                        bg="white"
+                                        w="100%"
+                                    >
+                                        <TableContainer mt="5px">
+                                            <Table>
+                                                <Thead>
+                                                    <Tr>
+                                                        <Th>Address</Th>
+                                                        <Th>Votes</Th>
+                                                        <Th></Th>
+                                                    </Tr>
+                                                </Thead>
+                                                <Tbody>
+                                                    {Object.keys(
+                                                        participationInfo
+                                                    ).map((outer, i) => {
+                                                        return Object.keys(
+                                                            participationInfo[
+                                                                outer
+                                                            ]
+                                                        ).map((inner, j) => {
+                                                            return (
+                                                                <Tr>
+                                                                    <Td
+                                                                        color="#3D5CC3"
+                                                                        fontWeight="semibold"
+                                                                    >
+                                                                        <NextLink
+                                                                            href={`/profile/${inner}`}
+                                                                        >
+                                                                            {
+                                                                                inner
+                                                                            }
+                                                                        </NextLink>
+                                                                    </Td>
+                                                                    <Td>
+                                                                        {IconConverter.toNumber(
+                                                                            participationInfo[
+                                                                                outer
+                                                                            ][
+                                                                                inner
+                                                                            ]
+                                                                        )}
+                                                                    </Td>
+                                                                    <Td>
+                                                                        {outer ==
+                                                                        "agree"
+                                                                            ? "Approved"
+                                                                            : outer ==
+                                                                              "disagree"
+                                                                            ? "Rejected"
+                                                                            : "No Vote"}
+                                                                    </Td>
+                                                                </Tr>
+                                                            );
+                                                        });
+                                                    })}
+                                                </Tbody>
+                                            </Table>
+                                        </TableContainer>
                                     </Box>
-                                </Box>
+                                </VStack>
                             </GridItem>
-                            <GridItem colSpan={1} rowSpan={2}>
+                            <GridItem colSpan={1} rowSpan={1}>
                                 <VStack spacing="25px">
                                     <Box
                                         borderRadius="15px"
@@ -578,67 +674,6 @@ const ProposalDetail = () => {
                                         />
                                     </Box>
                                 </VStack>
-                            </GridItem>
-                            <GridItem colSpan={2} rowSpan={1}>
-                                <Box
-                                    borderRadius="15px"
-                                    p="30px 50px"
-                                    shadow="md"
-                                    bg="white"
-                                    w="100%"
-                                >
-                                    <TableContainer mt="5px">
-                                        <Table>
-                                            <Thead>
-                                                <Tr>
-                                                    <Th>Address</Th>
-                                                    <Th>Votes</Th>
-                                                    <Th></Th>
-                                                </Tr>
-                                            </Thead>
-                                            <Tbody>
-                                                {Object.keys(
-                                                    participationInfo
-                                                ).map((outer, i) => {
-                                                    return Object.keys(
-                                                        participationInfo[outer]
-                                                    ).map((inner, j) => {
-                                                        return (
-                                                            <Tr>
-                                                                <Td
-                                                                    color="#3D5CC3"
-                                                                    fontWeight="semibold"
-                                                                >
-                                                                    <NextLink
-                                                                        href={`/profile/${inner}`}
-                                                                    >
-                                                                        {inner}
-                                                                    </NextLink>
-                                                                </Td>
-                                                                <Td>
-                                                                    {IconConverter.toNumber(
-                                                                        participationInfo[
-                                                                            outer
-                                                                        ][inner]
-                                                                    )}
-                                                                </Td>
-                                                                <Td>
-                                                                    {outer ==
-                                                                    "agree"
-                                                                        ? "Approved"
-                                                                        : outer ==
-                                                                          "disagree"
-                                                                        ? "Rejected"
-                                                                        : "No Vote"}
-                                                                </Td>
-                                                            </Tr>
-                                                        );
-                                                    });
-                                                })}
-                                            </Tbody>
-                                        </Table>
-                                    </TableContainer>
-                                </Box>
                             </GridItem>
                         </Grid>
                     </Box>
