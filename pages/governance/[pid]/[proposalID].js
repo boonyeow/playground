@@ -1,6 +1,7 @@
 import {
     Box,
     Button,
+    Center,
     Flex,
     FormControl,
     FormLabel,
@@ -24,7 +25,7 @@ import {
 } from "@chakra-ui/react";
 import Sidebar from "../../../components/Sidebar";
 import PageHeader from "../../../components/PageHeader";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
 import { ChevronRightIcon } from "@chakra-ui/icons";
@@ -129,6 +130,9 @@ const ProposalDetail = () => {
         desc: "awaiting tx approval...",
     });
     const [showClose, setShowClose] = useState(true);
+
+    const [showState,setShowState] = useState('more');
+    const textRef = useRef();
 
     const options = ["Approve", "Reject"];
     const { getRootProps, getRadioProps } = useRadioGroup({
@@ -394,12 +398,26 @@ const ProposalDetail = () => {
                                                 )}
                                         </Flex>
 
-                                        <Text color="#8e8e8e" mt="25px">
+                                        {/* <Text color="#8e8e8e" mt="25px">
                                             {Object.keys(proposalInfo).length >
                                                 0 &&
                                                 proposalInfo.info.description}
                                         </Text>
-                                        <Text textAlign="center">See more</Text>
+                                        <Text textAlign="center">See more</Text> */}
+
+                                        <Text ref={textRef} color="#8e8e8e" mt="25px" noOfLines={showState == 'more' ? 4 : ''} li>
+                                            {Object.keys(proposalInfo).length >
+                                                0 &&
+                                                proposalInfo.info.description}
+                                        </Text>
+                                        {Object.keys(proposalInfo).length > 0 && 
+                                            proposalInfo.info.description.length > 350 &&
+                                            <Center>
+                                            <Button variant='ghost' _hover={{color:'black', bg:'white'}} borderRadius='full' m='1rem' width='100px' onClick={() => showState == 'more' ? setShowState('less') : setShowState('more')}>
+                                                See {showState}
+                                            </Button>
+                                            </Center>
+                                        }
 
                                         <Box
                                             borderRadius="15px"
