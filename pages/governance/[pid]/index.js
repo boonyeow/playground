@@ -247,6 +247,7 @@ const ProjectGovernance = () => {
                             <ProposalCollection
                                 proposalInfo={proposalInfo}
                                 pid={pid}
+                                userInfo={userInfo}
                             />
                         </Box>
                         <Box

@@ -23,6 +23,10 @@ import IconService from "icon-sdk-js";
 import ICONexConnection from "../util/interact";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import NextLink from "next/link";
+import { useEffect, useState } from "react";
+import CustomAlert from "./CustomAlert";
+import cfg from "../util/config";
+
 
 const {
     IconConverter,
@@ -33,10 +37,18 @@ const {
 } = IconService;
 
 const connection = new ICONexConnection();
-const ProposalCollection = ({ proposalInfo, pid }) => {
+const ProposalCollection = ({ proposalInfo, pid, userInfo }) => {
     console.log(proposalInfo);
-    console.log(pid);
-    const statusInfo = {
+    // const [lastblock, setLastBlock] = useState('');
+    const [showStatus, setShowStatus] = useState(false);
+    const [statusInfo, setStatusInfo] = useState({
+        type: "loading",
+        title: "executing proposal",
+        desc: "awaiting tx approval...",
+    });
+    const [showClose, setShowClose] = useState(true);
+
+    const statusInformation = {
         0: {
             status: "Active",
             theme: {
@@ -74,16 +86,151 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
         },
     };
 
-    const getlatestblockheight = async () => {
-        // Returns block information
-        const block = await connection.iconService.getLastBlock().execute();
-        return block;
-    };
-    let latestblockheight = getlatestblockheight();
-    console.log(latestblockheight);
+    // currently user need to refresh to get most updated proposal status
+    // useEffect(() => {
+    //     const getlatestblockheight = async () => {
+    //         // Returns block information
+    //         const block = await connection.iconService.getLastBlock().execute();
+    //         setLastBlock(block.height)
+    //     };
+    //     getlatestblockheight()
+    // }, []);
 
-    const check = (endbLockHeight, status, disagreePercentage) => {
-        //first check, if status = active
+    const executeProposal = async (event, proposalIndexInfo, index) => {
+
+        setShowStatus(true);
+        setShowClose(false);
+        if (parseInt(proposalIndexInfo.proposalType) == 1) {
+            let data = {};
+            data.withdrawalRate = proposalIndexInfo.withdrawalRate;
+            data.id = IconConverter.toHexNumber(index);
+
+            const txObj = new IconBuilder.CallTransactionBuilder()
+                .from(userInfo.userAddress)
+                .to(pid)
+                .nid(cfg.NID)
+                .nonce(IconConverter.toBigNumber(1))
+                .version(IconConverter.toBigNumber(3))
+                .timestamp(new Date().getTime() * 1000)
+                .method("changeWithdrawalRate")
+                .params(data)
+                .build();
+            console.log("txobj", txObj);
+            const estimatedSteps = IconConverter.toBigNumber(
+                await connection.debugService.estimateStep(txObj).execute()
+            );
+            console.log("estimatedSteps", estimatedSteps);
+
+            txObj.stepLimit = IconService.IconConverter.toHex(
+                estimatedSteps.plus(IconConverter.toBigNumber(10000)) // prevent out of step
+            );
+
+            const payload = {
+                jsonrpc: "2.0",
+                method: "icx_sendTransaction",
+                id: 6639,
+                params: IconConverter.toRawTransaction(txObj),
+            };
+
+            let rpcResponse = await connection.ICONexRequest(
+                "REQUEST_JSON-RPC",
+                payload
+            );
+
+            getTransactionResult(rpcResponse, 5);
+        }
+
+        // need to do for execution of refund proposal
+    };
+
+    const cancelProposal = async (event, index) => {
+
+        setStatusInfo({ type: "loading", title: "cancelling proposal", desc: "awaiting tx approval..." });
+        setShowStatus(true);
+        setShowClose(false);
+        const txObj = new IconBuilder.CallTransactionBuilder()
+            .from(userInfo.userAddress)
+            .to(pid)
+            .nid(cfg.NID)
+            .nonce(IconConverter.toBigNumber(1))
+            .version(IconConverter.toBigNumber(3))
+            .timestamp(new Date().getTime() * 1000)
+            .method("cancelProposal")
+            .params({
+                id: IconConverter.toHexNumber(index)
+            })
+            .build();
+        const estimatedSteps = IconConverter.toBigNumber(
+            await connection.debugService.estimateStep(txObj).execute()
+        );
+        console.log("estimatedSteps", estimatedSteps);
+
+        txObj.stepLimit = IconService.IconConverter.toHex(
+            estimatedSteps.plus(IconConverter.toBigNumber(10000)) // prevent out of step
+        );
+
+        const payload = {
+            jsonrpc: "2.0",
+            method: "icx_sendTransaction",
+            id: 6639,
+            params: IconConverter.toRawTransaction(txObj),
+        };
+
+        let rpcResponse = await connection.ICONexRequest(
+            "REQUEST_JSON-RPC",
+            payload
+        );
+
+        getTransactionResult(rpcResponse, 5);
+    };
+
+    const getTransactionResult = async (rpcResponse, maxRetry, values) => {
+        console.log("trying...", maxRetry);
+        if (rpcResponse.error) {
+            setShowClose(true);
+            setStatusInfo({
+                type: "failure",
+                title: "ooops",
+                desc: "your transaction was not approved",
+            });
+        } else {
+            try {
+                const txResult = await connection.iconService
+                    .getTransactionResult(rpcResponse.result)
+                    .execute();
+                if (txResult.status === 1) {
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "success",
+                        title: "success",
+                        desc: "your proposal has been executed!",
+                    });
+                } else {
+                    console.log("FAILED BOI", txResult);
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "failure",
+                        title: "ooops",
+                        desc: "your transaction has failed, please try again",
+                    });
+                }
+            } catch (err) {
+                if (maxRetry > 0) {
+                    setTimeout(
+                        () => getTransactionResult(rpcResponse, maxRetry - 1),
+                        2200
+                    );
+                } else {
+                    console.log(err);
+                    setShowClose(true);
+                    setStatusInfo({
+                        type: "failure",
+                        title: "ooops",
+                        desc: "your transaction has failed, please try again",
+                    });
+                }
+            }
+        }
     };
     return (
         <TableContainer>
@@ -97,11 +244,6 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
                 </Thead>
                 <Tbody>
                     {Object.keys(proposalInfo).map((index) => {
-                        let endBlockHeight = IconConverter.toNumber(
-                            proposalInfo[index].info.endBlockHeight
-                        );
-                        console.log(endBlockHeight);
-
                         const totalVotes =
                             parseInt(proposalInfo[index].disagreeVotes) +
                             parseInt(proposalInfo[index].agreeVotes) +
@@ -134,7 +276,7 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
                                         fontWeight="semibold"
                                         fontSize="sm"
                                         sx={
-                                            statusInfo[
+                                            statusInformation[
                                                 parseInt(
                                                     proposalInfo[index].info
                                                         .status
@@ -143,7 +285,7 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
                                         }
                                     >
                                         {
-                                            statusInfo[
+                                            statusInformation[
                                                 parseInt(
                                                     proposalInfo[index].info
                                                         .status
@@ -176,13 +318,6 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
                                     </Box>
                                 </Td>
                                 <Td>
-                                    {/* <NextLink
-                                        href={`/governance/${pid}/${index}`}
-                                    >
-                                        <Button variant="outside-button">
-                                            View more
-                                        </Button>
-                                    </NextLink> */}
                                     <Menu>
                                         <MenuButton
                                             as={Button}
@@ -191,15 +326,43 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
                                         >
                                             Actions
                                         </MenuButton>
-                                        <MenuList>
-                                            <NextLink
-                                                href={`/governance/${pid}/${index}`}
-                                            >
-                                                <MenuItem>View</MenuItem>
-                                            </NextLink>
-                                            <MenuItem>Execute</MenuItem>
-                                            <MenuItem>Cancel</MenuItem>
-                                        </MenuList>
+                                        {parseInt(proposalInfo[index].info.status) == 0 &&
+                                            <MenuList>
+                                                <NextLink
+                                                    href={`/governance/${pid}/${index}`}
+                                                >
+                                                    <MenuItem>View</MenuItem>
+                                                </NextLink>
+                                                <MenuItem
+                                                    onClick={event => cancelProposal(event, index)}
+                                                >Cancel</MenuItem>
+                                            </MenuList>
+                                        }
+                                        {parseInt(proposalInfo[index].info.status) == 1 &&
+                                            <MenuList>
+                                                <NextLink
+                                                    href={`/governance/${pid}/${index}`}
+                                                >
+                                                    <MenuItem>View</MenuItem>
+                                                </NextLink>
+                                                <MenuItem
+                                                    onClick={event => executeProposal(event, proposalInfo[index].info, index)}
+                                                >Execute</MenuItem>
+                                            </MenuList>
+                                        }
+                                        {console.log(IconConverter.toNumber(proposalInfo[index].info.status))}
+                                        {(IconConverter.toNumber(proposalInfo[index].info.status) === 2 || IconConverter.toNumber(proposalInfo[index].info.status) === 3 || IconConverter.toNumber(proposalInfo[index].info.status) === 4) &&
+                                            // {IconConverter.toNumber(proposalInfo[index].info.status) === 3 &&
+
+                                            <MenuList>
+                                                <NextLink
+                                                    href={`/governance/${pid}/${index}`}
+                                                >
+                                                    <MenuItem>View</MenuItem>
+                                                </NextLink>
+                                            </MenuList>
+                                        }
+
                                     </Menu>
                                 </Td>
                             </Tr>
@@ -207,7 +370,23 @@ const ProposalCollection = ({ proposalInfo, pid }) => {
                     })}
                 </Tbody>
             </Table>
+            <CustomAlert
+                showStatus={showStatus}
+                onClose={() => {
+                    setShowStatus(false);
+                    setStatusInfo({
+                        type: "loading",
+                        title: "executing proposal",
+                        desc: "awaiting tx approval",
+                    }); //revert everything to default
+                }}
+                title={statusInfo.title}
+                desc={statusInfo.desc}
+                status={statusInfo.type}
+                showClose={showClose}
+            />
         </TableContainer>
+
     );
 };
 

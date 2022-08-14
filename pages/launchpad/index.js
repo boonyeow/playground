@@ -81,7 +81,7 @@ const Launchpad = () => {
 
     return (
         <>
-            <Box maxWidth={"8xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
+            <Box maxWidth={"8xl"} width="100%" m="auto" minheight="100vh" py="2.5vh">
                 <Sidebar active="Launchpad" />
 
                 <Box
