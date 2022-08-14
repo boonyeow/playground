@@ -7,6 +7,11 @@ import {
     HStack,
     Input,
     SimpleGrid,
+    Tab,
+    TabList,
+    TabPanel,
+    TabPanels,
+    Tabs,
     Text,
     useNumberInput,
     VStack,
@@ -24,6 +29,7 @@ import Dispenser from "../../components/Dispenser";
 import dynamic from "next/dynamic";
 import Footer from "../../components/Footer";
 import SingleListing from "../../components/SingleListing";
+import { Prose } from "@nikolovlazar/chakra-ui-prose";
 
 const FeaturedProject = dynamic(
     () => import("../../components/FeaturedProject"),
@@ -145,21 +151,67 @@ const ProjectDetail = () => {
                         </Flex>
 
                         <Box mt="25px">
-                            <Text fontWeight="semibold">Gallery</Text>
-
-                            <Grid
-                                templateColumns="repeat(5, 1fr)"
-                                templateRows="repeat(2, 1fr)"
-                                gap="25px"
-                                mt="15px"
-                            >
-                                {[...Array(totalSupply)].map((current, i) => (
-                                    <SingleListing
-                                        title={`${projectInfo.name} - ${i}`}
-                                        seed={pid}
-                                    ></SingleListing>
-                                ))}
-                            </Grid>
+                            <Tabs>
+                                <TabList borderBottom="0">
+                                    <Tab
+                                        borderBottom="2px solid"
+                                        _selected={{
+                                            color: "#0e0e0e",
+                                            fontWeight: "semibold",
+                                            borderColor: "#0e0e0e",
+                                        }}
+                                    >
+                                        Gallery
+                                    </Tab>
+                                    <Tab
+                                        borderBottom="2px solid"
+                                        _selected={{
+                                            color: "#0e0e0e",
+                                            fontWeight: "semibold",
+                                            borderColor: "#0e0e0e",
+                                        }}
+                                    >
+                                        Overview
+                                    </Tab>
+                                </TabList>
+                                <TabPanels>
+                                    <TabPanel>
+                                        <Grid
+                                            templateColumns="repeat(5, 1fr)"
+                                            templateRows="repeat(2, 1fr)"
+                                            gap="25px"
+                                            mt="25px"
+                                        >
+                                            {[...Array(totalSupply)].map(
+                                                (current, i) => (
+                                                    <SingleListing
+                                                        key={i}
+                                                        title={`${projectInfo.name} - ${i}`}
+                                                        seed={pid}
+                                                    ></SingleListing>
+                                                )
+                                            )}
+                                        </Grid>
+                                    </TabPanel>
+                                    <TabPanel>
+                                        <Prose mt="25px">
+                                            <Box
+                                                bg="white"
+                                                borderRadius="15px"
+                                                h="100%"
+                                                w="100%"
+                                                px="50px"
+                                                pt="1px"
+                                                pb="26px"
+                                                shadow="lg"
+                                                dangerouslySetInnerHTML={{
+                                                    __html: projectInfo.details,
+                                                }}
+                                            ></Box>
+                                        </Prose>
+                                    </TabPanel>
+                                </TabPanels>
+                            </Tabs>
                         </Box>
                     </Box>
                 </Box>

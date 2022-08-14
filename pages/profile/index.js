@@ -15,10 +15,8 @@ import {
 import Sidebar from "../../components/Sidebar";
 import PageHeader from "../../components/PageHeader";
 import { useEffect, useState } from "react";
-import NftCollection from "../../components/NftCollection";
+import SingleListing from "../../components/SingleListing";
 import NextImage from "next/image";
-
-
 
 const Profile = () => {
     const [userInfo, setUserInfo] = useState({
@@ -57,18 +55,12 @@ const Profile = () => {
                             mt="15px"
                             width="100%"
                             spacingY="20px"
-                        >
-                            <NftCollection />
-                            <NftCollection />
-                            <NftCollection />
-                            <NftCollection />
-                            <NftCollection />
-                        </SimpleGrid>
+                        ></SimpleGrid>
                     </Box>
                 </Box>
             </Box>
         </>
-    )
-}
+    );
+};
 
-export default Profile
+export default Profile;

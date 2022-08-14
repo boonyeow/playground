@@ -35,7 +35,6 @@ import ICONexConnection, { sleep } from "../../../util/interact";
 import { formatTimestamp, getEstimatedEnd } from "../../../util/helper";
 import cfg from "../../../util/config";
 import CustomAlert from "../../../components/CustomAlert";
-import VoterList from "../../../components/VoterList";
 const {
     IconConverter,
     IconBuilder,

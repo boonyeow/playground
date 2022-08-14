@@ -43,6 +43,7 @@ const FeaturedProject = ({
     const [startDifference, setStartDifference] = useState(
         projectInfo.startTimestamp - new Date().getTime()
     );
+    const currentTimestamp = new Date().getTime();
     useEffect(() => {
         console.log("rendering");
         if (projectInfo && !isGovernance) {
@@ -85,8 +86,6 @@ const FeaturedProject = ({
         return `${daysDifference}D ${hoursDifference}H ${minutesDifference}m ${secondsDifference}s`;
     };
 
-    const currentTimestamp = new Date().getTime();
-
     return (
         <Flex borderRadius="15px" p="30px" shadow="md" bg="#0e0e0e" w="100%">
             <Box color="white" w="100%">
@@ -121,14 +120,6 @@ const FeaturedProject = ({
                                 style={{ borderRadius: "50px" }}
                             />
                         )}
-                        {/* <NextImage
-                            layout="responsive"
-                            objectFit="contain"
-                            width="100%"
-                            height="100%"
-                            src={src}
-                            style={{ borderRadius: "50px" }}
-                        /> */}
                     </Box>
                     <NextLink href={`/governance/${addr}`}>
                         <Button borderRadius="50px" color="black" fontSize="sm">
@@ -160,7 +151,9 @@ const FeaturedProject = ({
                                 />
                                 <AdditionalInfo
                                     title="Withdrawal Rate"
-                                    value={`${projectInfo.withdrawalRate} ICX / sec`}
+                                    value={`${
+                                        projectInfo.withdrawalRate / 10 ** 18
+                                    } ICX / sec`}
                                 />
                             </>
                         ) : (
