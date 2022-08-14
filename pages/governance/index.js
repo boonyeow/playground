@@ -8,23 +8,64 @@ import axios from "axios";
 import SkeletonProject from "../../components/SkeletonProject";
 import Footer from "../../components/Footer";
 import cfg from "../../util/config";
+import IconService from "icon-sdk-js";
+import ICONexConnection from "../../util/interact";
+
+const {
+    IconConverter,
+    IconBuilder,
+    HttpProvider,
+    SignedTransaction,
+    IconWallet,
+} = IconService;
+
 const Governance = () => {
+    const connection = new ICONexConnection();
     const [userInfo, setUserInfo] = useState({
         userAddress: 0,
         projectsDeployed: [],
     });
     const [projectList, setProjectList] = useState([]);
+    const [involvedProjects, setInvolvedList] = useState([]);
 
     useEffect(() => {
         const fetchProjects = async () => {
             let res = await axios.get(`${cfg.BASE_URL}/api/projects/fetch`);
             setProjectList(res.data);
         };
-        const temp = localStorage.getItem("_persist");
-        temp = temp == null ? userInfo : JSON.parse(temp);
-        setUserInfo(temp);
-        fetchProjects();
-    }, []);
+
+        const getBalance = async (contractAddress) => {
+            const call = new IconBuilder.CallBuilder()
+                .method("balanceOf")
+                .to(contractAddress)
+                .params({ _owner: userInfo.userAddress })
+                .build();
+            return await connection.iconService.call(call).execute();
+        };
+
+        if (userInfo.userAddress === 0) {
+            const temp = localStorage.getItem("_persist");
+            temp = temp == null ? userInfo : JSON.parse(temp);
+            setUserInfo(temp);
+            fetchProjects();
+        }
+
+        if (projectList.length > 0) {
+            const involvedProjectsData = [];
+            let promises = [];
+            for (var i = 0; i < projectList.length; i++) {
+                promises.push(getBalance(projectList[i].contractAddress));
+            }
+            Promise.all(promises).then((res) => {
+                for (var j = 0; j < res.length; j++) {
+                    if (IconConverter.toNumber(res[j]) > 0) {
+                        involvedProjectsData.push(projectList[j]);
+                    }
+                }
+                setInvolvedList(involvedProjectsData);
+            });
+        }
+    }, [projectList]);
 
     return (
         <>
@@ -52,14 +93,29 @@ const Governance = () => {
                             Participating DAOs
                         </Text>
                         <SimpleGrid spacingX="25px" spacingY="25px" columns="3">
-                            <Project
-                                title="Project Name"
-                                desc="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an"
-                                src="/../public/unnamed.jpg"
-                                actionLabel="View Activity"
-                                href={""}
-                                contractAddr=""
-                            />
+                            {involvedProjects.length > 0 &&
+                                involvedProjects.map(
+                                    (currentProject, index) => {
+                                        return (
+                                            <Project
+                                                title={currentProject.name}
+                                                desc={currentProject.description}
+                                                src={
+                                                    currentProject.thumbnailSrc
+                                                }
+                                                actionLabel="View Activity"
+                                                href={`governance/${currentProject.contractAddress}`}
+                                                contractAddr={
+                                                    currentProject.contractAddress
+                                                }
+                                            />
+                                        );
+                                    }
+                                )}
+                            {involvedProjects.length == 0 &&
+                                [0, 1, 2].map((n) => (
+                                    <SkeletonProject key={n} />
+                                ))}
                         </SimpleGrid>
                     </Box>
                     <Box w="100%" mt="15px">
