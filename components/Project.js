@@ -4,7 +4,6 @@ import NextLink from "next/link";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 
 const Project = ({ src, title, desc, actionLabel, href, contractAddr }) => {
-    //src = src == "" ? "/../../4.avif" : src; // to remove;
     return (
         <Flex
             mt="10px"

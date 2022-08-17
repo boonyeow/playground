@@ -146,7 +146,7 @@ const FeaturedProject = ({
                         {isGovernance ? (
                             <>
                                 <AdditionalInfo
-                                    title="Locked Balance"
+                                    title="Project Balance"
                                     value={`${contractBalance / 10 ** 18} ICX`}
                                 />
                                 <AdditionalInfo

@@ -3,7 +3,6 @@ import NextImage from "next/image";
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 
 const SingleListing = ({ title, src, seed }) => {
-    // src = "/../public/4.avif";
     return (
         <>
             <Flex w="full" alignItems="center" justifyContent="center">

@@ -27,7 +27,6 @@ import { useEffect, useState } from "react";
 import CustomAlert from "./CustomAlert";
 import cfg from "../util/config";
 
-
 const {
     IconConverter,
     IconBuilder,
@@ -97,7 +96,6 @@ const ProposalCollection = ({ proposalInfo, pid, userInfo }) => {
     // }, []);
 
     const executeProposal = async (event, proposalIndexInfo, index) => {
-
         setShowStatus(true);
         setShowClose(false);
         if (parseInt(proposalIndexInfo.proposalType) == 1) {
@@ -144,8 +142,11 @@ const ProposalCollection = ({ proposalInfo, pid, userInfo }) => {
     };
 
     const cancelProposal = async (event, index) => {
-
-        setStatusInfo({ type: "loading", title: "cancelling proposal", desc: "awaiting tx approval..." });
+        setStatusInfo({
+            type: "loading",
+            title: "cancelling proposal",
+            desc: "awaiting tx approval...",
+        });
         setShowStatus(true);
         setShowClose(false);
         const txObj = new IconBuilder.CallTransactionBuilder()
@@ -157,7 +158,7 @@ const ProposalCollection = ({ proposalInfo, pid, userInfo }) => {
             .timestamp(new Date().getTime() * 1000)
             .method("cancelProposal")
             .params({
-                id: IconConverter.toHexNumber(index)
+                id: IconConverter.toHexNumber(index),
             })
             .build();
         const estimatedSteps = IconConverter.toBigNumber(
@@ -326,7 +327,9 @@ const ProposalCollection = ({ proposalInfo, pid, userInfo }) => {
                                         >
                                             Actions
                                         </MenuButton>
-                                        {parseInt(proposalInfo[index].info.status) == 0 &&
+                                        {parseInt(
+                                            proposalInfo[index].info.status
+                                        ) == 0 && (
                                             <MenuList>
                                                 <NextLink
                                                     href={`/governance/${pid}/${index}`}
@@ -334,11 +337,20 @@ const ProposalCollection = ({ proposalInfo, pid, userInfo }) => {
                                                     <MenuItem>View</MenuItem>
                                                 </NextLink>
                                                 <MenuItem
-                                                    onClick={event => cancelProposal(event, index)}
-                                                >Cancel</MenuItem>
+                                                    onClick={(event) =>
+                                                        cancelProposal(
+                                                            event,
+                                                            index
+                                                        )
+                                                    }
+                                                >
+                                                    Cancel
+                                                </MenuItem>
                                             </MenuList>
-                                        }
-                                        {parseInt(proposalInfo[index].info.status) == 1 &&
+                                        )}
+                                        {parseInt(
+                                            proposalInfo[index].info.status
+                                        ) == 1 && (
                                             <MenuList>
                                                 <NextLink
                                                     href={`/governance/${pid}/${index}`}
@@ -346,12 +358,33 @@ const ProposalCollection = ({ proposalInfo, pid, userInfo }) => {
                                                     <MenuItem>View</MenuItem>
                                                 </NextLink>
                                                 <MenuItem
-                                                    onClick={event => executeProposal(event, proposalInfo[index].info, index)}
-                                                >Execute</MenuItem>
+                                                    onClick={(event) =>
+                                                        executeProposal(
+                                                            event,
+                                                            proposalInfo[index]
+                                                                .info,
+                                                            index
+                                                        )
+                                                    }
+                                                >
+                                                    Execute
+                                                </MenuItem>
                                             </MenuList>
-                                        }
-                                        {console.log(IconConverter.toNumber(proposalInfo[index].info.status))}
-                                        {(IconConverter.toNumber(proposalInfo[index].info.status) === 2 || IconConverter.toNumber(proposalInfo[index].info.status) === 3 || IconConverter.toNumber(proposalInfo[index].info.status) === 4) &&
+                                        )}
+                                        {console.log(
+                                            IconConverter.toNumber(
+                                                proposalInfo[index].info.status
+                                            )
+                                        )}
+                                        {(IconConverter.toNumber(
+                                            proposalInfo[index].info.status
+                                        ) === 2 ||
+                                            IconConverter.toNumber(
+                                                proposalInfo[index].info.status
+                                            ) === 3 ||
+                                            IconConverter.toNumber(
+                                                proposalInfo[index].info.status
+                                            ) === 4) && (
                                             // {IconConverter.toNumber(proposalInfo[index].info.status) === 3 &&
 
                                             <MenuList>
@@ -361,8 +394,7 @@ const ProposalCollection = ({ proposalInfo, pid, userInfo }) => {
                                                     <MenuItem>View</MenuItem>
                                                 </NextLink>
                                             </MenuList>
-                                        }
-
+                                        )}
                                     </Menu>
                                 </Td>
                             </Tr>
@@ -386,7 +418,6 @@ const ProposalCollection = ({ proposalInfo, pid, userInfo }) => {
                 showClose={showClose}
             />
         </TableContainer>
-
     );
 };
 

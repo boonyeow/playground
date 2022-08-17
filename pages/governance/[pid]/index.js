@@ -22,6 +22,7 @@ import ProposalCollection from "../../../components/ProposalCollection";
 import cfg from "../../../util/config";
 import HolderList from "../../../components/HolderList";
 import Footer from "../../../components/Footer";
+import Withdrawal from "../../../components/Withdrawal";
 
 const {
     IconConverter,
@@ -195,17 +196,10 @@ const ProjectGovernance = () => {
                                     contractBalance={contractBalance}
                                     isGovernance={true}
                                 />
-                                <HStack spacing="25px">
-                                    <Box
-                                        w="100%"
-                                        height="100%"
-                                        bg="black"
-                                        borderRadius="15px"
-                                        p="30px"
-                                    >
-                                        {contractBalance}
-                                    </Box>
-                                </HStack>
+                                <Withdrawal
+                                    projectInfo={projectInfo}
+                                    contractBalance={contractBalance}
+                                ></Withdrawal>
                             </SimpleGrid>
                         </Flex>
                         <Box
