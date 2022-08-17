@@ -197,8 +197,10 @@ const ProjectGovernance = () => {
                                     isGovernance={true}
                                 />
                                 <Withdrawal
+                                    userInfo={userInfo}
                                     projectInfo={projectInfo}
                                     contractBalance={contractBalance}
+                                    addr={pid}
                                 ></Withdrawal>
                             </SimpleGrid>
                         </Flex>
@@ -225,16 +227,13 @@ const ProjectGovernance = () => {
                                 {/* <Button onClick={test}> createetest</Button> */}
                                 {isOwner === true && (
                                     <NextLink href={`${pid}/create`}>
-                                        <Button
-                                            bg="transparent"
+                                        <Box
+                                            as="button"
                                             color="#3D5CC3"
-                                            _hover={{
-                                                bg: "blue.100",
-                                                color: "#000000",
-                                            }}
+                                            fontWeight="semibold"
                                         >
                                             Create Proposal
-                                        </Button>
+                                        </Box>
                                     </NextLink>
                                 )}
                             </Flex>

@@ -112,7 +112,13 @@ const ProjectDetail = () => {
 
     return (
         <>
-            <Box maxWidth={"8xl"} width="100%" m="auto" h="150vh" pt="2.5vh">
+            <Box
+                maxWidth={"8xl"}
+                width="100%"
+                m="auto"
+                minHeight="100vh"
+                pt="2.5vh"
+            >
                 <Sidebar active="Explore" />
                 <Box w="100%" h="100%" ml="75px" p="1.5rem 3rem 3rem 3rem">
                     <PageHeader
@@ -161,7 +167,7 @@ const ProjectDetail = () => {
                                             borderColor: "#0e0e0e",
                                         }}
                                     >
-                                        Gallery
+                                        Overview
                                     </Tab>
                                     <Tab
                                         borderBottom="2px solid"
@@ -171,10 +177,27 @@ const ProjectDetail = () => {
                                             borderColor: "#0e0e0e",
                                         }}
                                     >
-                                        Overview
+                                        Gallery
                                     </Tab>
                                 </TabList>
                                 <TabPanels>
+                                    <TabPanel>
+                                        <Prose mt="25px">
+                                            <Box
+                                                bg="white"
+                                                borderRadius="15px"
+                                                h="100%"
+                                                w="100%"
+                                                px="50px"
+                                                pt="1px"
+                                                pb="26px"
+                                                shadow="lg"
+                                                dangerouslySetInnerHTML={{
+                                                    __html: projectInfo.details,
+                                                }}
+                                            ></Box>
+                                        </Prose>
+                                    </TabPanel>
                                     <TabPanel>
                                         <Grid
                                             templateColumns="repeat(5, 1fr)"
@@ -192,23 +215,6 @@ const ProjectDetail = () => {
                                                 )
                                             )}
                                         </Grid>
-                                    </TabPanel>
-                                    <TabPanel>
-                                        <Prose mt="25px">
-                                            <Box
-                                                bg="white"
-                                                borderRadius="15px"
-                                                h="100%"
-                                                w="100%"
-                                                px="50px"
-                                                pt="1px"
-                                                pb="26px"
-                                                shadow="lg"
-                                                dangerouslySetInnerHTML={{
-                                                    __html: projectInfo.details,
-                                                }}
-                                            ></Box>
-                                        </Prose>
                                     </TabPanel>
                                 </TabPanels>
                             </Tabs>

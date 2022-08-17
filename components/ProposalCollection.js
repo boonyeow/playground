@@ -338,6 +338,18 @@ const ProposalCollection = ({ proposalInfo, pid, userInfo }) => {
                                                 </NextLink>
                                                 <MenuItem
                                                     onClick={(event) =>
+                                                        executeProposal(
+                                                            event,
+                                                            proposalInfo[index]
+                                                                .info,
+                                                            index
+                                                        )
+                                                    }
+                                                >
+                                                    Execute
+                                                </MenuItem>
+                                                <MenuItem
+                                                    onClick={(event) =>
                                                         cancelProposal(
                                                             event,
                                                             index

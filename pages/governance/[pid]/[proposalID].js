@@ -245,6 +245,25 @@ const ProposalDetail = () => {
                     .getTransactionResult(rpcResponse.result)
                     .execute();
                 if (txResult.status === 1) {
+                    const call = new IconBuilder.CallBuilder()
+                        .from(null)
+                        .to(pid)
+                        .method("getProposalInfo")
+                        .params({ id: IconConverter.toHexNumber(proposalID) })
+                        .build();
+                    let res = await connection.iconService.call(call).execute();
+                    setProposalInfo(res);
+
+                    let a = IconConverter.toNumber(res.agreeVotes);
+                    let d = IconConverter.toNumber(res.disagreeVotes);
+                    let nv = IconConverter.toNumber(res.noVotes);
+                    let total = a + d + nv;
+                    setProgressBar({
+                        agree: ((a / total) * 100).toFixed(),
+                        disagree: ((d / total) * 100).toFixed(),
+                        noVotes: ((nv / total) * 100).toFixed(),
+                    });
+
                     setShowClose(true);
                     setStatusInfo({
                         type: "success",
