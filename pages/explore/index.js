@@ -110,9 +110,9 @@ const Explore = () => {
                             <InputGroup>
                                 <InputLeftElement
                                     pointerEvents="none"
-                                    children={
-                                        <AiOutlineSearch color="gray.300" />
-                                    }
+                                    children={[
+                                        <AiOutlineSearch color="gray.300" />,
+                                    ]}
                                 />
                                 <Input
                                     placeholder="Search a project"
@@ -155,7 +155,7 @@ const Explore = () => {
                         {lastKey == undefined || lastKey == [] ? (
                             <Center w="100%" m="2.5rem">
                                 <Text fontWeight="semibold">
-                                    End of list! You've viewed{" "}
+                                    End of list! You&apos;ve viewed{" "}
                                     {Object.keys(projectList).length} projects.
                                 </Text>
                             </Center>

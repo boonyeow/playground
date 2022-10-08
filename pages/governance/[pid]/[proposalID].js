@@ -571,7 +571,9 @@ const ProposalDetail = () => {
                                                             ]
                                                         ).map((inner, j) => {
                                                             return (
-                                                                <Tr>
+                                                                <Tr
+                                                                    key={`${i}_${j}`}
+                                                                >
                                                                     <Td
                                                                         color="#3D5CC3"
                                                                         fontWeight="semibold"

@@ -22,7 +22,6 @@ import IconService from "icon-sdk-js";
 import ICONexConnection from "../../util/interact";
 import SkeletonProject from "../../components/SkeletonProject";
 
-
 const {
     IconConverter,
     IconBuilder,
@@ -123,9 +122,10 @@ const Profile = () => {
                                     }
                                 )}
                             {involvedProjects.length == 0 &&
-                                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((n) => (
-                                    <SkeletonProject key={n} />
-                                ))}
+                                [
+                                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                    13, 14,
+                                ].map((n) => <SkeletonProject key={n} />)}
                         </SimpleGrid>
                     </Box>
                 </Box>

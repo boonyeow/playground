@@ -101,10 +101,10 @@ const CollectionPage = () => {
                                 >
                                     Lorem Ipsum is simply dummy text of the
                                     printing and typesetting industry. Lorem
-                                    Ipsum has been the industry's standard Lorem
-                                    Ipsum is simply dummy text of the printing
-                                    and typesetting industry. Lorem Ipsum has
-                                    been the industry's standard
+                                    Ipsum has been the industry&apos;s standard
+                                    Lorem Ipsum is simply dummy text of the
+                                    printing and typesetting industry. Lorem
+                                    Ipsum has been the industry&apos;s standard
                                 </Text>
                             </Box>
                             <Box mt="1rem">

@@ -37,10 +37,11 @@ const DataTable = ({ columns, data }) => {
     return (
         <Table {...getTableProps()} variant="simple">
             <Thead>
-                {headerGroups.map((headerGroup) => (
-                    <Tr {...headerGroup.getHeaderGroupProps()}>
-                        {headerGroup.headers.map((column) => (
+                {headerGroups.map((headerGroup, index) => (
+                    <Tr key={index} {...headerGroup.getHeaderGroupProps()}>
+                        {headerGroup.headers.map((column, innerIndex) => (
                             <Th
+                                key={innerIndex}
                                 {...column.getHeaderProps(
                                     column.getSortByToggleProps()
                                 )}
@@ -62,12 +63,13 @@ const DataTable = ({ columns, data }) => {
                 ))}
             </Thead>
             <Tbody {...getTableBodyProps()}>
-                {rows.map((row) => {
+                {rows.map((row, index) => {
                     prepareRow(row);
                     return (
-                        <Tr {...row.getRowProps()}>
-                            {row.cells.map((cell) => (
+                        <Tr key={index} {...row.getRowProps()}>
+                            {row.cells.map((cell, innerIndex) => (
                                 <Td
+                                    key={innerIndex}
                                     {...cell.getCellProps()}
                                     isNumeric={cell.column.isNumeric}
                                 >

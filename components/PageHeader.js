@@ -187,7 +187,7 @@ const PageHeader = ({ title, userInfo, setUserInfo }) => {
                         pb={12}
                     >
                         <Stack w="100%">
-                            <Text>Don't have a wallet?</Text>
+                            <Text>Don&apos;t have a wallet?</Text>
                             <Button
                                 variant="homepage-button"
                                 onClick={() => {
