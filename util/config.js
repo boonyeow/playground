@@ -1,4 +1,4 @@
-const BASE_URL = "https://playground-nbose8rzx-boonyeow.vercel.app";
+const BASE_URL = "https://playground-boonyeow.vercel.app";
 const TRACKER_URL = "https://lisbon.tracker.solidwallet.io";
 const GOVERNANCE_ADDRESS = "cx0000000000000000000000000000000000000001";
 const SCORE_INSTALL_ADDRESS = "cx0000000000000000000000000000000000000000"; //"cx0000000000000000000000000000000000000000"; //"cxe3d8e3d3b365816c4523e06a86b57a3c6284c14b"; //
