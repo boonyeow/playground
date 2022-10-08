@@ -98,8 +98,11 @@ const Governance = () => {
                                     (currentProject, index) => {
                                         return (
                                             <Project
+                                                key={index}
                                                 title={currentProject.name}
-                                                desc={currentProject.description}
+                                                desc={
+                                                    currentProject.description
+                                                }
                                                 src={
                                                     currentProject.thumbnailSrc
                                                 }

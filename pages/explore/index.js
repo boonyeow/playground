@@ -108,12 +108,9 @@ const Explore = () => {
                     <Box w="100%" mt="15px">
                         <Box display="inline-flex">
                             <InputGroup>
-                                <InputLeftElement
-                                    pointerEvents="none"
-                                    children={[
-                                        <AiOutlineSearch color="gray.300" />,
-                                    ]}
-                                />
+                                <InputLeftElement pointerEvents="none">
+                                    <AiOutlineSearch color="gray.300" />
+                                </InputLeftElement>
                                 <Input
                                     placeholder="Search a project"
                                     borderRadius="15px"
