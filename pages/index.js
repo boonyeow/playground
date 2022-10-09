@@ -96,7 +96,7 @@ const Home = () => {
                                         color="white"
                                         fontWeight="semibold"
                                     >
-                                        Launchpad is an NFT-based crowdfunding
+                                        CROWD9 is an NFT-based crowdfunding
                                         platform for entrepreneurs, developers &
                                         creatives.
                                     </Text>
