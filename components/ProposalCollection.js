@@ -102,6 +102,8 @@ const ProposalCollection = ({ proposalInfo, pid, userInfo }) => {
             let data = {};
             data.withdrawalRate = proposalIndexInfo.withdrawalRate;
             data.id = IconConverter.toHexNumber(index);
+            data.amount = IconConverter.toHexNumber(10);
+            data.lastWithdrawn = IconConverter.toHexNumber(10);
 
             const txObj = new IconBuilder.CallTransactionBuilder()
                 .from(userInfo.userAddress)
@@ -330,59 +332,59 @@ const ProposalCollection = ({ proposalInfo, pid, userInfo }) => {
                                         {parseInt(
                                             proposalInfo[index].info.status
                                         ) == 0 && (
-                                            <MenuList>
-                                                <NextLink
-                                                    href={`/governance/${pid}/${index}`}
-                                                >
-                                                    <MenuItem>View</MenuItem>
-                                                </NextLink>
-                                                <MenuItem
-                                                    onClick={(event) =>
-                                                        executeProposal(
-                                                            event,
-                                                            proposalInfo[index]
-                                                                .info,
-                                                            index
-                                                        )
-                                                    }
-                                                >
-                                                    Execute
-                                                </MenuItem>
-                                                <MenuItem
-                                                    onClick={(event) =>
-                                                        cancelProposal(
-                                                            event,
-                                                            index
-                                                        )
-                                                    }
-                                                >
-                                                    Cancel
-                                                </MenuItem>
-                                            </MenuList>
-                                        )}
+                                                <MenuList>
+                                                    <NextLink
+                                                        href={`/governance/${pid}/${index}`}
+                                                    >
+                                                        <MenuItem>View</MenuItem>
+                                                    </NextLink>
+                                                    <MenuItem
+                                                        onClick={(event) =>
+                                                            executeProposal(
+                                                                event,
+                                                                proposalInfo[index]
+                                                                    .info,
+                                                                index
+                                                            )
+                                                        }
+                                                    >
+                                                        Execute
+                                                    </MenuItem>
+                                                    <MenuItem
+                                                        onClick={(event) =>
+                                                            cancelProposal(
+                                                                event,
+                                                                index
+                                                            )
+                                                        }
+                                                    >
+                                                        Cancel
+                                                    </MenuItem>
+                                                </MenuList>
+                                            )}
                                         {parseInt(
                                             proposalInfo[index].info.status
                                         ) == 1 && (
-                                            <MenuList>
-                                                <NextLink
-                                                    href={`/governance/${pid}/${index}`}
-                                                >
-                                                    <MenuItem>View</MenuItem>
-                                                </NextLink>
-                                                <MenuItem
-                                                    onClick={(event) =>
-                                                        executeProposal(
-                                                            event,
-                                                            proposalInfo[index]
-                                                                .info,
-                                                            index
-                                                        )
-                                                    }
-                                                >
-                                                    Execute
-                                                </MenuItem>
-                                            </MenuList>
-                                        )}
+                                                <MenuList>
+                                                    <NextLink
+                                                        href={`/governance/${pid}/${index}`}
+                                                    >
+                                                        <MenuItem>View</MenuItem>
+                                                    </NextLink>
+                                                    <MenuItem
+                                                        onClick={(event) =>
+                                                            executeProposal(
+                                                                event,
+                                                                proposalInfo[index]
+                                                                    .info,
+                                                                index
+                                                            )
+                                                        }
+                                                    >
+                                                        Execute
+                                                    </MenuItem>
+                                                </MenuList>
+                                            )}
                                         {console.log(
                                             IconConverter.toNumber(
                                                 proposalInfo[index].info.status
@@ -397,16 +399,16 @@ const ProposalCollection = ({ proposalInfo, pid, userInfo }) => {
                                             IconConverter.toNumber(
                                                 proposalInfo[index].info.status
                                             ) === 4) && (
-                                            // {IconConverter.toNumber(proposalInfo[index].info.status) === 3 &&
+                                                // {IconConverter.toNumber(proposalInfo[index].info.status) === 3 &&
 
-                                            <MenuList>
-                                                <NextLink
-                                                    href={`/governance/${pid}/${index}`}
-                                                >
-                                                    <MenuItem>View</MenuItem>
-                                                </NextLink>
-                                            </MenuList>
-                                        )}
+                                                <MenuList>
+                                                    <NextLink
+                                                        href={`/governance/${pid}/${index}`}
+                                                    >
+                                                        <MenuItem>View</MenuItem>
+                                                    </NextLink>
+                                                </MenuList>
+                                            )}
                                     </Menu>
                                 </Td>
                             </Tr>
